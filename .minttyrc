@@ -2,6 +2,7 @@ BoldAsFont=no
 Locale=ja_JP
 Charset=UTF-8
 Transparency=high
+OpaqueWhenFocused=yes
 CursorType=block
 CursorBlinks=no
 Font=Consolas
