@@ -1,0 +1,35 @@
+#!/bin/sh
+
+if [[ $UID -eq 0 ]]; then
+   echo "Why would you install your dotfiles as root? Silly."
+   exit 1;
+fi
+
+echo -n "Are you sure you want to install? This will overwrite your dotfiles in ~/. [yN] "
+read __R
+if [[ $__R != "y" ]]; then
+    echo "Aborting..."
+    exit 130;
+fi
+
+BASE=`basename $0`
+if [[ ! -f "./$BASE" ]]; then
+    echo "You must run this script from within the repository!"
+    exit 1;
+fi
+
+for FILE in $(ls -A); do
+    if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" ]]; then # Don't copy the installer or .git folder.
+	continue
+    fi
+    echo "Installing $FILE..."
+    cp -r "$FILE" ~/
+done
+
+echo "Done installing... tying up loose ends."
+if [ -d ".ssh" ]; then
+    echo "chmodding .ssh to 600"
+    chmod 600 ~/.ssh
+fi
+
+echo "Done!"

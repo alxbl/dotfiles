@@ -1,0 +1,29 @@
+#!/bin/sh
+ZSHCFG=~/.zsh
+ZSH=$ZSHCFG/oh-my-zsh
+
+# TODO: Load from file
+plugins=(archlinux django compleat git github ssh-agent mercurial pip python screen)
+setopt completealiases
+
+# Disable annoying auto-correct.
+if [[ -f $ZSHCFG/zsh_nocomp ]]; then
+    while read -r COMMAND; do
+        alias $COMMAND="nocorrect $COMMAND"
+    done < "$ZSHCFG/zsh_nocomp"
+fi
+
+# Load aliases
+if [[ -f $ZSHCFG/aliases ]]; then
+    source $ZSHCFG/aliases
+fi
+
+source $ZSH/oh-my-zsh.sh
+if [[ -f $ZSHCFG/zsh_theme ]]; then
+    source $ZSHCFG/zsh_theme
+fi
+
+# Useful exports
+export EDITOR=emacs
+export LANG="en_US.UTF-8"
+export LC_ALL="en_US.UTF-8"

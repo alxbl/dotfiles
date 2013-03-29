@@ -1,0 +1,8 @@
+#!/bin/sh
+# ---
+alias aliases='emacs ~/.zsh/aliases'
+alias zshrc='emacs ~/.zsh/zshrc'
+# ---
+
+alias ls='ls --color=auto'
+alias irssi='ssh segfault -t screen -U -rd'

@@ -1,0 +1,17 @@
+[user]
+	name = Alexandre Beaulieu
+	email = alxbl03@gmail.com
+
+[color]
+	status = auto
+	diff = auto
+	interactive = auto
+	branch = auto
+
+[alias]
+	st = status
+	co = checkout
+	com = commit
+
+[log]
+	date = local
