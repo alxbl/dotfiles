@@ -1,4 +1,4 @@
-bundle exec rspec
+bundle
 mv
 cp
 touch
