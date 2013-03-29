@@ -1,3 +1,6 @@
 [submodule ".zsh/oh-my-zsh"]
 	path = .zsh/oh-my-zsh
 	url = git@github.com:robbyrussell/oh-my-zsh.git
+[submodule ".emacs.d/themes/solarized"]
+	path = .emacs.d/themes/solarized
+	url = git@github.com:sellout/emacs-color-theme-solarized.git
