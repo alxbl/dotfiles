@@ -3,6 +3,7 @@
 
 ;; GENERIC
 (setq backup-directory-alist    '((".*" . "~/.trash"))) ; Avoid clutter
+(load "vendor")
 
 ;; THEMES (https://github.com/zellio/emacs-config/blob/master/config/theme.el)
 (unless (boundp 'custom-theme-load-path)
@@ -29,3 +30,4 @@
 
 ;; CONFIGURATION
 (load "utf-8")
+
