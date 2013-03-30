@@ -4,9 +4,12 @@
 [submodule ".emacs.d/themes/solarized"]
 	path = .emacs.d/themes/solarized
 	url = git@github.com:sellout/emacs-color-theme-solarized.git
-[submodule ".emacs.d/vendor/emacs-rails"]
-	path = .emacs.d/vendor/emacs-rails
-	url = git@github.com:dima-exe/emacs-rails-reloaded.git
 [submodule ".emacs.d/vendor/ruby-mode"]
 	path = .emacs.d/vendor/ruby-mode
 	url = git@github.com:qoobaa/ruby-mode.git
+[submodule ".emacs.d/vendor/inf-ruby"]
+	path = .emacs.d/vendor/inf-ruby
+	url = git@github.com:nonsequitur/inf-ruby.git
+[submodule ".emacs.d/vendor/rinari"]
+	path = .emacs.d/vendor/rinari
+	url = git@github.com:eschulte/rinari.git

@@ -1,8 +1,5 @@
 ;; PATH
-(add-to-list 'load-path "~/.emacs.d/")
-
-;; GENERIC
-(setq backup-directory-alist    '((".*" . "~/.trash"))) ; Avoid clutter
+(add-to-list 'load-path "~/.emacs.d/config")
 (load "vendor")
 
 ;; THEMES (https://github.com/zellio/emacs-config/blob/master/config/theme.el)
@@ -29,5 +26,8 @@
 
 
 ;; CONFIGURATION
+(load "env") ; Global environment settings
+(vendor 'inf-ruby)
+(vendor 'ruby-mode)
+(vendor 'rinari)
 (load "utf-8")
-
