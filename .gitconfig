@@ -15,3 +15,6 @@
 
 [log]
 	date = local
+
+[push]
+	default = simple
