@@ -3,10 +3,11 @@ mv
 cp
 touch
 scp
-rscyn
+rsync
 grep
 egrep
 fgrep
 ssh
 mosh
 man
+emacs

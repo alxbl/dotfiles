@@ -27,7 +27,12 @@
 
 ;; CONFIGURATION
 (load "env") ; Global environment settings
+
+; Ruby
 (vendor 'inf-ruby)
 (vendor 'ruby-mode)
 (vendor 'rinari)
+
+; Lua
+(vendor 'lua-mode)
 (load "utf-8")

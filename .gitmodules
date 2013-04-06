@@ -13,3 +13,6 @@
 [submodule ".emacs.d/vendor/rinari"]
 	path = .emacs.d/vendor/rinari
 	url = git@github.com:eschulte/rinari.git
+[submodule ".emacs.d/vendor/lua-mode"]
+	path = .emacs.d/vendor/lua-mode
+	url = git@github.com:immerrr/lua-mode.git
