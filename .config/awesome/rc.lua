@@ -431,3 +431,17 @@ end)
 client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
 -- }}}
+
+-- -----------------------------------------------------------------------------
+-- Autoload
+-- -----------------------------------------------------------------------------
+do
+  local cmds =
+  {
+    "redshift -l 0:0 -O 3700K",
+  }
+
+  for _,c in pairs(cmds) do
+     awful.util.spawn(c)
+  end
+end
