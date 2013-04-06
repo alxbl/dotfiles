@@ -1,5 +1,6 @@
 bundle
 mv
+mc
 cp
 touch
 scp
