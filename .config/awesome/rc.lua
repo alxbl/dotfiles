@@ -38,7 +38,7 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init("~/.config/awesome/themes/tarsonis/theme.lua")
+beautiful.init("/home/alex/.config/awesome/themes/solarized-dark/theme.lua")
 -- This is used later as the default terminal and editor to run.
 terminal = "sakura"
 editor = os.getenv("EDITOR") or "nano"

@@ -1,26 +1,26 @@
----------------------------
--- Default awesome theme --
----------------------------
+--------------------------------
+-- Solarized Dark for Awesome --
+--------------------------------
 
 theme = {}
 
 theme.font          = "droid sans 8"
 
-theme.bg_normal     = "#222222"
-theme.bg_focus      = "#535d6c"
-theme.bg_urgent     = "#ff0000"
-theme.bg_minimize   = "#444444"
+theme.bg_normal     = "#002b36" -- base03
+theme.bg_focus      = "#073642" -- base02
+theme.bg_urgent     = "#dc322f" -- red
+theme.bg_minimize   = theme.bg_normal -- base03
 theme.bg_systray    = theme.bg_normal
 
-theme.fg_normal     = "#aaaaaa"
-theme.fg_focus      = "#ffffff"
-theme.fg_urgent     = "#ffffff"
-theme.fg_minimize   = "#ffffff"
+theme.fg_normal     = "#586e75" -- base01
+theme.fg_focus      = "#657b83" -- base00
+theme.fg_urgent     = "#fdf6e3" -- base3
+theme.fg_minimize   = theme.fg_normal
 
 theme.border_width  = 1
-theme.border_normal = "#000000"
-theme.border_focus  = "#535d6c"
-theme.border_marked = "#91231c"
+theme.border_normal = "#586e75" -- base01
+theme.border_focus  = "#268bd2" -- blue
+theme.border_marked = "#d33682" -- magenta
 
 -- There are other variable sets
 -- overriding the default one when
@@ -72,7 +72,7 @@ theme.titlebar_maximized_button_focus_inactive  = "/usr/share/awesome/themes/def
 theme.titlebar_maximized_button_normal_active = "/usr/share/awesome/themes/default/titlebar/maximized_normal_active.png"
 theme.titlebar_maximized_button_focus_active  = "/usr/share/awesome/themes/default/titlebar/maximized_focus_active.png"
 
-theme.wallpaper = "~/.config/awesome/themes/tarsonis/Crush.png"
+theme.wallpaper = "/home/alex/.config/awesome/themes/solarized-dark/Crush.png"
 
 -- You can use your own layout icons like this:
 theme.layout_fairh = "/usr/share/awesome/themes/default/layouts/fairhw.png"

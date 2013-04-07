@@ -27,6 +27,8 @@ fi
 export EDITOR=emacs
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
+export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 
+# PATH
 export GEM_HOME=~/.gem/ruby/2.0.0
 export PATH=$PATH:$GEM_HOME/bin
