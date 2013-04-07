@@ -38,8 +38,7 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init("/usr/share/awesome/themes/default/theme.lua")
-beautiful.wallpaper = "~/.wallpaper.jpg"
+beautiful.init("~/.config/awesome/themes/tarsonis/theme.lua")
 -- This is used later as the default terminal and editor to run.
 terminal = "sakura"
 editor = os.getenv("EDITOR") or "nano"
