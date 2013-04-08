@@ -1,2 +1,28 @@
+! X11 Generic Things
+Xcursor.theme: whiteglass
+Xcursor.size:  22
 xterm*termName: xterm-256color
 xterm*locale: true
+
+! Font stuff
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
+URxvt.font: xft:Droid Sans Mono:size=10
+
+URxvt.urgentOnBell: true
+URxvt.scrollBar: false
+URxvt.scrollTtyOutput: true
+URxvt.scrollLines: 2000
+URxvt.letterSpace: -2
+
+! Open links
+URxvt.perl-ext-common: default,matcher
+URxvt.urlLauncher: chromium
+URxvt.matcher.button: 1
+
+
+! Color theme
+#include ".xresources.d/solarized/solarized"

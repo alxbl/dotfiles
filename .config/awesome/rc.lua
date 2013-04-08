@@ -38,9 +38,9 @@ end
 
 -- {{{ Variable definitions
 -- Themes define colours, icons, and wallpapers
-beautiful.init("/home/alex/.config/awesome/themes/solarized-dark/theme.lua")
+beautiful.init(os.getenv("HOME") .. "/.config/awesome/themes/solarized-dark/theme.lua")
 -- This is used later as the default terminal and editor to run.
-terminal = "sakura"
+terminal = "urxvt"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 
@@ -355,6 +355,13 @@ awful.rules.rules = {
     -- Set Firefox to always map on tags number 2 of screen 1.
     -- { rule = { class = "Firefox" },
     --   properties = { tag = tags[1][2] } },
+
+    -- Float fullscreen flash
+    { rule = { instance = "plugin-container" },
+      properties = { floating = true } },
+    { rule = { instance = "exe" },
+      properties = { floating = true } },
+
 }
 -- }}}
 

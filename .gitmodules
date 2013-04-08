@@ -16,3 +16,6 @@
 [submodule ".emacs.d/vendor/lua-mode"]
 	path = .emacs.d/vendor/lua-mode
 	url = git@github.com:immerrr/lua-mode.git
+[submodule ".xresources.d/solarized"]
+	path = .xresources.d/solarized
+	url = git@github.com:solarized/xresources.git
