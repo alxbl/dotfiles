@@ -23,6 +23,11 @@ if [[ -f $ZSHCFG/zsh_theme ]]; then
     source $ZSHCFG/zsh_theme
 fi
 
+# Load up colors
+if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
+    eval `dircolors $HOME/.xresources.d/dircolors`
+fi
+
 # Useful exports
 export EDITOR=emacs
 export LANG="en_US.UTF-8"
