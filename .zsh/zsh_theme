@@ -10,9 +10,9 @@ zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{11}%r'
 zstyle ':vcs_info:*' enable git svn hg
 theme_precmd () {
         if [[ -z $(git ls-files --other --exclude-standard 2> /dev/null) ]] {
-                zstyle ':vcs_info:*' formats ' [%b%c%u%B%F{green}]'
+                zstyle ':vcs_info:*' formats ' [%b%c%u%F{green}]'
         } else {
-                zstyle ':vcs_info:*' formats ' [%b%c%u%B%F{red}*%F{green}]'
+                zstyle ':vcs_info:*' formats ' [%b%c%u%F{red}*%F{green}]'
         }
         vcs_info
 }
@@ -20,7 +20,7 @@ theme_precmd () {
 setopt prompt_subst
 local user_color='blue'; [ $UID -eq 0 ] && user_color='red'
 local prompt_sign='$'; [ $UID -eq 0 ] && prompt_sign='#'
-PROMPT='%B%F{$user_color}%n@%m%{$reset_color%} %B%F{cyan}%~%B%F{green}${vcs_info_msg_0_}%B%F{magenta}%{$reset_color%} %B$prompt_sign%{$reset_color%} '
-RPROMPT="%(?..[%B%F{orange}%?%{$reset_color%}])"
+PROMPT='%F{$user_color}%n@%m%{$reset_color%} %F{cyan}%~%F{green}${vcs_info_msg_0_}%F{magenta} $prompt_sign%{$reset_color%} '
+RPROMPT="%(?..[%F{red}%?%{$reset_color%}])"
 autoload -U add-zsh-hook
 add-zsh-hook precmd theme_precmd
