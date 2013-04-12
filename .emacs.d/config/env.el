@@ -46,3 +46,5 @@
     (indent-for-tab-command)))
 
 (global-set-key (kbd "TAB") 'smart-indent)
+
+(global-linum-mode)
