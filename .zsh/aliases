@@ -5,4 +5,4 @@ alias zshrc='emacs ~/.zsh/zshrc'
 # ---
 
 alias ls='ls --color=auto'
-alias irssi='mosh segfault'
+alias irc='mosh segfault'
