@@ -36,4 +36,5 @@ export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 
 # PATH
 export GEM_HOME=~/.gem/ruby/2.0.0
-export PATH=$PATH:$GEM_HOME/bin
+export LOCAL_BIN=~/.bin
+export PATH=$LOCAL_BIN:$PATH:$GEM_HOME/bin
