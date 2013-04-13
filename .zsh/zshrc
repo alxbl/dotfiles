@@ -1,8 +1,10 @@
 #!/bin/sh
+export SHELL=zsh
+
 ZSHCFG=~/.zsh
 ZSH=$ZSHCFG/oh-my-zsh
 
-# TODO: Load from file
+#77;10102;0c TODO: Load from file
 plugins=(archlinux django compleat git github ssh-agent mercurial pip python screen)
 setopt completealiases
 

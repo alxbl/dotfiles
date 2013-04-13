@@ -18,6 +18,9 @@ if [[ ! -f "./$BASE" ]]; then
     exit 1;
 fi
 
+echo "Updating submodules..."
+git submodule update --init --recursive
+
 for FILE in $(ls -A); do
     if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" ]]; then # Don't copy the installer or .git folder.
 	continue
