@@ -18,18 +18,27 @@ if [[ ! -f "./$BASE" ]]; then
     exit 1;
 fi
 
+echo ">> Updating submodules"
+git submodule update --init --recursive
+
+echo ">> Deploying dotfiles"
 for FILE in $(ls -A); do
     if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" ]]; then # Don't copy the installer or .git folder.
 	continue
     fi
-    echo "Installing $FILE..."
-    cp -r "$FILE" ~/
+
+    if [[ -f "$HOME/$FILE" || -d "$HOME/$FILE" ]]; then
+        echo "  +Update:  $FILE"
+    else
+        echo "  +Install: $FILE"
+    fi
+    cp -r -u "$FILE" ~/
 done
 
-echo "Done installing... tying up loose ends."
+echo ">> Done copying files. Post-install routine"
 if [ -d ".ssh" ]; then
-    echo "chmodding .ssh to 700"
+    echo "  +chmod: .ssh (700)"
     chmod 700 ~/.ssh
 fi
 
-echo "Done!"
+echo ">> Done!"

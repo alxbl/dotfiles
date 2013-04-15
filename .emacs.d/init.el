@@ -28,11 +28,12 @@
 ;; CONFIGURATION
 (load "env") ; Global environment settings
 
-; Ruby
-(vendor 'inf-ruby)
+(vendor 'yasnippet) ; Snippets
+(yas-global-mode 1)
+
+(vendor 'inf-ruby) ; Ruby
 (vendor 'ruby-mode)
 (vendor 'rinari)
 
-; Lua
-(vendor 'lua-mode)
+(vendor 'lua-mode) ; Lua
 (load "utf-8")
