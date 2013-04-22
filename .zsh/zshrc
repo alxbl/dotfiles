@@ -1,10 +1,9 @@
 #!/bin/sh
-export SHELL=zsh
 
 ZSHCFG=~/.zsh
 ZSH=$ZSHCFG/oh-my-zsh
 
-#77;10102;0c TODO: Load from file
+#TODO: Load from file
 plugins=(archlinux django compleat git github ssh-agent mercurial pip python screen)
 setopt completealiases
 
@@ -39,4 +38,4 @@ export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 # PATH
 export GEM_HOME=~/.gem/ruby/2.0.0
 export LOCAL_BIN=~/.bin
-export PATH=$LOCAL_BIN:$PATH:$GEM_HOME/bin
+export PATH=$PATH:$GEM_HOME/bin:$LOCAL_BIN
