@@ -14,6 +14,7 @@
     (dolist (theme themes)
       (unless (string= "." (substring theme 0 1))
         (add-to-list 'custom-theme-load-path (concat theme-dir "/" theme))))))
+
 ;; SHA256 for "safe" theme load
 (dolist (hash '(
   ;; Solarized Dark
@@ -34,6 +35,9 @@
 (vendor 'inf-ruby) ; Ruby
 (vendor 'ruby-mode)
 (vendor 'rinari)
+
+(vendor 'ido-mode) ; IDO
+(ido-mode t)
 
 (vendor 'lua-mode) ; Lua
 (load "utf-8")
