@@ -39,3 +39,8 @@ export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 export GEM_HOME=~/.gem/ruby/2.0.0
 export LOCAL_BIN=~/.bin
 export PATH=$PATH:$GEM_HOME/bin:$LOCAL_BIN
+
+# No idea why Cygwin doesn't do that by itself...
+if [ -n "$COMSPEC" -a -x "$COMSPEC" ]; then
+    export PATH=$PATH:/usr/local/bin
+fi
