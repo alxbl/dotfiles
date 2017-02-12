@@ -123,7 +123,7 @@ local mytitlebar= wibox.widget {
     widget = wibox.widget.textbox
 }
 -- Connect events.
-client.connect_signal("focus", function (c) mytitlebar.markup = c.class .. ": " .. c.name end)
+client.connect_signal("focus", function (c) mytitlebar.markup = c.class .. ": " .. (c.name or "") end)
 client.connect_signal("unfocus", function (c) mytitlebar.markup = "Awesome: press Win-s for help" end)
 client.connect_signal("property::name", function(c)
     if c == client.focus then -- Only update when the signal comes from the focused client.
