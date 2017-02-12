@@ -5,7 +5,7 @@ if [[ $UID -eq 0 ]]; then
    exit 1;
 fi
 
-echo -n "Are you sure you want to install? This will overwrite your dotfiles in ~/. [yN] "
+echo -n "Are you sure you want to install? This will overwrite any existing tracked dotfile in ~/. [yN] "
 read __R
 if [[ $__R != "y" ]]; then
     echo "Aborting..."
@@ -22,8 +22,12 @@ echo ">> Updating submodules"
 git submodule update --init --recursive
 
 echo ">> Deploying dotfiles"
+
+DST=$(pwd)
+FILES=$(ls -A)
+
 for FILE in $(ls -A); do
-    if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" ]]; then # Don't copy the installer or .git folder.
+    if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" || $FILE == ".gitignore" ]]; then # Don't copy the installer or .git folder.
 	continue
     fi
 
@@ -32,13 +36,13 @@ for FILE in $(ls -A); do
     else
         echo "  +Install: $FILE"
     fi
-    cp -r -u "$FILE" ~/
+    ln -f -s "$DST/$FILE" "$HOME/$FILE"
 done
 
-echo ">> Done copying files. Post-install routine"
-if [ -d ".ssh" ]; then
-    echo "  +chmod: .ssh (700)"
-    chmod 700 ~/.ssh
-fi
+#echo ">> Done copying files. Post-install routine"
+#if [ -d ".ssh" ]; then
+#    echo "  +chmod: .ssh (700)"
+#    chmod 700 ~/.ssh
+#fi
 
 echo ">> Done!"

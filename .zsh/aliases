@@ -1,8 +1,11 @@
 #!/bin/sh
 # ---
+alias rzshrc='source ~/.zshrc'
 alias aliases='emacs ~/.zsh/aliases'
 alias zshrc='emacs ~/.zsh/zshrc'
 # ---
-
 alias ls='ls --color=auto'
 alias irc='mosh segfault'
+alias code='visual-studio-code-oss'
+alias farcast='ssh -L 4444:localhost:30303 moria'
+alias genetec='rdesktop -g 1920x1080 -P -z -u abeaulieu -d GENETEC -r sound:off localhost:4444'

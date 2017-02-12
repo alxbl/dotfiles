@@ -1,1 +1,7 @@
 *.jar
+
+# blacklist most of the trash in .config.
+.config
+# Allow only actual dotfiles from .config
+!.config/.emacs.d
+!.config/awesome

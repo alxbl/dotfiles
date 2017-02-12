@@ -3,8 +3,7 @@
 ZSHCFG=~/.zsh
 ZSH=$ZSHCFG/oh-my-zsh
 
-#TODO: Load from file
-plugins=(archlinux django compleat git github ssh-agent mercurial pip python screen)
+plugins=(archlinux docker compleat git github ssh-agent mercurial screen)
 setopt completealiases
 
 # Disable annoying auto-correct.
@@ -33,14 +32,8 @@ fi
 export EDITOR=emacs
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
-export TERM=xterm-256color # Not supposed to do that, but whatever, man.
+# export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 
 # PATH
-export GEM_HOME=~/.gem/ruby/2.0.0
-export LOCAL_BIN=~/.bin
-export PATH=$PATH:$GEM_HOME/bin:$LOCAL_BIN
-
-# No idea why Cygwin doesn't do that by itself...
-if [ -n "$COMSPEC" -a -x "$COMSPEC" ]; then
-    export PATH=$PATH:/usr/local/bin
-fi
+export GEM_HOME=~/.gem/ruby/2.3.0
+export PATH=$PATH:$GEM_HOME/bin

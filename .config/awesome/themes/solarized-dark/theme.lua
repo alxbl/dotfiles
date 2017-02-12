@@ -4,7 +4,7 @@
 
 theme = {}
 
-theme.font          = "droid sans 8"
+theme.font          = "droid sans 12"
 
 theme.bg_normal     = "#002b36" -- base03
 theme.bg_focus      = "#073642" -- base02
