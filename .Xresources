@@ -25,4 +25,41 @@ URxvt.matcher.button: 1
 
 
 ! Color theme
-#include ".xresources.d/solarized/solarized"
+! #include ".xresources.d/solarized/solarized"
+! special
+*.foreground:   #f1f1f1
+*.background:   #121212
+*.cursorColor:  #f1f1f1
+
+! black
+*.color0:       #2c2f34
+*.color8:       #3b434d
+
+! red
+*.color1:       #c3425e
+*.color9:       #e26b85
+
+! green
+*.color2:       #abc944
+*.color10:      #ceea6e
+
+! yellow
+*.color3:       #ed8c49
+*.color11:      #e7a54f
+
+! blue
+*.color4:       #49a0e8
+*.color12:      #84b5e0
+
+! magenta
+*.color5:       #D44BBA
+*.color13:      #cd83bf
+
+! cyan
+*.color6:       #5ce3d2
+*.color14:      #6dc7bb
+
+! white
+*.color7:       #adb4bb
+*.color15:      #dae6e4
+

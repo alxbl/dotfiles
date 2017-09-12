@@ -22,3 +22,9 @@
 [submodule ".emacs.d/vendor/yasnippet"]
 	path = .emacs.d/vendor/yasnippet
 	url = git@github.com:capitaomorte/yasnippet.git
+[submodule ".config/awesome/freedesktop"]
+	path = .config/awesome/freedesktop
+	url = https://github.com/copycat-killer/awesome-freedesktop.git
+[submodule ".config/awesome/lain"]
+	path = .config/awesome/lain
+	url = https://github.com/copycat-killer/lain.git
