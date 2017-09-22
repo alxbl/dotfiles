@@ -3,7 +3,7 @@
 ZSHCFG=~/.zsh
 ZSH=$ZSHCFG/oh-my-zsh
 
-plugins=(archlinux docker compleat git github ssh-agent mercurial screen)
+plugins=(archlinux docker compleat git github ssh-agent mercurial tmux)
 setopt completealiases
 
 # Disable annoying auto-correct.
@@ -18,10 +18,11 @@ if [[ -f $ZSHCFG/aliases ]]; then
     source $ZSHCFG/aliases
 fi
 
+ZSH_THEME="nicoulaj"
 source $ZSH/oh-my-zsh.sh
-if [[ -f $ZSHCFG/zsh_theme ]]; then
-    source $ZSHCFG/zsh_theme
-fi
+#if [[ -f $ZSHCFG/zsh_theme ]]; then
+#    source $ZSHCFG/zsh_theme
+#fi
 
 # Load up colors
 if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
@@ -32,7 +33,6 @@ fi
 export EDITOR=emacs
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
-# export TERM=xterm-256color # Not supposed to do that, but whatever, man.
 
 # PATH
 export GEM_HOME=~/.gem/ruby/2.3.0

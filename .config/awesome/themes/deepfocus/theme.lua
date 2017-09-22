@@ -15,9 +15,8 @@ theme.wallpaper                                 = theme.dir .. "/wall.jpg"
 theme.font                                      = "Noto Sans 9"
 
 
--- local svg = cairo.svgSurface.create(theme.dir .. "/cmd.svg")
-
-
+local svg = cairo.SvgSurface.create(theme.dir .. "/cmd.svg", 32, 32)
+local cr = cairo.Context(svg)
 
 --
 theme.fg_normal                                 = "#FEFEFE"
@@ -306,8 +305,7 @@ function theme.at_screen_connect(s)
             layout = wibox.layout.fixed.horizontal,
             --spr,
             s.mytaglist,
-            s.mypromptbox,
-            spr,
+            s.mypromptbox
         },
         s.mytasklist, -- Middle widget
         { -- Right widgets

@@ -58,6 +58,9 @@ local function toggle_client_list()
     end
 end
 
+local function toggle_menu()
+end
+
 -- ROOT: Mouse buttons
 root.buttons(awful.util.table.join(
     awful.button({ }, 1, function () awful.util.mymainmenu:hide() end),

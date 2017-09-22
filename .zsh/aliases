@@ -5,7 +5,9 @@ alias aliases='emacs ~/.zsh/aliases'
 alias zshrc='emacs ~/.zsh/zshrc'
 # ---
 alias ls='ls --color=auto'
-alias irc='mosh segfault'
-alias code='visual-studio-code-oss'
-alias farcast='ssh -L 4444:localhost:30303 moria'
-alias genetec='rdesktop -g 1920x1080 -P -z -u abeaulieu -d GENETEC -r sound:off localhost:4444'
+alias irc='ssh moria -t tmux a'
+alias genetec='rdesktop -g 1920x1080 -P -z -u abeaulieu -d GENETEC -r sound:off localhost:3389'
+# ---
+alias twitch='chromium --app=https://www.twitch.tv/'
+alias netflix='chromium --app=https://www.netflix.com/'
+alias slack='chromium --app=https://slack.com'
