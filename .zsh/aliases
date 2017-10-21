@@ -1,8 +1,8 @@
 #!/bin/sh
 # ---
 alias rzshrc='source ~/.zshrc'
-alias aliases='emacs ~/.zsh/aliases'
-alias zshrc='emacs ~/.zsh/zshrc'
+alias aliases='$EDITOR ~/.zsh/aliases'
+alias zshrc='$EDITOR ~/.zsh/zshrc'
 # ---
 alias ls='ls --color=auto'
 alias irc='ssh moria -t tmux a'

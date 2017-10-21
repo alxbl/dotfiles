@@ -30,7 +30,7 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
 fi
 
 # Useful exports
-export EDITOR=emacs
+export EDITOR=vim
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
 
