@@ -10,7 +10,8 @@ Xft.antialias:  true
 Xft.rgba:       rgb
 Xft.hinting:    true
 Xft.hintstyle:  hintslight
-URxvt*font: xft:Droid Sans Mono:size=10
+URxvt*font: xft:Droid Sans Mono:size=10, \
+            xft:DejaVu Sans Mono:size=10
 
 URxvt.urgentOnBell: true
 URxvt.scrollBar: false

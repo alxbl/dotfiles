@@ -28,3 +28,6 @@
 [submodule ".config/awesome/lain"]
 	path = .config/awesome/lain
 	url = https://github.com/copycat-killer/lain.git
+[submodule ".emacs.d/vendor/typescript.el"]
+	path = .emacs.d/vendor/typescript-mode
+	url = https://github.com/ananthakumaran/typescript.el.git
