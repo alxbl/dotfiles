@@ -42,14 +42,24 @@ theme.useless_gap                               = 12
 local markup = lain.util.markup
 local separators = lain.util.separators
 
-
-local file = "/home/alex/.config/awesome/themes/deepfocus/cmd.svg"
-local md = require('material')
-
-local _cmd = md.widget.svg({ path = file, width = 32, height = 32, color = "#ffffff" })
-local cmd = wibox.container.margin(_cmd.widget, 6,0,6,0)
-
 clock = wibox.widget.textclock()
+
+local function add_tag(t, screen)
+        local tag = t.tag
+        local name
+        if t.icon then name = nil else name = t.name end -- Don't show tag name if there's an icon.
+        awful.tag.add(t.name, { icon = nil, screen = screen, layout = tag.layout })
+end
+
+----
+---- TAGS
+----
+local tags = {
+    { name = "", tag = { layout = awful.layout.suit.tile }},
+    { name = "", tag = { layout = awful.layout.suit.tile }},
+    { name = "", tag = { layout = awful.layout.suit.tile }},
+    { name = "", tag = { layout = awful.layout.suit.tile }}
+}
 
 
 -- ALSA volume
@@ -74,7 +84,7 @@ local cpu = lain.widget.cpu({
 
 function theme.at_screen_connect(s)
     -- Quake application
-    -- s.quake = lain.util.quake({ app = awful.util.terminal })
+    s.quake = lain.util.quake({ app = awful.util.terminal })
 
     -- If wallpaper is a function, call it with the screen
     local wallpaper = theme.wallpaper
@@ -84,7 +94,11 @@ function theme.at_screen_connect(s)
     gears.wallpaper.maximized(wallpaper, s, true)
 
     -- Tags
-    awful.tag(awful.util.tagnames, s, awful.layout.layouts)
+    -- awful.tag(awful.util.tagnames, s, awful.layout.layouts)
+    for n, t in ipairs(tags) do
+        add_tag(t, s)
+    end
+    awful.tag.viewnext(s)
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -110,7 +124,6 @@ function theme.at_screen_connect(s)
         layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            cmd,
             s.mytaglist,
             s.mypromptbox
         },
