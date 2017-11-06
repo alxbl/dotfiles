@@ -1,5 +1,6 @@
 *.jar
 
+.vim/bundle
 # blacklist most of the trash in .config.
 .config
 # Allow only actual dotfiles from .config
