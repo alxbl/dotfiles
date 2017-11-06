@@ -20,20 +20,15 @@ fi
 
 ZSH_THEME="nicoulaj"
 source $ZSH/oh-my-zsh.sh
-#if [[ -f $ZSHCFG/zsh_theme ]]; then
-#    source $ZSHCFG/zsh_theme
-#fi
 
 # Load up colors
 if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
     eval `dircolors $HOME/.xresources.d/dircolors`
 fi
 
+# setxkbmap -option ctrl:nocaps # caps lock is CTRL
 # Useful exports
 export EDITOR=vim
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
 
-# PATH
-export GEM_HOME=~/.gem/ruby/2.3.0
-export PATH=$PATH:$GEM_HOME/bin
