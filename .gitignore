@@ -1,5 +1,6 @@
 *.jar
 
+.vim/.netrwhist
 .vim/bundle
 # blacklist most of the trash in .config.
 .config
