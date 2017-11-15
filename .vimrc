@@ -7,8 +7,9 @@ so ~/.vim/global.vim
 so ~/.vim/plugins.vim
 so ~/.vim/keys.vim
 so ~/.vim/theme.vim
+so ~/.vim/lang.vim
 
-set wildignore+=**/node_modules/*
+set wildignore+=**/node_modules/*,node_modules/**
 
 " Python Specific
 augroup Python
@@ -34,8 +35,6 @@ augroup Web
                 \ set shiftwidth=2
 augroup END
 
-" Auto-completion
-let g:ycm_server_python_interpreter='/usr/bin/python2'
-let g:ycm_autoclose_preview_window_after_completion=1
-map g<space> :YcmCompleter GoToDefinitionElseDeclaration<CR>
+autocmd FileType typescript setlocal omnifunc=lsp#complete
 
+let g:ctrlp_show_hidden = 1
