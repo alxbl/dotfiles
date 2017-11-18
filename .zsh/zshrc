@@ -27,6 +27,7 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
 fi
 
 # setxkbmap -option ctrl:nocaps # caps lock is CTRL
+stty -ixon
 # Useful exports
 export EDITOR=vim
 export LANG="en_CA.UTF-8"

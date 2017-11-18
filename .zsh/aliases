@@ -8,7 +8,13 @@ alias vimrc='$EDITOR ~/.vimrc'
 alias ls='ls --color=auto'
 alias irc='ssh moria -t tmux a'
 alias genetec='rdesktop -g 1920x1080 -P -z -u abeaulieu -d GENETEC -r sound:off localhost:3389'
+alias win64='rdesktop -g 1440x900 localhost'
 # ---
 alias twitch='chromium --app=https://www.twitch.tv/'
 alias netflix='chromium --app=https://www.netflix.com/'
 alias slack='chromium --app=https://slack.com'
+
+# --- use neovim if available.
+if command -v nvim >/dev/null 2>&1; then
+    alias vim='nvim -u ~/.vimrc'
+fi
