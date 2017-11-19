@@ -14,6 +14,8 @@ nnoremap <C-l> <C-W><C-l>
 " Buffer Management
 nnoremap <leader>o :bp<CR>
 nnoremap <leader>i :bn<CR>
+nnoremap <C-Tab> :bn<CR>
+nnoremap <C-S-Tab> :bp<CR>
 nnoremap <leader>q :bd<CR>
 
 " Code folding

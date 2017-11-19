@@ -7,6 +7,11 @@ set modeline       " Listen to the mode-line if present
 syntax on          " Enable syntax-highlight
 filetype off       " Don't try to determine filetype based on content
 
+set wildignore+=**/node_modules/*,node_modules/**
+"
+" Copy to x clipboard
+set clipboard=unnamed
+
 " Show relative line numbers
 set number
 set relativenumber
