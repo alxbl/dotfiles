@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =3
+let g:netrw_dirhist_1='/home/alex/dev/web/expressjs'
+let g:netrw_dirhist_2='/home/alex/dev/src/tsmean/backend/main-module'
+let g:netrw_dirhist_3='/home/alex/dotfiles/.config/termite'

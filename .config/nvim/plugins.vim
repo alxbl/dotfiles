@@ -1,12 +1,21 @@
 so ~/.config/nvim/plug.vim
 call plug#begin('~/.config/nvim/plugged')
 
+Plug 'vim-airline/vim-airline'
+
 Plug 'tpope/vim-fugitive'
 Plug 'tmhedberg/SimpylFold'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'scrooloose/syntastic'
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'autozimu/LanguageClient-neovim'
+Plug 'junegunn/fzf'
+
+" Language support.
+" https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugs' }
+Plug 'roxma/nvim-completion-manager'
+Plug 'Shougo/echodoc.vim'
+Plug 'leafgarland/typescript-vim'
 
 " Pretty colors.
 Plug 'chriskempson/base16-vim'

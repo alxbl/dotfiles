@@ -7,8 +7,8 @@ so ~/.vim/keys.vim
 
 " neovim specific plugins.
 so ~/.config/nvim/plugins.vim
+so ~/.config/nvim/lsp.vim
 
-" Grab some of the configs that are compatible between vim and nvim.
 so ~/.vim/theme.vim
 
 

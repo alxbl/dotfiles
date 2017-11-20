@@ -26,7 +26,7 @@ nnoremap <C-s> <ESC>:w<CR>
 
 " Quickly reload vim config.
 nnoremap <leader>er :so $MYVIMRC<CR>
-nnoremap <leader>ev :sp $MYVIMRC<CR>
+nnoremap <leader>ev :vs $MYVIMRC<CR>
 
 " Language Semantics
 
