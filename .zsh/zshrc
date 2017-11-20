@@ -18,7 +18,9 @@ if [[ -f $ZSHCFG/aliases ]]; then
     source $ZSHCFG/aliases
 fi
 
+
 ZSH_THEME="nicoulaj"
+DISABLE_AUTO_TITLE=true
 source $ZSH/oh-my-zsh.sh
 
 # Load up colors
@@ -29,7 +31,7 @@ fi
 # setxkbmap -option ctrl:nocaps # caps lock is CTRL
 stty -ixon
 # Useful exports
-export EDITOR=vim
+export EDITOR=nvim
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
 
