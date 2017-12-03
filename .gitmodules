@@ -34,6 +34,3 @@
 [submodule ".vim/bundle/Vundle.vim"]
 	path = .vim/bundle/Vundle.vim
 	url = https://github.com/gmarik/Vundle.vim.git
-[submodule ".config/base16-shell"]
-	path = .config/base16-shell
-	url = git@github.com:chriskempson/base16-shell.git
