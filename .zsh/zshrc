@@ -19,9 +19,10 @@ if [[ -f $ZSHCFG/aliases ]]; then
 fi
 
 
-ZSH_THEME="nicoulaj"
+ZSH_THEME="lambda"
 DISABLE_AUTO_TITLE=true
 source $ZSH/oh-my-zsh.sh
+bindkey -v # vi bindings.
 
 # Load up colors
 if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
