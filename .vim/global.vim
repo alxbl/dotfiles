@@ -9,7 +9,7 @@ set showcmd        " Show the pending command at the bottom right
 syntax on          " Enable syntax-highlight
 filetype off       " Don't try to determine filetype based on content
 
-set wildignore+=**/node_modules/*,node_modules/**
+set wildignore+=**/node_modules/*,node_modules/**,**/CMakeFiles/**,**/build/**
 "
 " Copy to x clipboard
 set clipboard=unnamed

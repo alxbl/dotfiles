@@ -38,4 +38,4 @@ nnoremap <F2> :LspRename<CR>
 nnoremap <F12> :LspDefinition<CR>
 nnoremap <leader>r :LspReferences<CR>
 nnoremap <leader>p :LspDocumentSymbol<CR>
-nnoremap <C-p> :CtrlP<CR>
+nnoremap <C-p> :FZF<CR>
