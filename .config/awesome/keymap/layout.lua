@@ -97,21 +97,19 @@ local bindings = awful.util.table.join(
     awful.key({ VARS.altkey }, "Left", function () lain.util.tag_view_nonempty(-1) end, {description = "view  previous nonempty", group = "tag"}),
     awful.key({ VARS.altkey }, "Right", function () lain.util.tag_view_nonempty(1) end, {description = "view  previous nonempty", group = "tag"}),
     -- Default client focus
-    awful.key({ VARS.altkey }, "j", function () awful.client.focus.byidx( 1) end, {description = "focus next by index", group = "client"}),
-    awful.key({ VARS.altkey }, "k", function () awful.client.focus.byidx(-1) end, {description = "focus previous by index", group = "client"}),
     -- By direction client focus
     awful.key({ VARS.modkey }, "j", function() awful.client.focus.bydirection("down") if client.focus then client.focus:raise() end end),
     awful.key({ VARS.modkey }, "k", function() awful.client.focus.bydirection("up") if client.focus then client.focus:raise() end end),
     awful.key({ VARS.modkey }, "h", function() awful.client.focus.bydirection("left") if client.focus then client.focus:raise() end end),
     awful.key({ VARS.modkey }, "l", function() awful.client.focus.bydirection("right") if client.focus then client.focus:raise() end end),
-    awful.key({ VARS.modkey }, "w", function () awful.util.mymainmenu:show() end, {description = "show main menu", group = "awesome"}),
+    -- awful.key({ VARS.modkey }, "w", function () awful.util.mymainmenu:show() end, {description = "show main menu", group = "awesome"}),
     -- Layout manipulation
     awful.key({ VARS.modkey, "Shift" }, "j", function () awful.client.swap.byidx(  1) end, {description = "swap with next client by index", group = "client"}),
     awful.key({ VARS.modkey, "Shift" }, "k", function () awful.client.swap.byidx( -1) end, {description = "swap with previous client by index", group = "client"}),
-    awful.key({ VARS.modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end, {description = "focus the next screen", group = "screen"}),
+    awful.key({ VARS.modkey,           }, "o", function () awful.screen.focus_relative( 1) end, {description = "focus the next screen", group = "screen"}),
     awful.key({ VARS.modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end, {description = "focus the previous screen", group = "screen"}),
     awful.key({ VARS.modkey }, "u", awful.client.urgent.jumpto, {description = "jump to urgent client", group = "client"}),
-    awful.key({ VARS.modkey }, "Tab", function () awful.client.focus.history.previous() if client.focus then client.focus:raise() end end, {description = "go back", group = "client"}),
+    awful.key({ VARS.altkey }, "Tab", function () awful.client.focus.history.previous() if client.focus then client.focus:raise() end end, {description = "go back", group = "client"}),
 
     -- Show/Hide Wibox
     awful.key({ VARS.modkey }, "b", function ()
