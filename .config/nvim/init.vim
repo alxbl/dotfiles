@@ -11,4 +11,7 @@ so ~/.config/nvim/lsp.vim
 
 so ~/.vim/theme.vim
 
+so ~/.vim/lang.vim
 
+" Wiki Stuff
+let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]

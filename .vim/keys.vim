@@ -5,6 +5,10 @@ let mapleader = "\<space>"
 " ; is also good for ex-mode
 nnoremap ; :
 
+" Tab completion while typing
+inoremap <tab> <C-n>
+inoremap <S-tab> <C-p>
+
 " No-frill pane switching
 nnoremap <C-h> <C-W><C-h>
 nnoremap <C-j> <C-W><C-j>

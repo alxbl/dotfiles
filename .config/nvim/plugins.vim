@@ -17,10 +17,12 @@ Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
 Plug 'roxma/nvim-completion-manager'
 Plug 'Shougo/echodoc.vim'
 Plug 'leafgarland/typescript-vim'
+Plug 'wavded/vim-stylus'
 
 " Pretty colors.
 Plug 'chriskempson/base16-vim'
 Plug 'iKarith/tigrana'
 
+Plug 'vimwiki/vimwiki'
 call plug#end()
 

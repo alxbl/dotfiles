@@ -11,8 +11,6 @@ let g:LanguageClient_serverCommands = {
             \ }
 
 let g:LanguageClient_autoStart = 1
-
-
 " Language Server specific bindings
 nnoremap <leader>d :call LanguageClient_textDocument_definition()<CR>
 nnoremap <F1> :call LanguageClient_textDocument_hover()<CR>
