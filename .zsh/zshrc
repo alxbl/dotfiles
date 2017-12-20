@@ -22,15 +22,14 @@ fi
 ZSH_THEME="lambda"
 DISABLE_AUTO_TITLE=true
 source $ZSH/oh-my-zsh.sh
-bindkey -v # vi bindings.
 
 # Load up colors
 if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
     eval `dircolors $HOME/.xresources.d/dircolors`
 fi
 
-# setxkbmap -option ctrl:nocaps # caps lock is CTRL
-stty -ixon
+stty -ixon # stop C-Q, C-S from freezing terminal.
+
 # Useful exports
 export EDITOR=nvim
 export LANG="en_CA.UTF-8"
