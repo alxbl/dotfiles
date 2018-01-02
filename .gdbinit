@@ -1,9 +1,8 @@
 python
 
 import sys
-sys.path.insert(0, '~/.gdb')
+import os
+sys.path.append(os.path.join(os.environ["HOME"], ".gdb"))
 
-
-# Pretty Printers
 import glm
 end
