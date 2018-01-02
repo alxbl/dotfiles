@@ -28,6 +28,9 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
     eval `dircolors $HOME/.xresources.d/dircolors`
 fi
 
+# Ruby gems
+export PATH=$PATH:~/.gem/ruby/2.4.0/bin
+
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
 # Useful exports
