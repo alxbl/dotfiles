@@ -3,16 +3,12 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set encoding=utf-8 " Use UTF-8 encoding
 set nocompatible   " vi? Nah!
-set nowrap
+set nowrap         " Don't wrap lines
 set modeline       " Listen to the mode-line if present
 set noshowmode     " airline-bar shows it already
 set showcmd        " Show the pending command at the bottom right
 syntax on          " Enable syntax-highlight
 filetype off       " Don't try to determine filetype based on content
-
-" Project-specific settings
-set exrc
-set secure
 
 set wildignore+=**/node_modules/*,node_modules/**,**/CMakeFiles/**,**/build/**
 "
@@ -34,6 +30,7 @@ set softtabstop=4
 set shiftwidth=4
 
 " Enable code folding
-set foldmethod=indent
+set foldmethod=syntax
 set foldlevel=99
+set foldcolumn=0
 

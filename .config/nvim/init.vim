@@ -15,3 +15,4 @@ so ~/.vim/lang.vim
 
 " Wiki Stuff
 let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]
+let g:vimwiki_folding = 'syntax'

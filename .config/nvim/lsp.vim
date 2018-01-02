@@ -7,7 +7,8 @@ set signcolumn=yes
 " \ 'javascript': [ 'javascript-typescript-stdio' ],
 let g:LanguageClient_serverCommands = {
             \ 'typescript': [ 'typescript-language-server', '--stdio' ],
-            \ 'python': [ 'pyls' ]
+            \ 'python': [ 'pyls' ],
+            \ 'cpp': [ 'clangd' ]
             \ }
 
 let g:LanguageClient_autoStart = 1

@@ -6,6 +6,7 @@ Plug 'vim-airline/vim-airline-themes'
 
 Plug 'tpope/vim-fugitive'
 Plug 'tmhedberg/SimpylFold'
+Plug 'tpope/vim-surround'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'scrooloose/syntastic'
 Plug 'junegunn/fzf'

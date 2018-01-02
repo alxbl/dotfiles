@@ -23,6 +23,13 @@ augroup Web
 
     au BufNewFile,BufRead *.ejs set filetype=html
 augroup END
+
 " Python
 
-" Clang
+" C/C++
+augroup C
+    au!
+    au BufNewFile,BufRead *.cpp,*.h
+                \ set filetype=cpp.doxygen
+augroup END
+
