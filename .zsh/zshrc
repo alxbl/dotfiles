@@ -6,6 +6,10 @@ ZSH=$ZSHCFG/oh-my-zsh
 plugins=(archlinux docker compleat git github ssh-agent mercurial tmux)
 setopt completealiases
 
+_has() {
+  return $( whence $1 >/dev/null )
+}
+
 # Disable annoying auto-correct.
 if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     while read -r COMMAND; do
@@ -22,6 +26,13 @@ fi
 ZSH_THEME="lambda"
 DISABLE_AUTO_TITLE=true
 source $ZSH/oh-my-zsh.sh
+
+# FZF && ag
+if _has fzf && _has ag; then
+  export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+fi
 
 # Load up colors
 if [[ -f "$HOME/.xresources.d/dircolors" ]]; then

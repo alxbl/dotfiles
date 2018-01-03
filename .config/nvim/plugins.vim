@@ -1,29 +1,49 @@
+" vim:foldmethod=marker:foldlevel=0
 so ~/.config/nvim/plug.vim
 call plug#begin('~/.config/nvim/plugged')
 
+" Navigation {{{
+Plug 'junegunn/fzf'          " Fuzzy File Finding
+Plug 'junegunn/fzf.vim'      " FZF common commands
+Plug 'mileszs/ack.vim'       " For ag support
+Plug 'scrooloose/nerdtree'   " Better than netrw
+
+let g:fzf_layout = { 'down': '~20%' }
+" }}}
+
+" Editing {{{
+Plug 'editorconfig/editorconfig-vim'  " Respect .editorconfig when present
+Plug 'tpope/vim-surround'             " Wrap in parenthesis
+Plug 'tpope/vim-unimpaired'           " Additional navigation bindings
+Plug 'christoomey/vim-tmux-navigator' " Seamless tmux+vim pane switching
+" }}}
+
+" Language support {{{
+" https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
+" Make vim into an LSP client. Hooray!
+Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+
+Plug 'roxma/nvim-completion-manager' " Completions for neovim
+Plug 'Shougo/echodoc.vim'            " Show function documentation in command bar
+Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
+Plug 'wavded/vim-stylus'             " Stylus .styl files
+Plug 'tmhedberg/SimpylFold'          " Python Smart Folding
+" }}}
+
+" Pretty colors {{{
+Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+" }}}
+
+" Documentation {{{
+Plug 'vimwiki/vimwiki'
+
+let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]
+let g:vimwiki_folding = 'syntax'
 
 Plug 'tpope/vim-fugitive'
-Plug 'tmhedberg/SimpylFold'
-Plug 'tpope/vim-surround'
-Plug 'editorconfig/editorconfig-vim'
-Plug 'scrooloose/syntastic'
-Plug 'junegunn/fzf'
-let g:fzf_layout = { 'down': '~20%' }
+" }}}
 
-" Language support.
-" https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-Plug 'roxma/nvim-completion-manager'
-Plug 'Shougo/echodoc.vim'
-Plug 'leafgarland/typescript-vim'
-Plug 'wavded/vim-stylus'
-
-" Pretty colors.
-Plug 'chriskempson/base16-vim'
-Plug 'iKarith/tigrana'
-
-Plug 'vimwiki/vimwiki'
 call plug#end()
 

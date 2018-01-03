@@ -1,18 +1,30 @@
+" vim:foldmethod=marker:sw=2
+"       .__
+" ___  _|__| ____________  ____
+" \  \/ |  |/     \_  __ _/ ___\
+"  \   /|  |  Y Y  |  | \\  \___
+"   \_/ |__|__|_|  |__|   \___  >
+"                \/           \/
 "
-" / I control the matrix . . . /
+"  / Neo wasn't expecting this /
 "
 
+"
+" Reminder: `gf` is your friend.
+"
+
+" Share some vanilla settings with vim
 so ~/.vim/global.vim
 so ~/.vim/keys.vim
 
-" neovim specific plugins.
+" Plugin manifest
 so ~/.config/nvim/plugins.vim
+
+" Language Server Targets
 so ~/.config/nvim/lsp.vim
 
-so ~/.vim/theme.vim
-
+" Language Specific Settings
 so ~/.vim/lang.vim
 
-" Wiki Stuff
-let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]
-let g:vimwiki_folding = 'syntax'
+" Set theme last to ensure everything gets styled.
+so ~/.vim/theme.vim

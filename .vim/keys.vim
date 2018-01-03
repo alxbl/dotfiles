@@ -2,18 +2,17 @@
 nmap <space> <Nop>
 let mapleader = "\<space>"
 
-" ; is also good for ex-mode
-nnoremap ; :
+nnoremap ; :Buffers<CR>
 
 " Tab completion while typing
 inoremap <tab> <C-n>
 inoremap <S-tab> <C-p>
 
 " No-frill pane switching
-nnoremap <C-h> <C-W><C-h>
-nnoremap <C-j> <C-W><C-j>
-nnoremap <C-k> <C-W><C-k>
-nnoremap <C-l> <C-W><C-l>
+nnoremap <M-h> <C-W><C-h>
+nnoremap <M-j> <C-W><C-j>
+nnoremap <M-k> <C-W><C-k>
+nnoremap <M-l> <C-W><C-l>
 
 " Buffer Management
 nnoremap <leader>o :bp<CR>
