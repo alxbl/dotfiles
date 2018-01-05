@@ -11,7 +11,7 @@ syntax on          " Enable syntax-highlight
 filetype off       " Don't try to determine filetype based on content
 
 set wildignore+=**/node_modules/*,node_modules/**,**/CMakeFiles/**,**/build/**
-"
+
 " Copy to x clipboard
 set clipboard=unnamed
 
@@ -22,6 +22,9 @@ set relativenumber
 " Show trailing whitespace and tabs
 exec "set listchars=nbsp:_,trail:\uB7,tab:\uBB\uBB"
 set list
+
+" Remove trailing whitespace
+autocmd BufWritePre * %s/\s\+$//e
 
 " Default tab width is 4
 set expandtab
