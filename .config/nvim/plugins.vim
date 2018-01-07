@@ -8,6 +8,12 @@ Plug 'junegunn/fzf.vim'      " FZF common commands
 Plug 'mileszs/ack.vim'       " For ag support
 Plug 'scrooloose/nerdtree'   " Better than netrw
 
+let g:ackprg = 'ag --vimgrep --smart-case'
+cnoreabbrev ag Ack
+cnoreabbrev aG Ack
+cnoreabbrev Ag Ack
+cnoreabbrev AG Ack
+
 let g:fzf_layout = { 'down': '~20%' }
 " }}}
 

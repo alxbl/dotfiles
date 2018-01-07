@@ -8,7 +8,8 @@ set signcolumn=yes
 let g:LanguageClient_serverCommands = {
             \ 'typescript': [ 'typescript-language-server', '--stdio' ],
             \ 'python': [ 'pyls' ],
-            \ 'cpp': [ 'clangd' ]
+            \ 'cpp': [ 'clangd' ],
+            \ 'cpp.doxygen': [ 'clangd' ]
             \ }
 
 let g:LanguageClient_autoStart = 1
