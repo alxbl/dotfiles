@@ -20,6 +20,7 @@ let g:fzf_layout = { 'down': '~20%' }
 " Editing {{{
 Plug 'editorconfig/editorconfig-vim'  " Respect .editorconfig when present
 Plug 'tpope/vim-surround'             " Wrap in parenthesis
+Plug 'tpope/vim-commentary'           " Toggle Comment Support
 Plug 'tpope/vim-unimpaired'           " Additional navigation bindings
 Plug 'christoomey/vim-tmux-navigator' " Seamless tmux+vim pane switching
 " }}}
