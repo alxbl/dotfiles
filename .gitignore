@@ -3,7 +3,10 @@
 .vim/bundle
 .vim/lsp.log
 .gdb/__pycache__
+
 # blacklist most of the trash in .config.
 .config
+
 # Allow only actual dotfiles from .config
 !.config/awesome
+!.config/termite/config
