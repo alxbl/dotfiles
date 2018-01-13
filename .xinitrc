@@ -8,4 +8,5 @@ stty -xion
 setxkbmap -option ctrl:nocaps
 
 redshift -l 0:0 -O 3500K &
+unclutter &
 exec awesome
