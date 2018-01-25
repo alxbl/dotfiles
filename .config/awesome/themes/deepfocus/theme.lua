@@ -11,7 +11,7 @@ local os, math, string = os, math, string
 
 local theme                                     = {}
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/deepfocus"
-theme.wallpaper                                 = theme.dir .. "/wall.jpg"
+theme.wallpaper                                 = os.getenv("HOME") .. "/.config/wallpapers/train.jpg"
 theme.font                                      = "Noto Sans 9"
 
 theme.fg_normal                                 = "#FEFEFE"
