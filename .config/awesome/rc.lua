@@ -12,7 +12,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 local CONFIG_DIR = string.format("%s/.config/awesome/", os.getenv("HOME"))
 local VARS = gears.protected_call(dofile, CONFIG_DIR .. "vars.lua")
 local KEYMAP = require("keymap")
-local RULES = require("rules")
+-- local RULES = require("rules")
 
 -- {{{ Error handling
 if awesome.startup_errors then naughty.notify({ preset = naughty.config.presets.critical,
@@ -252,7 +252,9 @@ awful.key({ VARS.modkey }, "x", function ()
         exe_callback = awful.util.eval,
         history_path = awful.util.get_cache_dir() .. "/history_eval"
     }
-end, {description = "lua execute prompt", group = "awesome"})
+end, {description = "lua execute prompt", group = "awesome"}),
+awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +5%\"") end),
+awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end)
 )
 
 
@@ -278,7 +280,7 @@ awful.rules.rules = {
 
     -- Titlebars
     { rule_any = { type = { "dialog", "normal" } },
-    properties = { titlebars_enabled = true } },
+    properties = { titlebars_enabled = false } },
 
     -- Set Firefox to always map on the first tag on screen 1.
     { rule = { class = "Firefox" },
@@ -286,6 +288,9 @@ awful.rules.rules = {
 
     { rule = { class = "Gimp", role = "gimp-image-window" },
     properties = { maximized = true } },
+
+    { rule = { class = "rdesktop" },
+    properties = { screen = 2, maximized = true, titlebars_enabled = false} },
 }
 -- }}}
 
