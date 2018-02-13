@@ -1,6 +1,6 @@
 --
 -- [[ . . . Let yourself relax and slip into a perfectly focused state . . . ]]
--- 
+--
 local gears = require("gears")
 local lain  = require("lain")
 local awful = require("awful")
@@ -11,7 +11,7 @@ local os, math, string = os, math, string
 
 local theme                                     = {}
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/deepfocus"
-theme.wallpaper                                 = os.getenv("HOME") .. "/.config/wallpapers/train.jpg"
+theme.wallpaper                                 = os.getenv("HOME") .. "/.config/awesome/themes/deepfocus/wall.jpg"
 theme.font                                      = "Noto Sans 9"
 
 theme.fg_normal                                 = "#FEFEFE"

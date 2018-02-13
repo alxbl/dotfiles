@@ -109,7 +109,7 @@ local bindings = awful.util.table.join(
     awful.key({ VARS.modkey,           }, "o", function () awful.screen.focus_relative( 1) end, {description = "focus the next screen", group = "screen"}),
     awful.key({ VARS.modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end, {description = "focus the previous screen", group = "screen"}),
     awful.key({ VARS.modkey }, "u", awful.client.urgent.jumpto, {description = "jump to urgent client", group = "client"}),
-    awful.key({ VARS.altkey }, "Tab", function () awful.client.focus.history.previous() if client.focus then client.focus:raise() end end, {description = "go back", group = "client"}),
+    awful.key({ VARS.modkey }, "Tab", function () awful.client.focus.history.previous() if client.focus then client.focus:raise() end end, {description = "go back", group = "client"}),
 
     -- Show/Hide Wibox
     awful.key({ VARS.modkey }, "b", function ()
