@@ -1,3 +1,4 @@
+-- vim:foldmethod=marker:
 --
 -- [[ . . . Let yourself relax and slip into a perfectly focused state . . . ]]
 --
@@ -9,6 +10,7 @@ local wibox = require("wibox")
 
 local os, math, string = os, math, string
 
+-- Theme Style {{{
 local theme                                     = {}
 theme.dir                                       = os.getenv("HOME") .. "/.config/awesome/themes/deepfocus"
 theme.wallpaper                                 = os.getenv("HOME") .. "/.config/awesome/themes/deepfocus/wall.jpg"
@@ -38,6 +40,7 @@ theme.menu_width                                = 140
 theme.tasklist_plain_task_name                  = true
 theme.tasklist_disable_icon                     = true
 theme.useless_gap                               = 12
+-- }}}
 
 local markup = lain.util.markup
 local separators = lain.util.separators
@@ -45,21 +48,20 @@ local separators = lain.util.separators
 clock = wibox.widget.textclock()
 
 local function add_tag(t, screen)
-        local tag = t.tag
-        local name
-        if t.icon then name = nil else name = t.name end -- Don't show tag name if there's an icon.
-        awful.tag.add(t.name, { icon = nil, screen = screen, layout = tag.layout })
+    local tag = t.tag
+    local name
+    if t.icon then name = nil else name = t.name end -- Don't show tag name if there's an icon.
+    awful.tag.add(t.name, { icon = nil, screen = screen, layout = tag.layout })
 end
 
-----
----- TAGS
-----
+-- TAGS {{{
 local tags = {
     { name = "", tag = { layout = awful.layout.suit.tile }},
     { name = "", tag = { layout = awful.layout.suit.tile }},
     { name = "", tag = { layout = awful.layout.suit.tile }},
     { name = "", tag = { layout = awful.layout.suit.tile }}
 }
+-- }}}
 
 
 -- ALSA volume
@@ -83,9 +85,6 @@ local cpu = lain.widget.cpu({
 })
 
 function theme.at_screen_connect(s)
-    -- Quake application
-    s.quake = lain.util.quake({ app = awful.util.terminal })
-
     -- If wallpaper is a function, call it with the screen
     local wallpaper = theme.wallpaper
     if type(wallpaper) == "function" then
@@ -98,18 +97,9 @@ function theme.at_screen_connect(s)
     for n, t in ipairs(tags) do
         add_tag(t, s)
     end
-    awful.tag.viewnext(s)
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
-    -- Create an imagebox widget which will contains an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
-    s.mylayoutbox = awful.widget.layoutbox(s)
-    s.mylayoutbox:buttons(awful.util.table.join(
-                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
-                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
     -- Create a taglist widget
     s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, awful.util.taglist_buttons)
 
@@ -117,26 +107,27 @@ function theme.at_screen_connect(s)
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "bottom", screen = s, height = 32, bg = theme.bg_normal, fg = theme.fg_normal })
+    s.mywibox = awful.wibar({ position = "bottom", screen = s, height = 32, bg = theme.bg_normal, fg = theme.fg_normal, stretch = true})
 
     -- Add widgets to the wibox
     s.mywibox:setup {
-        layout = wibox.layout.align.horizontal,
+        layout = wibox.layout.fixed.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
             s.mytaglist,
             s.mypromptbox
         },
-        s.mytasklist, -- Middle widget
+        -- s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
             wibox.container.margin(wibox.widget { nil, mem.widget, layout = wibox.layout.align.horizontal }, 2, 3),
             wibox.container.margin(wibox.widget { nil, cpu.widget, layout = wibox.layout.align.horizontal }, 3, 4),
             wibox.container.margin(clock, 4, 8),
-            s.mylayoutbox,
         },
     }
+    -- s.tags[1].view_only()
+    -- awful.tag.viewidx(1, s)
 end
 
 return theme
