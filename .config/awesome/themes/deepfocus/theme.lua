@@ -111,13 +111,13 @@ function theme.at_screen_connect(s)
 
     -- Add widgets to the wibox
     s.mywibox:setup {
-        layout = wibox.layout.fixed.horizontal,
+        layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
             s.mytaglist,
             s.mypromptbox
         },
-        -- s.mytasklist, -- Middle widget
+        s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
