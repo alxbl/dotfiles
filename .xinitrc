@@ -7,6 +7,6 @@ export DefaultIMModule=fcitx
 stty -xion
 setxkbmap -option ctrl:nocaps
 
-redshift -l 0:0 -O 3500K &
+redshift -l 0:0 -O 4000K &
 unclutter &
 exec awesome
