@@ -1,36 +1,36 @@
 [submodule ".zsh/oh-my-zsh"]
-	path = .zsh/oh-my-zsh
-	url = git@github.com:robbyrussell/oh-my-zsh.git
+    path = .zsh/oh-my-zsh
+    url = https://github.com/robbyrussell/oh-my-zsh.git
 [submodule ".emacs.d/themes/solarized"]
-	path = .emacs.d/themes/solarized
-	url = git@github.com:sellout/emacs-color-theme-solarized.git
+    path = .emacs.d/themes/solarized
+    url = https://github.com/sellout/emacs-color-theme-solarized.git
 [submodule ".emacs.d/vendor/ruby-mode"]
-	path = .emacs.d/vendor/ruby-mode
-	url = git@github.com:qoobaa/ruby-mode.git
+    path = .emacs.d/vendor/ruby-mode
+    url = https://github.com/qoobaa/ruby-mode.git
 [submodule ".emacs.d/vendor/inf-ruby"]
-	path = .emacs.d/vendor/inf-ruby
-	url = git@github.com:nonsequitur/inf-ruby.git
+    path = .emacs.d/vendor/inf-ruby
+    url = https://github.com/nonsequitur/inf-ruby.git
 [submodule ".emacs.d/vendor/rinari"]
-	path = .emacs.d/vendor/rinari
-	url = git@github.com:eschulte/rinari.git
+    path = .emacs.d/vendor/rinari
+    url = https://github.com/eschulte/rinari.git
 [submodule ".emacs.d/vendor/lua-mode"]
-	path = .emacs.d/vendor/lua-mode
-	url = git@github.com:immerrr/lua-mode.git
+    path = .emacs.d/vendor/lua-mode
+    url = https://github.com/immerrr/lua-mode.git
 [submodule ".xresources.d/solarized"]
-	path = .xresources.d/solarized
-	url = git@github.com:solarized/xresources.git
+    path = .xresources.d/solarized
+    url = https://github.com/solarized/xresources.git
 [submodule ".emacs.d/vendor/yasnippet"]
-	path = .emacs.d/vendor/yasnippet
-	url = git@github.com:capitaomorte/yasnippet.git
+    path = .emacs.d/vendor/yasnippet
+    url = https://github.com/capitaomorte/yasnippet.git
 [submodule ".config/awesome/freedesktop"]
-	path = .config/awesome/freedesktop
-	url = https://github.com/copycat-killer/awesome-freedesktop.git
+    path = .config/awesome/freedesktop
+    url = https://github.com/copycat-killer/awesome-freedesktop.git
 [submodule ".config/awesome/lain"]
-	path = .config/awesome/lain
-	url = https://github.com/copycat-killer/lain.git
+    path = .config/awesome/lain
+    url = https://github.com/copycat-killer/lain.git
 [submodule ".emacs.d/vendor/typescript.el"]
-	path = .emacs.d/vendor/typescript-mode
-	url = https://github.com/ananthakumaran/typescript.el.git
+    path = .emacs.d/vendor/typescript-mode
+    url = https://github.com/ananthakumaran/typescript.el.git
 [submodule ".vim/bundle/Vundle.vim"]
-	path = .vim/bundle/Vundle.vim
-	url = https://github.com/gmarik/Vundle.vim.git
+    path = .vim/bundle/Vundle.vim
+    url = https://github.com/gmarik/Vundle.vim.git
