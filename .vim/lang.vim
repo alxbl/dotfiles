@@ -16,7 +16,7 @@ let python_highlight_all=1
 " HTML/JS/CSS/TS
 augroup Web
     au!
-    au BufNewFile,BufRead *.ts,*.js,*.html,*.css,*.ejs
+    au BufNewFile,BufRead *.ts,*.js,*.html,*.css,*.ejs,*.htm
                 \ set tabstop=2 |
                 \ set softtabstop=2 |
                 \ set shiftwidth=2
