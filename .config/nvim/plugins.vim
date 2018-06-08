@@ -35,6 +35,7 @@ Plug 'Shougo/echodoc.vim'            " Show function documentation in command ba
 Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files
 Plug 'tmhedberg/SimpylFold'          " Python Smart Folding
+Plug 'rust-lang/rust.vim'            " The Rust programming language
 " }}}
 
 " Pretty colors {{{

@@ -6,10 +6,10 @@ set signcolumn=yes
 " Register language servers here
 " \ 'javascript': [ 'javascript-typescript-stdio' ],
 let g:LanguageClient_serverCommands = {
+            \ 'rust': ['rustup', 'run', 'stable', 'rls'],
             \ 'typescript': [ 'typescript-language-server', '--stdio' ],
             \ 'python': [ 'pyls' ],
             \ 'cpp': [ 'clangd' ],
-            \ 'cpp.doxygen': [ 'clangd' ]
             \ }
 
 let g:LanguageClient_autoStart = 1
