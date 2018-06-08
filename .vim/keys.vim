@@ -50,3 +50,32 @@ nnoremap <leader><tab> :normal gg=G<CR>
 
 nnoremap <F2> :LspRename<CR>
 " }}}
+
+
+" Advanced Macros {{{
+
+" <N>gco: Go to Nth character of the file.
+function! s:GoToCharacter( count )
+    let l:save_view = winsaveview()
+    " We need to include the newline position in the searches, too. The
+    " newline is a character, too, and should be counted.
+    let l:save_virtualedit = &virtualedit
+    try
+        let [l:fixPointMotion, l:searchExpr, l:searchFlags] = ['gg0', '\%#\_.\{' . (a:count + 1) . '}', 'ceW']
+        silent! execute 'normal!' l:fixPointMotion
+
+        if search(l:searchExpr, l:searchFlags) == 0
+            " We couldn't reach the final destination.
+            execute "normal! \<C-\>\<C-n>\<Esc>" | " Beep.
+            call winrestview(l:save_view)
+            return 0
+        else
+            return 1
+        endif
+    finally
+        let &virtualedit = l:save_virtualedit
+    endtry
+endfunction
+" We start at the beginning, on character number 1.
+nnoremap <silent> gco :<C-u>if ! <SID>GoToCharacter(v:count1 - 1)<Bar>echoerr 'No such position'<Bar>endif<Bar><CR>
+" }}}
