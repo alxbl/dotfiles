@@ -13,6 +13,4 @@ alias twitch='chromium --app=https://www.twitch.tv/'
 alias netflix='chromium --app=https://www.netflix.com/'
 alias slack='chromium --app=https://slack.com'
 alias youtube='chromium --app=https://www.youtube.com'
-# ---
-alias vim='nvim'
 

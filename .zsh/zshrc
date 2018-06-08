@@ -39,13 +39,19 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
     eval `dircolors $HOME/.xresources.d/dircolors`
 fi
 
-# Ruby gems
-export PATH=$PATH:~/.gem/ruby/2.4.0/bin
+# PATH
+export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.4.0/bin
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
-# Useful exports
-export EDITOR=nvim
+# use nvim if available.
+if command -v nvim &>/dev/null; then
+    export EDITOR=nvim
+    alias vim='nvim'
+else
+    export EDITOR=vim
+fi
+
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
 
