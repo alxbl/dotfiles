@@ -28,3 +28,4 @@ so ~/.vim/lang.vim
 
 " Set theme last to ensure everything gets styled.
 so ~/.vim/theme.vim
+
