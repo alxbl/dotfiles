@@ -46,7 +46,7 @@ nnoremap <C-s> <ESC>:w<CR>
 inoremap <C-s> <ESC>:w<CR>a
 
 " Format File
-nnoremap <leader><tab> :normal gg=G<CR>
+nnoremap <leader><tab> :normal gg=G<CR><C-o><C-o>
 
 nnoremap <F2> :LspRename<CR>
 " }}}
