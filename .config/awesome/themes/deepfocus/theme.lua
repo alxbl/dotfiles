@@ -39,7 +39,7 @@ theme.menu_height                               = 32
 theme.menu_width                                = 140
 theme.tasklist_plain_task_name                  = true
 theme.tasklist_disable_icon                     = true
-theme.useless_gap                               = 12
+theme.useless_gap                               = 3
 -- }}}
 
 local markup = lain.util.markup
@@ -107,7 +107,7 @@ function theme.at_screen_connect(s)
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, awful.util.tasklist_buttons)
 
     -- Create the wibox
-    s.mywibox = awful.wibar({ position = "bottom", screen = s, height = 32, bg = theme.bg_normal, fg = theme.fg_normal, stretch = true})
+    s.mywibox = awful.wibar({ position = "bottom", screen = s, height = 24, bg = theme.bg_normal, fg = theme.fg_normal, stretch = true})
 
     -- Add widgets to the wibox
     s.mywibox:setup {
