@@ -14,6 +14,7 @@ nnoremap ; :Buffers<CR>
 nnoremap <C-p> :FZF<CR>
 nnoremap <C-b> :NERDTreeToggle<CR>
 nnoremap <leader>f :Ack!<Space>
+nnoremap <C-J> =o
 
 " Language Server Protocol
 nnoremap <leader>d :LspDefinition<CR>
@@ -39,14 +40,14 @@ inoremap <S-tab> <C-p>
 
 " Quick aliases for surround.vim
 nmap <leader>8 ysiW
-nmap <leader>( ysiw
+nmap <leader>* ysiw
 
 " Ctrl-s is the only sin
 nnoremap <C-s> <ESC>:w<CR>
 inoremap <C-s> <ESC>:w<CR>a
 
 " Format File
-nnoremap <leader><tab> :normal gg=G<CR><C-o><C-o>
+nnoremap <leader><tab> :normal gg=G<CR>
 
 nnoremap <F2> :LspRename<CR>
 " }}}

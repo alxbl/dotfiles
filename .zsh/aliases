@@ -3,6 +3,8 @@
 alias rzshrc='source ~/.zshrc'
 alias aliases='$EDITOR ~/.zsh/aliases'
 alias zshrc='$EDITOR ~/.zsh/zshrc'
+alias vivaldi='vivaldi-snapshot'
+alias mux='tmuxinator'
 # ---
 alias ls='ls --color=auto'
 alias irc='ssh moria -t tmux a'

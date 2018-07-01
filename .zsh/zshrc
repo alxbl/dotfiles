@@ -1,13 +1,13 @@
 #!/bin/sh
 
-ZSHCFG=~/.zsh
-ZSH=$ZSHCFG/oh-my-zsh
+ZSHCFG="$HOME/.zsh"
+ZSH="$ZSHCFG/oh-my-zsh"
 
-plugins=(archlinux docker compleat git github ssh-agent mercurial tmux)
+plugins=(archlinux docker compleat git github ssh-agent tmux)
 setopt completealiases
 
 _has() {
-  return $( whence $1 >/dev/null )
+  return $(whence $1 >/dev/null)
 }
 
 # Disable annoying auto-correct.
@@ -23,9 +23,8 @@ if [[ -f $ZSHCFG/aliases ]]; then
 fi
 
 
-ZSH_THEME="lambda"
 DISABLE_AUTO_TITLE=true
-source $ZSH/oh-my-zsh.sh
+ZSH_THEME="bureau" source "$ZSH/oh-my-zsh.sh"
 
 # FZF && ag
 if _has fzf && _has ag; then

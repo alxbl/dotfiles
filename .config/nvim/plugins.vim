@@ -49,6 +49,7 @@ Plug 'vimwiki/vimwiki'
 
 let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]
 let g:vimwiki_folding = 'syntax'
+let g:vimwiki_table_auto_fmt = 1
 
 Plug 'tpope/vim-fugitive'
 " }}}
