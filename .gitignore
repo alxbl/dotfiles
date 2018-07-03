@@ -4,9 +4,11 @@
 .vim/lsp.log
 .gdb/__pycache__
 
-# blacklist most of the trash in .config.
+# Don't track random and sensitive files
 .config
+.gnupg
 
 # Allow only actual dotfiles from .config
 !.config/awesome
 !.config/termite/config
+!.gnupg/gpg.conf

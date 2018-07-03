@@ -1,7 +1,7 @@
 [user]
     name = Alexandre Beaulieu
     email = alex@segfault.me
-    signingkey = 25DEB091
+    signingkey = E3FC7081
 
 [color]
     status = auto
@@ -19,5 +19,6 @@
 
 [push]
     default = simple
+
 [commit]
     pgpsign = true
