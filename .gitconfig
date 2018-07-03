@@ -1,20 +1,23 @@
 [user]
-	name = Alexandre Beaulieu
-	email = alex@segfault.me
+    name = Alexandre Beaulieu
+    email = alex@segfault.me
+    signingkey = 25DEB09111C6326B
 
 [color]
-	status = auto
-	diff = auto
-	interactive = auto
-	branch = auto
+    status = auto
+    diff = auto
+    interactive = auto
+    branch = auto
 
 [alias]
-	st = status
-	co = checkout
-	com = commit
+    st = status
+    co = checkout
+    com = commit
 
 [log]
-	date = local
+    date = local
 
 [push]
-	default = simple
+    default = simple
+[commit]
+    pgpsign = true
