@@ -21,4 +21,4 @@
     default = simple
 
 [commit]
-    pgpsign = true
+    gpgsign = true
