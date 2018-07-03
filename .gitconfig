@@ -1,7 +1,7 @@
 [user]
     name = Alexandre Beaulieu
     email = alex@segfault.me
-    signingkey = 25DEB09111C6326B
+    signingkey = 25DEB091
 
 [color]
     status = auto
