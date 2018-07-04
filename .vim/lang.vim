@@ -27,7 +27,14 @@ augroup END
 augroup C
     au!
     au BufNewFile,BufRead *.cpp,*.h
-                \ set filetype=cpp.doxygen
+        \ set filetype=cpp.doxygen
+augroup END
+" }}}
+" vimWiki {{{
+augroup VimWiki
+    au!
+    au BufNewFile,BufRead *.wiki
+        \ set textwidth=80
 augroup END
 " }}}
 
