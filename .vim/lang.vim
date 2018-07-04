@@ -1,4 +1,5 @@
-" Python Specific
+" vim:foldmethod=marker:
+" Python Specific {{{
 augroup Python
     au!
     au BufNewFile,BufRead *.py
@@ -9,10 +10,9 @@ augroup Python
                 \ set autoindent |
                 \ set fileformat=unix
 augroup END
-
 let python_highlight_all=1
-
-" HTML/JS/CSS/TS
+" }}}
+" HTML/JS/CSS/TS {{{
 augroup Web
     au!
     au BufNewFile,BufRead *.ts,*.js,*.html,*.css,*.ejs,*.htm
@@ -22,13 +22,12 @@ augroup Web
 
     au BufNewFile,BufRead *.ejs set filetype=html
 augroup END
-
-" Python
-
-" C/C++
+" }}}
+" C/C++ {{{
 augroup C
     au!
     au BufNewFile,BufRead *.cpp,*.h
                 \ set filetype=cpp.doxygen
 augroup END
+" }}}
 
