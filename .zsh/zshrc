@@ -3,7 +3,7 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 
-plugins=(archlinux docker compleat git github ssh-agent tmux)
+plugins=(archlinux docker compleat git github ssh-agent gpg-agent tmux)
 setopt completealiases
 
 _has() {
