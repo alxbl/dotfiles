@@ -40,6 +40,8 @@ fi
 
 # PATH
 export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.4.0/bin
+export DEV_PATH="$HOME/dev"
+export PEDA="$DEV_PATH/foss/peda"
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 

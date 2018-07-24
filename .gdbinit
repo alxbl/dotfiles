@@ -1,3 +1,5 @@
+source $PEDA/peda.py
+
 python
 
 import sys
