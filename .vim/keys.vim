@@ -46,9 +46,11 @@ nmap <leader>* ysiw
 nnoremap <C-s> <ESC>:w<CR>
 inoremap <C-s> <ESC>:w<CR>a
 
+" Save as root (https://stackoverflow.com/a/7078429)
+cmap w!! w !sudo tee >/dev/null %
+
 " Format File
 nnoremap <leader><tab> :normal gg=G<CR>
-
 nnoremap <F2> :LspRename<CR>
 " }}}
 
