@@ -23,6 +23,7 @@ augroup Web
     au BufNewFile,BufRead *.ejs set filetype=html
 augroup END
 " }}}
+
 " C/C++ {{{
 augroup C
     au!
@@ -30,6 +31,7 @@ augroup C
         \ set filetype=cpp.doxygen
 augroup END
 " }}}
+
 " vimWiki {{{
 augroup VimWiki
     au!
@@ -38,3 +40,12 @@ augroup VimWiki
 augroup END
 " }}}
 
+" YAML {{{
+augroup Yaml
+    au!
+    au BufNewFile, BufRead *.yaml,*.yml
+                \ set tabstop=2 |
+                \ set softtabstop=2 |
+                \ set shiftwidth=2
+augroup END
+" }}}
