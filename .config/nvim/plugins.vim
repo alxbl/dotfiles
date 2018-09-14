@@ -27,10 +27,11 @@ Plug 'christoomey/vim-tmux-navigator' " Seamless tmux+vim pane switching
 
 " Language support {{{
 " https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
-" Make vim into an LSP client. Hooray!
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+"
+" TODO: CLEAN UP DEPRECATED STUFF
+" Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+" Plug 'roxma/nvim-completion-manager' " Completions for neovim
 
-Plug 'roxma/nvim-completion-manager' " Completions for neovim
 Plug 'Shougo/echodoc.vim'            " Show function documentation in command bar
 Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files
