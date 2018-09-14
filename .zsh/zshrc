@@ -39,7 +39,7 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
 fi
 
 # PATH
-export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.4.0/bin
+export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.5.0/bin
 export DEV_PATH="$HOME/dev"
 export PEDA="$DEV_PATH/foss/peda"
 
