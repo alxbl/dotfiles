@@ -38,9 +38,10 @@ do -- Handle runtime errors after startup
 end
 
 awful.spawn("setxkbmap -option ctrl:nocaps")
-awful.spawn("xset r rate 300 45")
+awful.spawn("xset r rate 350 45")
 run_once({
     "unclutter -root",
+    "fcitx",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 })
 -- }}}
