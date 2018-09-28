@@ -54,6 +54,8 @@ local TERM   = os.getenv("TERMINAL") or "termite"
 
 -- beautiful.init(HOME .. ".config/awesome/themes/neo/theme.lua")
 beautiful.init(CONFIG .. "themes/neo/theme.lua")
+naughty.config.defaults.screen = awful.screen.primary
+naughty.config.screen = awful.screen.primary
 
 awful.layout.layouts = {
     awful.layout.suit.tile,
@@ -61,6 +63,8 @@ awful.layout.layouts = {
     awful.layout.suit.fair,
     awful.layout.suit.magnifier,
     awful.layout.suit.corner.nw,
+    lain.layout.centerwork,
+    lain.layout.cascade
 }
 
 local function pick_wnd()
@@ -72,7 +76,7 @@ local function run_cmd()
 end
 
 local function lock_screen()
-    awful.spawn("i3lock -i " .. CONFIG .. "lock.png")
+    awful.spawn("i3lock -t -i " .. CONFIG .. "lock.png")
 end
 
 -- }}}
@@ -196,8 +200,8 @@ KEYS = gears.table.join(
     awful.key({ MOD,           }, "Return", function () awful.spawn(TERM) end, {description = "open terminal",      group = "awesome"}),
     awful.key({ MOD,           }, "w", pick_wnd,                               {description = "open window picker", group = "awesome"}),
     awful.key({ MOD,           }, "r", run_cmd,                                {description = "open launcher",      group = "awesome"}),
-    awful.key({ MOD, "Shift"   }, "l", lock_screen,                            {description = "lock screen",        group = "awesome"}),
     awful.key({ MOD,           }, "p", function() awful.spawn("flameshot gui") end),
+    awful.key({ "Control", "Mod1"  }, "l", lock_screen,                            {description = "lock screen",        group = "awesome"}),
 
     -- Layouts
     awful.key({ MOD,           }, "Left",   awful.tag.viewprev,        {description = "view previous",  group = "tag"}),
@@ -214,10 +218,10 @@ KEYS = gears.table.join(
     awful.key({ MOD, "Shift"   }, "space", function () awful.layout.inc(-1)                end, {description = "select previous", group = "layout"}),
 
     -- Clients
-    awful.key({ MOD,           }, "j", function () awful.client.focus.byidx( 1)    end, {description = "focus next by index",                group = "client"}),
-    awful.key({ MOD,           }, "k", function () awful.client.focus.byidx(-1)    end, {description = "focus previous by index",            group = "client"}),
-    awful.key({ MOD, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end, {description = "swap with next client by index",     group = "client"}),
-    awful.key({ MOD, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end, {description = "swap with previous client by index", group = "client"}),
+    awful.key({ MOD,           }, "j", function ()  awful.client.focus.byidx( 1)    end, {description = "focus next by index",                group = "client"}),
+    awful.key({ MOD,           }, "k", function ()  awful.client.focus.byidx(-1)    end, {description = "focus previous by index",            group = "client"}),
+    awful.key({ MOD, "Shift"   }, "j", function ()  awful.client.swap.byidx(  1)    end, {description = "swap with next client by index",     group = "client"}),
+    awful.key({ MOD, "Shift"   }, "k", function ()  awful.client.swap.byidx( -1)    end, {description = "swap with previous client by index", group = "client"}),
     awful.key({ MOD,           }, "u", awful.client.urgent.jumpto,                      {description = "jump to urgent client",              group = "client"}),
 
     awful.key({ MOD,           }, "Tab",
@@ -255,7 +259,10 @@ KEYS = gears.table.join(
                     history_path = awful.util.get_cache_dir() .. "/history_eval"
                   }
               end,
-              {description = "lua execute prompt", group = "awesome"})
+              {description = "lua execute prompt", group = "awesome"}),
+
+    awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +5%\"") end),
+    awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end)
 )
 
 CLIENT_KEYS = gears.table.join(
@@ -271,6 +278,7 @@ CLIENT_KEYS = gears.table.join(
     awful.key({ MOD,           }, "o",      function (c) c:move_to_screen()               end, {description = "move to screen", group = "client"}),
     awful.key({ MOD,           }, "t",      function (c) c.ontop = not c.ontop            end, {description = "toggle keep on top", group = "client"}),
     awful.key({ MOD,           }, "n", function (c) c.minimized = true end , {description = "minimize", group = "client"}),
+    awful.key({ MOD,           }, "q", function (c) c:kill()                        end, {description = "kill focused client",                group = "client"}),
     awful.key({ MOD,           }, "m",
         function (c)
             c.maximized = not c.maximized
@@ -350,6 +358,7 @@ clientbuttons = gears.table.join(
 root.keys(KEYS)
 -- }}}
 -- 5. Rules {{{
+-- TODO: Import
 awful.rules.rules = {
     {
         rule = { }, -- DEFAULT
@@ -390,9 +399,10 @@ awful.rules.rules = {
           "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
         }
       }, properties = { floating = true }},
+      -- TODO: Center
 
     -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "normal", "dialog" }
+    { rule_any = {type = { "dialog" }
       }, properties = { titlebars_enabled = true }
     },
 
@@ -420,7 +430,6 @@ client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_n
 
 -- Title bars
 client.connect_signal("request::titlebars", function(c)
-    if not beautiful.show_titlebar then return end
     if beautiful.titlebar_fun then
         beautiful.titlebar_fun(c)
         return
