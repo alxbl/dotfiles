@@ -42,6 +42,7 @@ awful.spawn("xset r rate 350 45")
 run_once({
     "unclutter -root",
     "fcitx",
+    "flameshot",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 })
 -- }}}
@@ -76,7 +77,7 @@ local function run_cmd()
 end
 
 local function lock_screen()
-    awful.spawn("i3lock -t -i " .. CONFIG .. "lock.png")
+    awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png")
 end
 
 -- }}}
