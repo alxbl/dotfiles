@@ -346,10 +346,11 @@ clientbuttons = gears.table.join(
 root.keys(KEYS)
 -- }}}
 -- 5. Rules {{{
--- TODO: Import
+-- TODO: Import from external file.
 awful.rules.rules = {
+    -- DEFAULT
     {
-        rule = { }, -- DEFAULT
+        rule = { },
         properties = {
             border_width = beautiful.border_width,
             border_color = beautiful.border_normal,
@@ -378,7 +379,6 @@ awful.rules.rules = {
           "pinentry",
           "veromix",
           "xtightvncviewer"},
-
         name = {
           "Event Tester",  -- xev.
         },
@@ -387,14 +387,19 @@ awful.rules.rules = {
           "pop-up",       -- e.g. Google Chrome's (detached) Developer Tools.
         }
       }, properties = { floating = true }},
-      -- TODO: Center
-
     -- Add titlebars to normal clients and dialogs
-    { rule_any = {type = { "dialog" }
-      }, properties = { titlebars_enabled = true }
-    },
+    { rule_any = {type = { "dialog" } }, properties = { titlebars_enabled = true } },
 
+    -- Workspace
     { rule = { class = "Firefox" }, properties = { screen = 1, tag = "2" } },
+    { rule = { class = "Spotify" }, properties = { screen = 1, tag = "9" } },
+    -- Chat
+    { rule = { class = "Keybase" }, properties = { screen = 2, tag = "3" } },
+    { rule = { class = "Slack" }, properties = { screen = 2, tag = "3" } },
+
+    -- VM sessions go on second screen
+    { rule = { class = "virt-manager" }, properties = { screen = 2, tag = "1" } },
+    { rule = { name = "win10 on QEMU/KVM" }, properties = { screen = 2, tag = "2", maximized = true } },
 }
 -- }}}
 -- 6. Signal Hooks {{{
