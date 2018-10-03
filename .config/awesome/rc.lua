@@ -41,6 +41,7 @@ awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 45")
 run_once({
     "unclutter -root",
+    "compton -i 0.8",
     "fcitx",
     "flameshot",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
