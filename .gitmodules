@@ -34,3 +34,6 @@
 [submodule ".vim/bundle/Vundle.vim"]
     path = .vim/bundle/Vundle.vim
     url = https://github.com/gmarik/Vundle.vim.git
+[submodule ".zsh/themes/geometry"]
+	path = .zsh/themes/geometry
+	url = https://github.com/geometry-zsh/geometry
