@@ -12,6 +12,7 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
                       require("awful.hotkeys_popup.keys") -- application specific hotkey map
 -- Extensions
 local lain          = require("lain")
+local markup        = lain.util.markup
 -- }}}
 -- 1. Startup {{{
 local function run_once(cmd_arr)
@@ -44,6 +45,7 @@ run_once({
     "compton -i 0.8",
     "fcitx",
     "flameshot",
+    "nm-applet",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 })
 -- }}}
@@ -54,8 +56,9 @@ local CONFIG = HOME .. "/.config/awesome/"
 local EDITOR = os.getenv("EDITOR") or "vi"
 local TERM   = os.getenv("TERMINAL") or "termite"
 
--- beautiful.init(HOME .. ".config/awesome/themes/neo/theme.lua")
 beautiful.init(CONFIG .. "themes/neo/theme.lua")
+
+-- FIXME: Doesn't seem to work.
 naughty.config.defaults.screen = awful.screen.primary
 naughty.config.screen = awful.screen.primary
 
@@ -69,22 +72,12 @@ awful.layout.layouts = {
     lain.layout.cascade
 }
 
-local function pick_wnd()
-    awful.spawn("rofi -show window")
-end
-
-local function run_cmd()
-    awful.spawn("rofi -show run")
-end
-
-local function lock_screen()
-    awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png")
-end
-
+local function pick_wnd()    awful.spawn("rofi -show window") end
+local function run_cmd()     awful.spawn("rofi -show run") end
+local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 -- }}}
 -- 3. Taskbar Keyboard {{{
-mykeyboardlayout = awful.widget.keyboardlayout() -- Keymap indicator
-mytextclock = wibox.widget.textclock() -- Clock
+mytextclock = wibox.widget.textclock("%H:%M") -- Clock
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -109,14 +102,10 @@ local tasklist_buttons = gears.table.join(
                                               if c == client.focus then
                                                   c.minimized = true
                                               else
-                                                  -- Without this, the following
-                                                  -- :isvisible() makes no sense
                                                   c.minimized = false
                                                   if not c:isvisible() and c.first_tag then
                                                       c.first_tag:view_only()
                                                   end
-                                                  -- This will also un-minimize
-                                                  -- the client, if needed
                                                   client.focus = c
                                                   c:raise()
                                               end
@@ -129,10 +118,8 @@ local tasklist_buttons = gears.table.join(
                                           end))
 
 local function set_wallpaper(s)
-    -- Wallpaper
     if beautiful.wallpaper then
         local wallpaper = beautiful.wallpaper
-        -- If wallpaper is a function, call it with the screen
         if type(wallpaper) == "function" then
             wallpaper = wallpaper(s)
         end
@@ -144,47 +131,53 @@ end
 screen.connect_signal("property::geometry", set_wallpaper)
 
 awful.screen.connect_for_each_screen(function(s)
-    -- Wallpaper
     set_wallpaper(s)
 
+    local volume = lain.widget.alsa({
+        --togglechannel = "IEC958,3",
+        settings = function()
+            header = " Vol "
+            vlevel  = volume_now.level
+
+            if volume_now.status == "off" then
+                vlevel = vlevel .. "M "
+            else
+                vlevel = vlevel .. " "
+            end
+
+            widget:set_markup(markup.font(beautiful.font, markup(gray, header) .. markup(white, vlevel)))
+        end
+    })
     -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
-    -- Create an imagebox widget which will contain an icon indicating which layout we're using.
-    -- We need one layoutbox per screen.
     s.mylayoutbox = awful.widget.layoutbox(s)
     s.mylayoutbox:buttons(gears.table.join(
                            awful.button({ }, 1, function () awful.layout.inc( 1) end),
                            awful.button({ }, 3, function () awful.layout.inc(-1) end),
                            awful.button({ }, 4, function () awful.layout.inc( 1) end),
                            awful.button({ }, 5, function () awful.layout.inc(-1) end)))
-    -- Create a taglist widget
     s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.noempty, taglist_buttons)
-
-    -- Create a tasklist widget
     s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons)
-
-    -- Create the wibox
     s.mywibox = awful.wibar({ position = "top", screen = s })
 
-    -- Add widgets to the wibox
     s.mywibox:setup {
-        layout = wibox.layout.align.horizontal,
-        { -- Left widgets
+        layout = wibox.layout.fixed.horizontal,
+        fill_space = false,
+        {
             layout = wibox.layout.fixed.horizontal,
-            mylauncher,
+            s.mylayoutbox,
             s.mytaglist
         },
-        s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
-            mykeyboardlayout,
             wibox.widget.systray(),
+            volume.widget,
             mytextclock,
-            s.mylayoutbox,
         },
     }
 end)
+
 -- }}}
 --  4. Key bindings {{{
 root.buttons(gears.table.join(
@@ -403,6 +396,13 @@ awful.rules.rules = {
 }
 -- }}}
 -- 6. Signal Hooks {{{
+function on_focus_change(c, focused)
+    if focused then
+        c.border_color = beautiful.border_focus
+    else
+        c.border_color = beautiful.border_normal
+    end
+end
 client.connect_signal("manage", function (c) -- New client.
     -- if not awesome.startup then awful.client.setslave(c) end
     if awesome.startup and
@@ -418,8 +418,8 @@ client.connect_signal("mouse::enter", function(c)
     end
 end)
 
-client.connect_signal("focus", function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal("unfocus", function(c) c.border_color = beautiful.border_normal end)
+client.connect_signal("focus", function(c) on_focus_change(c, true) end)
+client.connect_signal("unfocus", function (c) on_focus_change(c, false) end)
 
 -- Title bars
 client.connect_signal("request::titlebars", function(c)
