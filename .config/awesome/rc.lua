@@ -67,10 +67,6 @@ run_once({
     "nm-applet",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 })
-
-local function pick_wnd()    awful.spawn("rofi -show window") end
-local function run_cmd()     awful.spawn("rofi -show run") end
-local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 -- }}}
 -- 2. Basic Configuration {{{
 local MOD    = "Mod4"
@@ -78,6 +74,10 @@ local HOME   = os.getenv("HOME")
 local CONFIG = HOME .. "/.config/awesome/"
 local EDITOR = os.getenv("EDITOR") or "vi"
 local TERM   = os.getenv("TERMINAL") or "termite"
+
+local function pick_wnd()    awful.spawn("rofi -show window") end
+local function run_cmd()     awful.spawn("rofi -show run") end
+local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 
 beautiful.init(CONFIG .. "themes/neo/theme.lua")
 
