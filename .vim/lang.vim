@@ -23,7 +23,6 @@ augroup Web
     au BufNewFile,BufRead *.ejs set filetype=html
 augroup END
 " }}}
-
 " C/C++ {{{
 augroup C
     au!
@@ -31,7 +30,6 @@ augroup C
         \ set filetype=cpp.doxygen
 augroup END
 " }}}
-
 " vimWiki {{{
 augroup VimWiki
     au!
@@ -39,7 +37,6 @@ augroup VimWiki
         \ set textwidth=80
 augroup END
 " }}}
-
 " YAML {{{
 augroup Yaml
     au!
@@ -47,5 +44,12 @@ augroup Yaml
                 \ set tabstop=2 |
                 \ set softtabstop=2 |
                 \ set shiftwidth=2
+augroup END
+" }}}
+" Lua {{{
+augroup Lua
+    au!
+    au BufNewFile,BufRead *.lua
+                \ set foldmethod=indent
 augroup END
 " }}}
