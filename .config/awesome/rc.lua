@@ -1,4 +1,3 @@
--- vim:foldmethod=marker
 -- 0. Includes & stdlib {{{
 local gears         = require("gears")
 local awful         = require("awful")
@@ -6,15 +5,13 @@ local awful         = require("awful")
 local wibox         = require("wibox")
 local beautiful     = require("beautiful")
 local naughty       = require("naughty")
--- local menubar       = require("menubar")
--- ... is this even useful?
 local hotkeys_popup = require("awful.hotkeys_popup").widget
-                      require("awful.hotkeys_popup.keys") -- application specific hotkey map
+                      require("awful.hotkeys_popup.keys")
 -- Extensions
 local lain          = require("lain")
 local markup        = lain.util.markup
--- }}}
--- 1. Startup {{{
+-- -----------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
 local function run_once(cmd_arr)
     for _, cmd in ipairs(cmd_arr) do
         findme = cmd
@@ -26,9 +23,26 @@ local function run_once(cmd_arr)
     end
 end
 
-do -- Handle runtime errors after startup
+local function set_wallpaper(s)
+    if beautiful.wallpaper then
+        local wallpaper = beautiful.wallpaper
+        if type(wallpaper) == "function" then
+            wallpaper = wallpaper(s)
+        end
+        gears.wallpaper.maximized(wallpaper, s, true)
+    end
+end
+
+-- -----------------------------------
+-- Handle runtime errors after startup
+-- -----------------------------------
+do
     local in_error = false
     awesome.connect_signal("debug::error", function (err)
+        -- Don't show errors when rules try to spawn a client on a disconnected
+        -- screen.
+        if (err.text ~= "invalid screen number") then return end
+
         if in_error then return end
         in_error = true
         naughty.notify({ preset = naughty.config.presets.critical,
@@ -38,6 +52,11 @@ do -- Handle runtime errors after startup
     end)
 end
 
+-- FIXME: Doesn't seem to work.
+naughty.config.defaults.screen = awful.screen.primary
+naughty.config.screen = awful.screen.primary
+-- }}}
+-- 1. Startup {{{
 awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 45")
 run_once({
@@ -48,8 +67,12 @@ run_once({
     "nm-applet",
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
 })
+
+local function pick_wnd()    awful.spawn("rofi -show window") end
+local function run_cmd()     awful.spawn("rofi -show run") end
+local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 -- }}}
--- 2. Configuration & variables {{{
+-- 2. Basic Configuration {{{
 local MOD    = "Mod4"
 local HOME   = os.getenv("HOME")
 local CONFIG = HOME .. "/.config/awesome/"
@@ -57,10 +80,6 @@ local EDITOR = os.getenv("EDITOR") or "vi"
 local TERM   = os.getenv("TERMINAL") or "termite"
 
 beautiful.init(CONFIG .. "themes/neo/theme.lua")
-
--- FIXME: Doesn't seem to work.
-naughty.config.defaults.screen = awful.screen.primary
-naughty.config.screen = awful.screen.primary
 
 awful.layout.layouts = {
     awful.layout.suit.tile,
@@ -71,14 +90,8 @@ awful.layout.layouts = {
     lain.layout.centerwork,
     lain.layout.cascade
 }
-
-local function pick_wnd()    awful.spawn("rofi -show window") end
-local function run_cmd()     awful.spawn("rofi -show run") end
-local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 -- }}}
--- 3. Taskbar Keyboard {{{
-mytextclock = wibox.widget.textclock("%H:%M") -- Clock
-
+-- 3. Workspace {{{
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
                     awful.button({ }, 1, function(t) t:view_only() end),
@@ -117,37 +130,41 @@ local tasklist_buttons = gears.table.join(
                                               awful.client.focus.byidx(-1)
                                           end))
 
-local function set_wallpaper(s)
-    if beautiful.wallpaper then
-        local wallpaper = beautiful.wallpaper
-        if type(wallpaper) == "function" then
-            wallpaper = wallpaper(s)
-        end
-        gears.wallpaper.maximized(wallpaper, s, true)
-    end
-end
-
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
+
+
+-- Widgets {{{
+clock = wibox.widget.textclock("%H:%M")
+-- Battery {{{
+get_battery = function(p, ac)
+    if     p == 100 then  return (ac and "" or "")
+    elseif p >  90  then  return (ac and "" or "")
+    elseif p >  80  then  return (ac and "" or "")
+    elseif p >  70  then  return (ac and "" or "")
+    elseif p >  60  then  return (ac and "" or "")
+    elseif p >  50  then  return (ac and "" or "")
+    elseif p >  40  then  return (ac and "" or "")
+    elseif p >  30  then  return (ac and "" or "")
+    elseif p >  20  then  return (ac and "" or "")
+    elseif p >  10  then  return (ac and "" or "")
+    elseif p >   0  then  return (ac and "" or "")
+    else return "" end
+end
+bat =   lain.widget.bat({
+    battery = "BAT0",
+    settings = function()
+        bat_header = get_battery(bat_now.perc, bat_now.status == "Charging")
+        -- TODO: Color should not be hardcoded
+        widget:set_markup(markup.font("Material Icons 14", markup("#FFFFFF", bat_header)))
+    end
+})
+-- }}}
+-- }}}
 
 awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
-    local volume = lain.widget.alsa({
-        --togglechannel = "IEC958,3",
-        settings = function()
-            header = " Vol "
-            vlevel  = volume_now.level
-
-            if volume_now.status == "off" then
-                vlevel = vlevel .. "M "
-            else
-                vlevel = vlevel .. " "
-            end
-
-            widget:set_markup(markup.font(beautiful.font, markup(gray, header) .. markup(white, vlevel)))
-        end
-    })
     -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
@@ -158,22 +175,29 @@ awful.screen.connect_for_each_screen(function(s)
                            awful.button({ }, 4, function () awful.layout.inc( 1) end),
                            awful.button({ }, 5, function () awful.layout.inc(-1) end)))
     s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.noempty, taglist_buttons)
-    s.mytasklist = awful.widget.tasklist(s, awful.widget.tasklist.filter.currenttags, tasklist_buttons)
+
+    -- Display title of focused client here.
+    s.tasklist = wibox.widget {
+        text = "Awesome",
+        align = "center",
+        widget = wibox.widget.textbox
+    }
+
     s.mywibox = awful.wibar({ position = "top", screen = s })
 
     s.mywibox:setup {
-        layout = wibox.layout.fixed.horizontal,
-        fill_space = false,
+        layout = wibox.layout.align.horizontal,
         {
             layout = wibox.layout.fixed.horizontal,
             s.mylayoutbox,
             s.mytaglist
         },
+        s.tasklist,
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
-            volume.widget,
-            mytextclock,
+            bat.widget,
+            clock
         },
     }
 end)
@@ -399,6 +423,7 @@ awful.rules.rules = {
 function on_focus_change(c, focused)
     if focused then
         c.border_color = beautiful.border_focus
+        c.screen.tasklist.text = c.name
     else
         c.border_color = beautiful.border_normal
     end
@@ -456,4 +481,4 @@ client.connect_signal("request::titlebars", function(c)
     }
 end)
 -- }}}
-
+-- vim:foldmethod=marker:foldlevel=0
