@@ -35,12 +35,12 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 " Language support {{{
 " https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
-"
-" TODO: CLEAN UP DEPRECATED STUFF
-" Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
-" Plug 'roxma/nvim-completion-manager' " Completions for neovim
-
+Plug 'ncm2/ncm2'                     " Neovim Completion Manager
+Plug 'ncm2/tmux'
+Plug 'ncm2/path'
+Plug 'roxma/nvim-yarp'               " Required by ncm2
 Plug 'Shougo/echodoc.vim'            " Show function documentation in command bar
+
 Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files
 Plug 'tmhedberg/SimpylFold'          " Python Smart Folding

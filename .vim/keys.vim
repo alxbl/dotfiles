@@ -16,12 +16,6 @@ nnoremap <C-b> :NERDTreeToggle<CR>
 nnoremap <leader>f :Ack!<Space>
 nnoremap <C-J> =o
 
-" Language Server Protocol
-nnoremap <leader>d :LspDefinition<CR>
-nnoremap <F12> :LspDefinition<CR>
-nnoremap <leader>r :LspReferences<CR>
-nnoremap <leader>p :LspDocumentSymbol<CR>
-
 " No-frill pane switching (tmux aware)
 nnoremap <M-h> :TmuxNavigateLeft<CR>
 nnoremap <M-j> :TmuxNavigateDown<CR>
@@ -51,7 +45,6 @@ cmap w!! w !sudo tee >/dev/null %
 
 " Format File
 nnoremap <leader><tab> :normal gg=G<CR>
-nnoremap <F2> :LspRename<CR>
 " }}}
 
 
