@@ -4,7 +4,6 @@ ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG" # For oh-my-zsh
 
 plugins=(archlinux docker compleat git github ssh-agent gpg-agent nvm tmux)
-GEOMETRY_PROMPT_PLUGINS=(virtualenv docker_machine exec_time git hg)
 setopt completealiases
 
 _has() {
@@ -25,10 +24,7 @@ fi
 
 
 DISABLE_AUTO_TITLE=true
-ZSH_THEME="geometry/geometry"
-
-# oh-my-zsh
-source "$ZSH/oh-my-zsh.sh"
+source "$ZSHCFG/zsh_theme"
 
 # FZF && ag
 if _has fzf && _has ag; then
