@@ -15,10 +15,11 @@
 
 " Share some vanilla settings with vim
 so ~/.vim/global.vim
-so ~/.vim/keys.vim
 
 " Plugin manifest
 so ~/.config/nvim/plugins.vim
+
+so ~/.vim/keys.vim
 
 " Language Server Targets
 so ~/.config/nvim/lsp.vim

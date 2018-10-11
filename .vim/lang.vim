@@ -37,4 +37,19 @@ augroup VimWiki
         \ set textwidth=80
 augroup END
 " }}}
-
+" YAML {{{
+augroup Yaml
+    au!
+    au BufNewFile,BufRead *.yaml,*.yml
+                \ set tabstop=2 |
+                \ set softtabstop=2 |
+                \ set shiftwidth=2
+augroup END
+" }}}
+" Lua {{{
+augroup Lua
+    au!
+    au BufNewFile,BufRead *.lua
+                \ set foldmethod=indent
+augroup END
+" }}}

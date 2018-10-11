@@ -3,10 +3,11 @@ so ~/.config/nvim/plug.vim
 call plug#begin('~/.config/nvim/plugged')
 
 " Navigation {{{
-Plug 'junegunn/fzf'          " Fuzzy File Finding
-Plug 'junegunn/fzf.vim'      " FZF common commands
-Plug 'mileszs/ack.vim'       " For ag support
-Plug 'scrooloose/nerdtree'   " Better than netrw
+Plug 'junegunn/fzf'                   " Fuzzy File Finding
+Plug 'junegunn/fzf.vim'               " FZF common commands
+Plug 'mileszs/ack.vim'                " For ag support
+Plug 'scrooloose/nerdtree'            " Better than netrw
+Plug 'christoomey/vim-tmux-navigator' " Seamless tmux+vim pane switching
 
 let g:ackprg = 'ag --vimgrep --smart-case'
 cnoreabbrev ag Ack
@@ -22,15 +23,23 @@ Plug 'editorconfig/editorconfig-vim'  " Respect .editorconfig when present
 Plug 'tpope/vim-surround'             " Wrap in parenthesis
 Plug 'tpope/vim-commentary'           " Toggle Comment Support
 Plug 'tpope/vim-unimpaired'           " Additional navigation bindings
-Plug 'christoomey/vim-tmux-navigator' " Seamless tmux+vim pane switching
+Plug 'Shougo/neosnippet'              " Snippet framework
+Plug 'honza/vim-snippets'             " Snippet collection
+
+let g:neosnippet#enable_snipmate_compatibility = 1
+let g:neosnippet#snippets_directory = "~/.config/nvim/plugged/vim-snippets/snippets/"
+imap <C-k>     <Plug>(neosnippet_expand_or_jump)
+smap <C-k>     <Plug>(neosnippet_expand_or_jump)
+xmap <C-k>     <Plug>(neosnippet_expand_target)
 " }}}
 
 " Language support {{{
 " https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
-" Make vim into an LSP client. Hooray!
-Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+"
+" TODO: CLEAN UP DEPRECATED STUFF
+" Plug 'autozimu/LanguageClient-neovim', { 'do': ':UpdateRemotePlugins' }
+" Plug 'roxma/nvim-completion-manager' " Completions for neovim
 
-Plug 'roxma/nvim-completion-manager' " Completions for neovim
 Plug 'Shougo/echodoc.vim'            " Show function documentation in command bar
 Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files

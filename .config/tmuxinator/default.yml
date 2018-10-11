@@ -1,0 +1,23 @@
+name: $TEMPLATE
+root: ~/Work/$TEMPLATE
+on_project_first_start: mkdir -p ~/Work/$TEMPLATE/screens
+on_project_start: rm ~/Pictures/Screenshots; ln -s ~/Work/$TEMPLATE/screens ~/Pictures/Screenshots
+# on_project_restart: command
+# on_project_exit: command
+# on_project_stop: command
+# pre_window: rbenv shell 2.0.0-p247
+# tmux_options: -f ~/.tmux.mac.conf
+# tmux_command: byobu
+# startup_window: editor
+# startup_pane: 1
+# attach: false
+# post: tmux -CC attach -t testor
+
+windows:
+    - notes:
+        layout: main-vertical
+        panes:
+            - zsh
+            - zsh
+    - work:
+        - ranger
