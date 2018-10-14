@@ -13,4 +13,7 @@ alias win64='rdesktop -g 1440x900 -P -z localhost'
 alias twitch='chromium --app=https://www.twitch.tv/'
 alias netflix='chromium --app=https://www.netflix.com/'
 alias youtube='chromium --app=https://www.youtube.com'
+# ---
+alias torup='sudo systemctl start tor'
+alias tordown='sudo systemctl stop tor'
 
