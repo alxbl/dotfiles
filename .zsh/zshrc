@@ -24,6 +24,10 @@ fi
 
 
 DISABLE_AUTO_TITLE=true
+
+if [ $EUID -eq 0 ]; then
+   ZSH_DISABLE_COMPFIX="true"
+fi
 source "$ZSHCFG/zsh_theme"
 
 # FZF && ag
