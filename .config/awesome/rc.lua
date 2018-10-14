@@ -267,7 +267,9 @@ KEYS = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +5%\"") end),
-    awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end)
+    awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end),
+    awful.key({}, "XF86MonBrightnessDown", function() awful.spawn("brillo -U 5") end),
+    awful.key({}, "XF86MonBrightnessUp", function() awful.spawn("brillo -A 5") end)
 )
 
 CLIENT_KEYS = gears.table.join(
