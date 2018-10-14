@@ -36,9 +36,15 @@ xmap <C-k>     <Plug>(neosnippet_expand_target)
 " Language support {{{
 " https://github.com/autozimu/LanguageClient-neovim/blob/master/doc/LanguageClient.txt
 Plug 'ncm2/ncm2'                     " Neovim Completion Manager
-Plug 'ncm2/tmux'
-Plug 'ncm2/path'
-Plug 'roxma/nvim-yarp'               " Required by ncm2
+Plug 'roxma/nvim-yarp'
+autocmd BufEnter * call ncm2#enable_for_buffer()
+set completeopt=noinsert,menuone,noselect
+
+
+Plug 'ncm2/ncm2-bufword'
+Plug 'ncm2/ncm2-tmux'
+Plug 'ncm2/ncm2-path'
+
 Plug 'Shougo/echodoc.vim'            " Show function documentation in command bar
 
 Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
