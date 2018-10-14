@@ -18,7 +18,8 @@ augroup Web
     au BufNewFile,BufRead *.ts,*.js,*.html,*.css,*.ejs,*.htm
                 \ set tabstop=2 |
                 \ set softtabstop=2 |
-                \ set shiftwidth=2
+                \ set shiftwidth=2 |
+                \ set foldmethod=syntax
 
     au BufNewFile,BufRead *.ejs set filetype=html
 augroup END

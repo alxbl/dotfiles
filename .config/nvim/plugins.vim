@@ -51,6 +51,7 @@ Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files
 Plug 'tmhedberg/SimpylFold'          " Python Smart Folding
 Plug 'rust-lang/rust.vim'            " The Rust programming language
+Plug 'pangloss/vim-javascript'
 " }}}
 
 " Pretty colors {{{
