@@ -135,7 +135,6 @@ screen.connect_signal("property::geometry", set_wallpaper)
 
 
 -- Widgets {{{
-clock = wibox.widget.textclock("%H:%M")
 -- Battery {{{
 get_battery = function(p, ac)
     if     p == 100 then  return (ac and "" or "")
@@ -178,9 +177,8 @@ awful.screen.connect_for_each_screen(function(s)
 
     -- Display title of focused client here.
     s.tasklist = wibox.widget {
-        text = "Awesome",
         align = "center",
-        widget = wibox.widget.textbox
+        widget = wibox.widget.textclock("%a %b %d %H:%M")
     }
 
     s.mywibox = awful.wibar({ position = "top", screen = s })
@@ -196,8 +194,7 @@ awful.screen.connect_for_each_screen(function(s)
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
             wibox.widget.systray(),
-            bat.widget,
-            clock
+            bat.widget
         },
     }
 end)
@@ -425,7 +422,7 @@ awful.rules.rules = {
 function on_focus_change(c, focused)
     if focused then
         c.border_color = beautiful.border_focus
-        c.screen.tasklist.text = c.name
+        -- c.screen.tasklist.text = c.name
     else
         c.border_color = beautiful.border_normal
     end
