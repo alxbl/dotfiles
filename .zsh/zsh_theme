@@ -1,4 +1,4 @@
-GEOMETRY_PROMPT_PLUGINS=(virtualenv exec_time git hg jobs)
+GEOMETRY_PROMPT_PLUGINS=(virtualenv exec_time git hg +rustup jobs)
 GEOMETRY_SYMBOL_PROMPT="$"                  # default prompt symbol
 GEOMETRY_SYMBOL_RPROMPT=">"                 # multiline prompts
 GEOMETRY_SYMBOL_EXIT_VALUE="!"              # displayed when exit value is != 0
