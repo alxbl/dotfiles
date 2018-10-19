@@ -88,7 +88,7 @@ awful.layout.layouts = {
     awful.layout.suit.magnifier,
     awful.layout.suit.corner.nw,
     lain.layout.centerwork,
-    lain.layout.cascade
+    lain.layout.cascade.tile
 }
 -- }}}
 -- 3. Workspace {{{
