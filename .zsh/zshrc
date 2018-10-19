@@ -43,7 +43,11 @@ if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
 fi
 
 # PATH
-export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.5.0/bin
+if [ ! -v PATHFIX ]; then
+    export PATH=$PATH:~/.cargo/bin:~/.gem/ruby/2.5.0/bin
+    # Avoid re-appending to path.
+    export PATHFIX=1
+fi
 export DEV_PATH="$HOME/dev"
 export PEDA="$DEV_PATH/foss/peda"
 
