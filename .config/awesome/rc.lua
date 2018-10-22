@@ -58,7 +58,7 @@ naughty.config.screen = awful.screen.primary
 -- }}}
 -- 1. Startup {{{
 awful.spawn("setxkbmap -option ctrl:nocaps")
-awful.spawn("xset r rate 350 45")
+awful.spawn("xset r rate 350 70")
 run_once({
     "unclutter -root",
     "compton", -- -i 0.8
@@ -207,14 +207,14 @@ root.buttons(gears.table.join(
 ))
 KEYS = gears.table.join(
     -- Core
-    awful.key({ MOD,           }, "s",      hotkeys_popup.show_help,           {description="show help",            group = "awesome"}),
-    awful.key({ MOD, "Control" }, "r", awesome.restart,                        {description = "reload awesome",     group = "awesome"}),
-    awful.key({ MOD, "Shift"   }, "q", awesome.quit,                           {description = "quit awesome",       group = "awesome"}),
-    awful.key({ MOD,           }, "Return", function () awful.spawn(TERM) end, {description = "open terminal",      group = "awesome"}),
-    awful.key({ MOD,           }, "w", pick_wnd,                               {description = "open window picker", group = "awesome"}),
-    awful.key({ MOD,           }, "r", run_cmd,                                {description = "open launcher",      group = "awesome"}),
-    awful.key({ MOD,           }, "p", function() awful.spawn("flameshot gui") end),
-    awful.key({ "Control", "Mod1"  }, "l", lock_screen,                            {description = "lock screen",        group = "awesome"}),
+    awful.key({ MOD,           }, "s",      hotkeys_popup.show_help,                {description="show help",            group = "awesome"}),
+    awful.key({ MOD, "Control" }, "r", awesome.restart,                             {description = "reload awesome",     group = "awesome"}),
+    awful.key({ MOD, "Shift"   }, "q", awesome.quit,                                {description = "quit awesome",       group = "awesome"}),
+    awful.key({ MOD,           }, "Return", function () awful.spawn(TERM) end,      {description = "open terminal",      group = "awesome"}),
+    awful.key({ MOD,           }, "w", pick_wnd,                                    {description = "open window picker", group = "awesome"}),
+    awful.key({ MOD,           }, "r", run_cmd,                                     {description = "open launcher",      group = "awesome"}),
+    awful.key({ MOD,           }, "p", function() awful.spawn("flameshot gui") end, {description = "take screenshot",    group = "awesome"}),
+    awful.key({ "Control", "Mod1"  }, "l", lock_screen,                             {description = "lock screen",        group = "awesome"}),
 
     -- Layouts
     awful.key({ MOD,           }, "Left",   awful.tag.viewprev,        {description = "view previous",  group = "tag"}),
@@ -263,10 +263,11 @@ KEYS = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
+    -- TODO: lain volume widget
     awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +5%\"") end),
     awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end),
-    awful.key({}, "XF86MonBrightnessDown", function() awful.spawn("brillo -U 5") end),
-    awful.key({}, "XF86MonBrightnessUp", function() awful.spawn("brillo -A 5") end)
+    awful.key({}, "XF86MonBrightnessDown", function() awful.spawn("brillo -U 4") end),
+    awful.key({}, "XF86MonBrightnessUp", function() awful.spawn("brillo -A 4") end)
 )
 
 CLIENT_KEYS = gears.table.join(
