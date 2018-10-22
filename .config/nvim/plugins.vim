@@ -52,6 +52,10 @@ Plug 'wavded/vim-stylus'             " Stylus .styl files
 Plug 'tmhedberg/SimpylFold'          " Python Smart Folding
 Plug 'rust-lang/rust.vim'            " The Rust programming language
 Plug 'pangloss/vim-javascript'
+
+Plug 'prabirshrestha/async.vim'      " Language Server Protocol Support
+Plug 'prabirshrestha/vim-lsp'
+Plug 'ncm2/ncm2-vim-lsp'             " LSP completions in ncm2
 " }}}
 
 " Pretty colors {{{
