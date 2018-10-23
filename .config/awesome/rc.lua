@@ -216,6 +216,10 @@ KEYS = gears.table.join(
     awful.key({ MOD,           }, "p", function() awful.spawn("flameshot gui") end, {description = "take screenshot",    group = "awesome"}),
     awful.key({ "Control", "Mod1"  }, "l", lock_screen,                             {description = "lock screen",        group = "awesome"}),
 
+    -- TODO: Carousel
+    awful.key({ MOD,           }, "y", function() awful.spawn("bash " .. HOME.. "/.screenlayout/laptop.sh") end, {description = "Switch to laptop",    group = "awesome"}),
+    awful.key({ MOD,           }, "u", function() awful.spawn("bash " .. HOME .. "/.screenlayout/work-dual.sh") end, {description = "Switch to dual screen",    group = "awesome"}),
+
     -- Layouts
     awful.key({ MOD,           }, "Left",   awful.tag.viewprev,        {description = "view previous",  group = "tag"}),
     awful.key({ MOD,           }, "Right",  awful.tag.viewnext,        {description = "view next",      group = "tag"}),
