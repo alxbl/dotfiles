@@ -37,3 +37,6 @@
 [submodule ".zsh/themes/geometry"]
 	path = .zsh/themes/geometry
 	url = https://github.com/geometry-zsh/geometry
+[submodule ".tmux/plugins/tpm"]
+	path = .tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm
