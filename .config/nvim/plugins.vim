@@ -51,7 +51,8 @@ Plug 'leafgarland/typescript-vim'    " TypeScript .ts files
 Plug 'wavded/vim-stylus'             " Stylus .styl files
 Plug 'tmhedberg/SimpylFold'          " Python Smart Folding
 Plug 'rust-lang/rust.vim'            " The Rust programming language
-Plug 'pangloss/vim-javascript'
+Plug 'pangloss/vim-javascript'       " Enhanced Javascript support
+Plug 'matcatc/vim-asciidoc-folding'  " AsciiDoc folds (TODO: Remove once it lands)
 
 Plug 'prabirshrestha/async.vim'      " Language Server Protocol Support
 Plug 'prabirshrestha/vim-lsp'

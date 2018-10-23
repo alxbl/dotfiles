@@ -13,7 +13,7 @@ filetype off       " Don't try to determine filetype based on content
 set wildignore+=**/node_modules/*,node_modules/**,**/CMakeFiles/**,**/build/**
 
 " Copy to x clipboard
-set clipboard=unnamed
+set clipboard+=unnamedplus
 
 " Show relative line numbers
 set number
