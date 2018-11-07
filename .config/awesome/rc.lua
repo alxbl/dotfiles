@@ -12,6 +12,7 @@ local lain          = require("lain")
 local markup        = lain.util.markup
 -- -----------------------------------------------------------------------------
 -- -----------------------------------------------------------------------------
+local AUTO_FOCUS = false
 local function run_once(cmd_arr)
     for _, cmd in ipairs(cmd_arr) do
         findme = cmd
@@ -56,28 +57,12 @@ end
 naughty.config.defaults.screen = awful.screen.primary
 naughty.config.screen = awful.screen.primary
 -- }}}
--- 1. Startup {{{
-awful.spawn("setxkbmap -option ctrl:nocaps")
-awful.spawn("xset r rate 350 70")
-run_once({
-    "unclutter -root",
-    "compton", -- -i 0.8
-    "fcitx",
-    "flameshot",
-    "nm-applet",
-    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-})
--- }}}
--- 2. Basic Configuration {{{
+-- 1. Basic Configuration {{{
 local MOD    = "Mod4"
 local HOME   = os.getenv("HOME")
 local CONFIG = HOME .. "/.config/awesome/"
 local EDITOR = os.getenv("EDITOR") or "vi"
 local TERM   = os.getenv("TERMINAL") or "termite"
-
-local function pick_wnd()    awful.spawn("rofi -show window") end
-local function run_cmd()     awful.spawn("rofi -show run") end
-local function lock_screen() awful.spawn("i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png") end
 
 beautiful.init(CONFIG .. "themes/neo/theme.lua")
 
@@ -90,6 +75,25 @@ awful.layout.layouts = {
     lain.layout.centerwork,
     lain.layout.cascade.tile
 }
+-- }}}
+-- 2. Startup {{{
+local lock_cmd = "i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png"
+awful.spawn("setxkbmap -option ctrl:nocaps")
+awful.spawn("xset r rate 350 70")
+run_once({
+    "unclutter -root",
+    "compton", -- -i 0.8
+    "fcitx",
+    "flameshot",
+    "nm-applet",
+    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
+    "xautolock -time 5 -locker \"" .. lock_cmd .. "\""
+})
+
+local function pick_wnd()    awful.spawn("rofi -show window") end
+local function run_cmd()     awful.spawn("rofi -show run") end
+local function lock_screen() awful.spawn(lock_cmd) end
+
 -- }}}
 -- 3. Workspace {{{
 -- Create a wibox for each screen and add it
@@ -420,7 +424,7 @@ awful.rules.rules = {
 
     -- VM sessions go on second screen
     { rule = { class = "virt-manager" }, properties = { screen = 2, tag = "1" } },
-    { rule = { name = "win10 on QEMU/KVM" }, properties = { screen = 2, tag = "2", maximized = true } },
+    { rule = { name = "win10 on QEMU/KVM" }, properties = { screen = 2, tag = "2" } },
 }
 -- }}}
 -- 6. Signal Hooks {{{
@@ -441,11 +445,13 @@ client.connect_signal("manage", function (c) -- New client.
     end
 end)
 
-client.connect_signal("mouse::enter", function(c)
-    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier and awful.client.focus.filter(c) then
-        client.focus = c
-    end
-end)
+if AUTO_FOCUS then
+    client.connect_signal("mouse::enter", function(c)
+        if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier and awful.client.focus.filter(c) then
+            client.focus = c
+        end
+    end)
+end
 
 client.connect_signal("focus", function(c) on_focus_change(c, true) end)
 client.connect_signal("unfocus", function (c) on_focus_change(c, false) end)
