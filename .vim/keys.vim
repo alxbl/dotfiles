@@ -3,6 +3,7 @@
 " Basic Mappings {{{
 nmap <space> <Nop>
 let mapleader = "\<space>"
+let maplocalleader = ","
 
 " Quick Access to vimrc.
 nnoremap <leader>er :so $MYVIMRC<CR>
