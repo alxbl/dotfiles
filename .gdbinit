@@ -1,4 +1,4 @@
-source $PEDA/peda.py
+source /usr/share/pwndbg/gdbinit.py
 
 python
 
