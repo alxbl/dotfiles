@@ -73,6 +73,7 @@ let g:vimwiki_folding = 'syntax'
 let g:vimwiki_table_auto_fmt = 1
 
 Plug 'tpope/vim-fugitive'
+Plug 'jceb/vim-orgmode'
 " }}}
 
 call plug#end()
