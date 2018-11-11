@@ -13,9 +13,13 @@ alias win64='rdesktop -g 1440x900 -P -z localhost'
 alias twitch='chromium --app=https://www.twitch.tv/'
 alias netflix='chromium --app=https://www.netflix.com/'
 alias youtube='chromium --app=https://www.youtube.com'
+alias slackc='chromium --app=https://www.slack.com'
 # ---
 alias torup='sudo systemctl start tor'
 alias tordown='sudo systemctl stop tor'
 # ---
-alias redo='sudo !!'
+# Mount Windoes VM share using root:toor user.
+alias py2='source ~/.bin/py-2.7.15/bin/activate'
+alias py3='source ~/.bin/py-3.7.0/bin/activate'
+alias mvm='sudo mount -t cifs -o username=root,password=toor'
 
