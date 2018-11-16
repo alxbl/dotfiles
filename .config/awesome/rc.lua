@@ -222,7 +222,7 @@ KEYS = gears.table.join(
 
     -- TODO: Carousel
     awful.key({ MOD,           }, "y", function() awful.spawn("bash " .. HOME.. "/.screenlayout/laptop.sh") end, {description = "Switch to laptop",    group = "awesome"}),
-    awful.key({ MOD,           }, "u", function() awful.spawn("bash " .. HOME .. "/.screenlayout/work-dual.sh") end, {description = "Switch to dual screen",    group = "awesome"}),
+    awful.key({ MOD,           }, "i", function() awful.spawn("bash " .. HOME .. "/.screenlayout/work-dual.sh") end, {description = "Switch to dual screen",    group = "awesome"}),
 
     -- Layouts
     awful.key({ MOD,           }, "Left",   awful.tag.viewprev,        {description = "view previous",  group = "tag"}),
