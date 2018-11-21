@@ -1,1 +1,0 @@
-/home/alex/dev/dotfiles/.zsh
