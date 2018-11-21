@@ -81,7 +81,7 @@ local lock_cmd = "i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png"
 awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 70")
 run_once({
-    "unclutter -root",
+    -- "unclutter -root",
     "compton", -- -i 0.8
     "fcitx",
     "flameshot",
