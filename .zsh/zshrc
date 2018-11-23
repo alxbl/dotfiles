@@ -50,6 +50,7 @@ if [ ! -v PATHFIX ]; then
 fi
 export DEV_PATH="$HOME/dev"
 export PEDA="$DEV_PATH/foss/peda"
+export GOPATH="$HOME/Source/go"
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
