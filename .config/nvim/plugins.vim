@@ -63,6 +63,7 @@ Plug 'ncm2/ncm2-vim-lsp'             " LSP completions in ncm2
 Plug 'chriskempson/base16-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'dracula/vim'
 " }}}
 
 " Documentation {{{

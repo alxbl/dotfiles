@@ -12,7 +12,6 @@
 "
 " Reminder: `gf` is your friend.
 "
-
 " Share some vanilla settings with vim
 so ~/.vim/global.vim
 

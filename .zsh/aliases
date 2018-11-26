@@ -3,7 +3,7 @@
 alias rzshrc='source ~/.zshrc'
 alias aliases='$EDITOR ~/.zsh/aliases'
 alias zshrc='$EDITOR ~/.zsh/zshrc'
-alias mux='tmuxinator'
+alias tmux="env TERM=xterm-256color tmux"
 alias src="cd ~/Source"
 # ---
 alias ls='ls --color=auto'

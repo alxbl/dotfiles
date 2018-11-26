@@ -3,7 +3,7 @@ ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG" # For oh-my-zsh
 
-plugins=(archlinux docker compleat git github ssh-agent gpg-agent nvm tmux)
+plugins=(archlinux docker compleat git github ssh-agent gpg-agent nvm tmux fzf)
 setopt completealiases
 
 _has() {
@@ -33,8 +33,9 @@ source "$ZSHCFG/zsh_theme"
 # FZF && ag
 if _has fzf && _has ag; then
   export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
-  export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-  export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND"
+  # export FZF_CTRL_T_COMMAND="find $HOME -type d 2>/dev/null"
+  # export FZF_ALT_C_COMMAND="find $HOME -type d 2>/dev/null"
+  export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
 fi
 
 # Load up colors
@@ -48,8 +49,7 @@ if [ ! -v PATHFIX ]; then
     # Avoid re-appending to path.
     export PATHFIX=1
 fi
-export DEV_PATH="$HOME/dev"
-export PEDA="$DEV_PATH/foss/peda"
+export DEV_PATH="$HOME/Source/"
 export GOPATH="$HOME/Source/go"
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
@@ -65,3 +65,4 @@ fi
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
 
+export TERM=xterm-256color
