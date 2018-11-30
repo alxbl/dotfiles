@@ -49,7 +49,9 @@ if [ ! -v PATHFIX ]; then
     # Avoid re-appending to path.
     export PATHFIX=1
 fi
-export DEV_PATH="$HOME/Source/"
+
+export WORKSPACES="$HOME/Source:$HOME/Work"
+source "$ZSHCFG/workon/workon"
 export GOPATH="$HOME/Source/go"
 
 stty -ixon # stop C-Q, C-S from freezing terminal.

@@ -40,3 +40,6 @@
 [submodule ".tmux/plugins/tpm"]
 	path = .tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule ".zsh/workon"]
+	path = .zsh/workon
+	url = https://github.com/alxbl/workon/
