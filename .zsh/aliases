@@ -18,6 +18,7 @@ alias slackc='chromium --app=https://www.slack.com'
 # ---
 alias torup='sudo systemctl start tor'
 alias tordown='sudo systemctl stop tor'
+alias svc='sudo systemctl'
 # ---
 # Mount Windoes VM share using root:toor user.
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
