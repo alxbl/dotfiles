@@ -9,7 +9,7 @@ local HOME = os.getenv("HOME")
 
 local theme = {}
 
-theme.font          = "Noto sans 7"
+theme.font          = "Noto sans 8"
 
 -- Colors {{{
 local accent = "#33aadd"
@@ -26,7 +26,7 @@ theme.fg_focus      = "#ffffff"
 theme.fg_urgent     = "#ffffff"
 theme.fg_minimize   = theme.fg_normal
 
-theme.useless_gap   = dpi(15)
+theme.useless_gap   = dpi(7)
 theme.border_width  = dpi(1)
 theme.border_normal = "#000000"
 theme.border_focus  = accent
@@ -47,9 +47,16 @@ theme.taglist_squares_unsel = theme_assets.taglist_squares_unsel(taglist_square_
 -- notification_[border_color|border_width|shape|opacity]
 
 -- Layout Widget {{{
--- You can use your own layout icons like this:
+theme.lain_icons         = os.getenv("HOME") ..  "/.config/awesome/lain/icons/layout/default/"
+theme.layout_termfair    = theme.lain_icons .. "termfair.png"
+theme.layout_centerfair  = theme.lain_icons .. "centerfair.png"  -- termfair.center
+theme.layout_cascade     = theme.lain_icons .. "cascade.png"
+theme.layout_cascadetile = theme.lain_icons .. "cascadetile.png" -- cascade.tile
+theme.layout_centerwork  = theme.lain_icons .. "centerwork.png"
+theme.layout_centerworkh = theme.lain_icons .. "centerworkh.png" -- centerwork.horizontal
 theme.layout_fairh = themes_path.."default/layouts/fairhw.png"
 theme.layout_fairv = themes_path.."default/layouts/fairvw.png"
+
 theme.layout_floating  = themes_path.."default/layouts/floatingw.png"
 theme.layout_magnifier = themes_path.."default/layouts/magnifierw.png"
 theme.layout_max = themes_path.."default/layouts/maxw.png"
