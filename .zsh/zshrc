@@ -1,8 +1,7 @@
 #!/usr/bin/zsh
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
-ZSH_CUSTOM="$ZSHCFG" # For oh-my-zsh
-
+ZSH_CUSTOM="$ZSHCFG"
 plugins=(archlinux docker compleat git github ssh-agent gpg-agent nvm tmux fzf)
 setopt completealiases
 
@@ -17,30 +16,22 @@ if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     done < "$ZSHCFG/zsh_nocomp"
 fi
 
-# Load aliases
-if [[ -f $ZSHCFG/aliases ]]; then
-    source $ZSHCFG/aliases
-fi
-
+[[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
+[[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.
 
 DISABLE_AUTO_TITLE=true
-
 if [ $EUID -eq 0 ]; then
    ZSH_DISABLE_COMPFIX="true"
 fi
 source "$ZSHCFG/zsh_theme"
 
-# FZF && ag
+# FZF.
 if _has fzf && _has ag; then
   export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+  export FZF_BASE=$(dirname $(which fzf))
   # export FZF_CTRL_T_COMMAND="find $HOME -type d 2>/dev/null"
   # export FZF_ALT_C_COMMAND="find $HOME -type d 2>/dev/null"
   export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
-fi
-
-# Load up colors
-if [[ -f "$HOME/.xresources.d/dircolors" ]]; then
-    eval `dircolors $HOME/.xresources.d/dircolors`
 fi
 
 # PATH
@@ -50,11 +41,9 @@ if [ ! -v PATHFIX ]; then
     export PATHFIX=1
 fi
 
-export WORKSPACES="$HOME/Source:$HOME/Work"
-source "$ZSHCFG/workon/workon"
-export GOPATH="$HOME/Source/go"
-
-stty -ixon # stop C-Q, C-S from freezing terminal.
+# Not quite ready yet.
+# export WORKSPACES=$HOME/Source:$HOME/Work
+# source "$ZSHCFG/workon/workon"
 
 # use nvim if available.
 if command -v nvim &>/dev/null; then
@@ -64,7 +53,10 @@ else
     export EDITOR=vim
 fi
 
+# Other exports.
+export GOPATH="$HOME/Source/go"
 export LANG="en_CA.UTF-8"
 export LC_ALL="en_CA.UTF-8"
-
 export TERM=xterm-256color
+
+stty -ixon # stop C-Q, C-S from freezing terminal.
