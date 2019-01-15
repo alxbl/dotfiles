@@ -9,7 +9,7 @@ local HOME = os.getenv("HOME")
 
 local theme = {}
 
-theme.font          = "Noto sans 8"
+theme.font          = "Noto sans 7"
 
 -- Colors {{{
 local accent = "#33aadd"
