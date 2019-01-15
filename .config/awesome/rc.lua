@@ -68,12 +68,12 @@ beautiful.init(CONFIG .. "themes/neo/theme.lua")
 
 awful.layout.layouts = {
     awful.layout.suit.tile,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.fair,
+    -- awful.layout.suit.tile.bottom,
+    -- awful.layout.suit.fair,
     awful.layout.suit.magnifier,
     awful.layout.suit.corner.nw,
     lain.layout.centerwork,
-    lain.layout.cascade.tile
+    -- lain.layout.cascade.tile
 }
 -- }}}
 -- 2. Startup {{{
@@ -82,7 +82,7 @@ awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 70")
 run_once({
     -- "unclutter -root",
-    "compton", -- -i 0.8
+    "compton -i 0.9", -- -i 0.8
     "fcitx",
     "flameshot",
     "nm-applet",
@@ -114,7 +114,7 @@ local taglist_buttons = gears.table.join(
                     awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
                 )
 
-local tasklist_buttons = gears.table.join(
+local taskbar_buttons = gears.table.join(
                      awful.button({ }, 1, function (c)
                                               if c == client.focus then
                                                   c.minimized = true
@@ -159,48 +159,50 @@ bat =   lain.widget.bat({
     settings = function()
         bat_header = get_battery(bat_now.perc, bat_now.status == "Charging")
         -- TODO: Color should not be hardcoded
-        widget:set_markup(markup.font("Material Icons 14", markup("#FFFFFF", bat_header)))
+        -- widget:set_markup(markup.font("Material Icons 14", markup("#FFFFFF", bat_header)))
+        widget:set_markup("BAT0> " .. bat_now.perc .. "% ")
     end
 })
 -- }}}
 -- }}}
 
+-- TODO: screen added/removed signals to dynamically add/remove screens.
+--
 awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
-
-    -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
-    s.mylayoutbox = awful.widget.layoutbox(s)
-    s.mylayoutbox:buttons(gears.table.join(
-                           awful.button({ }, 1, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 3, function () awful.layout.inc(-1) end),
-                           awful.button({ }, 4, function () awful.layout.inc( 1) end),
-                           awful.button({ }, 5, function () awful.layout.inc(-1) end)))
-    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.noempty, taglist_buttons)
+    s.layout  = awful.widget.layoutbox(s)
+    s.taglist = awful.widget.taglist(s, awful.widget.taglist.filter.selected, taglist_buttons)
 
-    -- Display title of focused client here.
-    s.tasklist = wibox.widget {
-        align = "center",
-        widget = wibox.widget.textclock("%a %b %d %H:%M")
-    }
-
-    s.mywibox = awful.wibar({ position = "top", screen = s })
-
-    s.mywibox:setup {
+    local bar = {
         layout = wibox.layout.align.horizontal,
+        spacing = 7,
+        {
+
+            layout = wibox.layout.fixed.horizontal,
+            s.layout,
+            s.taglist,
+            wibox.container.margin(wibox.widget.systray(), 7),
+        },
+        nil,
         {
             layout = wibox.layout.fixed.horizontal,
-            s.mylayoutbox,
-            s.mytaglist
-        },
-        s.tasklist,
-        { -- Right widgets
-            layout = wibox.layout.fixed.horizontal,
-            wibox.widget.systray(),
-            bat.widget
-        },
+            spacing = 7,
+            spacing_widget = wibox.widget.separator,
+            bat.widget,
+            wibox.container.margin(wibox.widget.textclock("NOW> %Y-%m-%d  %R"), 0, 7),
+        }
     }
+
+    s.taskbar = awful.wibar({ position = "top", screen = s, })
+    s.taskbar:setup(bar)
+
+    s.layout:buttons(gears.table.join(
+       awful.button({ }, 1, function () awful.layout.inc( 1) end),
+       awful.button({ }, 3, function () awful.layout.inc(-1) end),
+       awful.button({ }, 4, function () awful.layout.inc( 1) end),
+       awful.button({ }, 5, function () awful.layout.inc(-1) end)))
 end)
 
 -- }}}
@@ -258,6 +260,7 @@ KEYS = gears.table.join(
     -- Screens
     awful.key({ MOD, "Control" }, "j", function () awful.screen.focus_relative( 1) end, {description = "focus the next screen",     group = "screen"}),
     awful.key({ MOD, "Control" }, "k", function () awful.screen.focus_relative(-1) end, {description = "focus the previous screen", group = "screen"}),
+    awful.key({ MOD,           }, "b", function () awful.screen.focused().taskbar.visible = not awful.screen.focused().taskbar.visible end, {description = "toggle task bar"}),
 
     -- Unsorted yet.
     awful.key({ MOD, "Control" }, "n",
