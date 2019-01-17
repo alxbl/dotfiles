@@ -24,10 +24,11 @@ if executable('typescript-language-server')
         \ })
 endif
 
-if executable('rls')
+if executable('typescript-language-server')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'rls',
         \ 'cmd': {server_info->['rustup', 'run', 'nightly', 'rls']},
+        \ 'root_uri':{server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'Cargo.toml'))},
         \ 'whitelist': ['rust'],
         \ })
 endif
@@ -54,4 +55,3 @@ nnoremap <leader>r :LspRename<CR>
 " DEBUG
 " let g:lsp_log_verbose = 1
 " let g:lsp_log_file = expand('~/vim-lsp.log')
-" let g:asyncomplete_log_file = expand('~/asyncomplete.log')
