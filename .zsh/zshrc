@@ -9,6 +9,15 @@ _has() {
   return $(whence $1 >/dev/null)
 }
 
+# FZF.
+if _has fzf && _has ag; then
+  export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+  # export FZF_BASE=$(dirname $(which fzf))
+  export FZF_CTRL_T_COMMAND="fd . 2>/dev/null"
+  export FZF_ALT_C_COMMAND="fd -t d 2>/dev/null"
+  export FZF_DEFAULT_OPTS='--height 30% --layout=reverse'
+fi
+
 # Disable annoying auto-correct.
 if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     while read -r COMMAND; do
@@ -24,15 +33,6 @@ if [ $EUID -eq 0 ]; then
    ZSH_DISABLE_COMPFIX="true"
 fi
 source "$ZSHCFG/zsh_theme"
-
-# FZF.
-if _has fzf && _has ag; then
-  export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
-  export FZF_BASE=$(dirname $(which fzf))
-  # export FZF_CTRL_T_COMMAND="find $HOME -type d 2>/dev/null"
-  # export FZF_ALT_C_COMMAND="find $HOME -type d 2>/dev/null"
-  export FZF_DEFAULT_OPTS='--height 30% --layout=reverse --border'
-fi
 
 # PATH
 if [ ! -v PATHFIX ]; then
