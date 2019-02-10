@@ -82,7 +82,7 @@ awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 70")
 run_once({
     -- "unclutter -root",
-    "compton -i 0.9", -- -i 0.8
+    "compton", -- -i 0.8
     "fcitx",
     "flameshot",
     "nm-applet",
@@ -188,10 +188,8 @@ awful.screen.connect_for_each_screen(function(s)
         nil,
         {
             layout = wibox.layout.fixed.horizontal,
-            spacing = 7,
-            spacing_widget = wibox.widget.separator,
             bat.widget,
-            wibox.container.margin(wibox.widget.textclock("NOW> %Y-%m-%d  %R"), 0, 7),
+            wibox.container.margin(wibox.widget.textclock(" | NOW> %Y-%m-%d  %R"), 0, 7),
         }
     }
 
