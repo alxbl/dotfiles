@@ -12,6 +12,18 @@ augroup Python
 augroup END
 let python_highlight_all=1
 " }}}
+" Ruby {{{
+augroup Ruby
+    au!
+    au BufNewFile,BufRead *.rb
+                \ set tabstop=2 |
+                \ set softtabstop=2 |
+                \ set shiftwidth=2 |
+                \ set expandtab |
+                \ set autoindent |
+                \ set fileformat=unix
+augroup END
+" }}}
 " HTML/JS/CSS/TS {{{
 augroup Web
     au!
@@ -52,5 +64,12 @@ augroup Lua
     au!
     au BufNewFile,BufRead *.lua
                 \ set foldmethod=indent
+augroup END
+" }}}
+" Markdown {{{
+augroup C
+    au!
+    au BufNewFile,BufRead *.md
+        \ set tw=80
 augroup END
 " }}}
