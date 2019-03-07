@@ -1,10 +1,11 @@
-source /usr/share/pwndbg/gdbinit.py
+source ~/Documents/Code/foss/pwndbg/gdbinit.py
+set follow-fork-mode parent
 
-python
+# python
 
-import sys
-import os
-sys.path.append(os.path.join(os.environ["HOME"], ".gdb"))
+# import sys
+# import os
+# sys.path.append(os.path.join(os.environ["HOME"], ".gdb"))
 
-import glm
-end
+# import glm
+# end
