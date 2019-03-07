@@ -82,7 +82,7 @@ awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 70")
 run_once({
     -- "unclutter -root",
-    "compton", -- -i 0.8
+    "compton -i 0.95", -- -i 0.8
     "fcitx",
     "flameshot",
     "nm-applet",
