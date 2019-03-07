@@ -3,25 +3,19 @@
 alias rzshrc='source ~/.zshrc'
 alias aliases='$EDITOR ~/.zsh/aliases'
 alias zshrc='$EDITOR ~/.zsh/zshrc'
-alias src="cd ~/Source"
+alias src="cd ~/Documents/Code"
 alias mux='tmuxinator'
+alias wiki='cd ~/.vimwiki'
 # ---
 alias ls='ls --color=auto'
-alias irc='ssh segfault -t tmux a'
+alias segv='mosh -P 60001 segfault -t tmux a'
 alias kali='ssh relay'
 alias win64='rdesktop -g 1440x900 -P -z localhost'
-# ---
-alias twitch='chromium --app=https://www.twitch.tv/'
-alias netflix='chromium --app=https://www.netflix.com/'
-alias youtube='chromium --app=https://www.youtube.com'
-alias slackc='chromium --app=https://www.slack.com'
 # ---
 alias torup='sudo systemctl start tor'
 alias tordown='sudo systemctl stop tor'
 alias svc='sudo systemctl'
 # ---
-# Mount Windoes VM share using root:toor user.
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
 alias py3='source ~/.bin/py-3.7.0/bin/activate'
-alias mvm='sudo mount -t cifs -o username=root,password=toor'
 
