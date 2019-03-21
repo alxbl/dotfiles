@@ -215,7 +215,8 @@ KEYS = gears.table.join(
     awful.key({ MOD, "Control" }, "r", awesome.restart,                             {description = "reload awesome",     group = "awesome"}),
     awful.key({ MOD, "Shift"   }, "q", awesome.quit,                                {description = "quit awesome",       group = "awesome"}),
     awful.key({ MOD,           }, "Return", function () awful.spawn(TERM) end,      {description = "open terminal",      group = "awesome"}),
-    awful.key({ MOD,           }, "w", pick_wnd,                                    {description = "open window picker", group = "awesome"}),
+    awful.key({ MOD,           }, "Tab", pick_wnd,                                  {description = "open window picker", group = "awesome"}),
+    awful.key({ "Mod1",        }, "Tab", pick_wnd,                                  {description = "open window picker", group = "awesome"}),
     awful.key({ MOD,           }, "r", run_cmd,                                     {description = "open launcher",      group = "awesome"}),
     awful.key({ MOD,           }, "p", function() awful.spawn("flameshot gui") end, {description = "take screenshot",    group = "awesome"}),
     awful.key({ "Control", "Mod1"  }, "l", lock_screen,                             {description = "lock screen",        group = "awesome"}),
@@ -245,14 +246,14 @@ KEYS = gears.table.join(
     awful.key({ MOD, "Shift"   }, "k", function ()  awful.client.swap.byidx( -1)    end, {description = "swap with previous client by index", group = "client"}),
     awful.key({ MOD,           }, "u", awful.client.urgent.jumpto,                      {description = "jump to urgent client",              group = "client"}),
 
-    awful.key({ MOD,           }, "Tab",
-        function ()
-            awful.client.focus.history.previous()
-            if client.focus then
-                client.focus:raise()
-            end
-        end,
-        {description = "switch to previous client", group = "client"}),
+    -- awful.key({ MOD,           }, "Tab",
+    --     function ()
+    --         awful.client.focus.history.previous()
+    --         if client.focus then
+    --             client.focus:raise()
+    --         end
+    --     end,
+    --     {description = "switch to previous client", group = "client"}),
 
 
     -- Screens
