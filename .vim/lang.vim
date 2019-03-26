@@ -47,7 +47,9 @@ augroup END
 augroup VimWiki
     au!
     au BufNewFile,BufRead *.wiki
-        \ set textwidth=80
+        \ set textwidth=80 |
+        \ set foldlevel=0
+
 augroup END
 " }}}
 " YAML {{{
