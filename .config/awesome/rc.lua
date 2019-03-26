@@ -168,12 +168,22 @@ bat =   lain.widget.bat({
 
 -- TODO: screen added/removed signals to dynamically add/remove screens.
 --
+function filter_tag(tag)
+    -- Show tags with urgent clients and the selected tag.
+    local urgent = false
+    local clients = tag:clients()
+    for k, c in pairs(clients) do
+        if c.urgent then return true end
+    end
+    return tag.selected
+end
+
 awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
     s.layout  = awful.widget.layoutbox(s)
-    s.taglist = awful.widget.taglist(s, awful.widget.taglist.filter.selected, taglist_buttons)
+    s.taglist = awful.widget.taglist(s, filter_tag, taglist_buttons)
 
     local bar = {
         layout = wibox.layout.align.horizontal,
