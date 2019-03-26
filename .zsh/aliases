@@ -3,7 +3,7 @@
 alias rzshrc='source ~/.zshrc'
 alias aliases='$EDITOR ~/.zsh/aliases'
 alias zshrc='$EDITOR ~/.zsh/zshrc'
-alias src="cd ~/Documents/Code"
+alias src="cd ~/Code"
 alias mux='tmuxinator'
 alias wiki='cd ~/.vimwiki'
 # ---
