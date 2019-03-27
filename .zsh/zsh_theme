@@ -3,6 +3,10 @@ GEOMETRY_SYMBOL_PROMPT="$"                  # default prompt symbol
 GEOMETRY_SYMBOL_RPROMPT=">"                 # multiline prompts
 GEOMETRY_SYMBOL_EXIT_VALUE="!"              # displayed when exit value is != 0
 GEOMETRY_SYMBOL_ROOT="#"                    # when logged in user is root
+GEOMETRY_PROMPT_PREFIX="["
+GEOMETRY_PROMPT_PREFIX_SPACER=""
+GEOMETRY_SYMBOL_SPACER=":"
+GEOMETRY_PROMPT_SUFFIX="]"
 PROMPT_GEOMETRY_COLORIZE_ROOT=true          # colorize root differently
 PROMPT_GEOMETRY_COLORIZE_SYMBOL=true        # colorize by hostname.
 ZSH_THEME="geometry/geometry"
