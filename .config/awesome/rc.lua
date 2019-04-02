@@ -137,37 +137,31 @@ local taskbar_buttons = gears.table.join(
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
-
 -- Widgets {{{
--- Battery {{{
-get_battery = function(p, ac)
-    if     p == 100 then  return (ac and "" or "")
-    elseif p >  90  then  return (ac and "" or "")
-    elseif p >  80  then  return (ac and "" or "")
-    elseif p >  70  then  return (ac and "" or "")
-    elseif p >  60  then  return (ac and "" or "")
-    elseif p >  50  then  return (ac and "" or "")
-    elseif p >  40  then  return (ac and "" or "")
-    elseif p >  30  then  return (ac and "" or "")
-    elseif p >  20  then  return (ac and "" or "")
-    elseif p >  10  then  return (ac and "" or "")
-    elseif p >   0  then  return (ac and "" or "")
-    else return "" end
-end
 bat =   lain.widget.bat({
     battery = "BAT0",
     settings = function()
-        bat_header = get_battery(bat_now.perc, bat_now.status == "Charging")
         -- TODO: Color should not be hardcoded
         -- widget:set_markup(markup.font("Material Icons 14", markup("#FFFFFF", bat_header)))
-        widget:set_markup("BAT0> " .. bat_now.perc .. "% ")
+        local fmt = string.format("<b>BAT0></b> %d%%", bat_now.perc)
+        widget:set_markup(fmt)
+    end
+})
+mem = lain.widget.mem({
+    settings = function()
+        local fmt = string.format("<b>MEM></b> %.1f/%.1fG (%d%%)", (mem_now.used / 1024.0), (mem_now.total / 1024.0), mem_now.perc)
+        widget:set_markup(fmt)
+    end
+})
+
+cpu = lain.widget.cpu({
+    settings = function()
+        local fmt = string.format("<b>CPU></b> %s%%", cpu_now.usage) -- TODO: sum all CPUs
+        widget:set_markup(fmt)
     end
 })
 -- }}}
--- }}}
 
--- TODO: screen added/removed signals to dynamically add/remove screens.
---
 function filter_tag(tag)
     -- Show tags with urgent clients and the selected tag.
     local urgent = false
@@ -178,6 +172,8 @@ function filter_tag(tag)
     return tag.selected
 end
 
+-- TODO: Global taglist?
+-- TODO: screen added/removed signals to dynamically add/remove screens.
 awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
@@ -187,7 +183,6 @@ awful.screen.connect_for_each_screen(function(s)
 
     local bar = {
         layout = wibox.layout.align.horizontal,
-        spacing = 7,
         {
 
             layout = wibox.layout.fixed.horizontal,
@@ -197,9 +192,17 @@ awful.screen.connect_for_each_screen(function(s)
         },
         nil,
         {
-            layout = wibox.layout.fixed.horizontal,
-            bat.widget,
-            wibox.container.margin(wibox.widget.textclock(" | NOW> %Y-%m-%d  %R"), 0, 7),
+            layout = awful.widget.only_on_screen,
+            screen = "primary",
+            {
+                bat.widget,
+                mem.widget,
+                cpu.widget,
+                wibox.container.margin(wibox.widget.textclock("<b>NOW></b> %Y-%m-%d %R"), 0, 7),
+                layout = wibox.layout.fixed.horizontal,
+                spacing_widget = { color = "#00000000", widget = wibox.widget.separator, },
+                spacing = 7,
+            }
         }
     }
 
@@ -283,9 +286,9 @@ KEYS = gears.table.join(
               end,
               {description = "restore minimized", group = "client"}),
 
-    -- TODO: lain volume widget
-    awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 +5%\"") end),
-    awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 0 false ; pactl set-sink-volume 0 -5%\"") end),
+    -- TODO: lain volume widget + dynamic sink selection
+    awful.key({}, "XF86AudioRaiseVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 4 false ; pactl set-sink-volume 0 +5%\"") end),
+    awful.key({}, "XF86AudioLowerVolume", function() awful.spawn("sh -c \"pactl set-sink-mute 4 false ; pactl set-sink-volume 0 -5%\"") end),
     awful.key({}, "XF86MonBrightnessDown", function() awful.spawn("brillo -U 4") end),
     awful.key({}, "XF86MonBrightnessUp", function() awful.spawn("brillo -A 4") end)
 )
