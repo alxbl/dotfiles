@@ -1,1 +1,2 @@
 source "$HOME/.zsh/zshrc"
+
