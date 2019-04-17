@@ -8,7 +8,7 @@ rofi.lines: 5
 ! rofi.line-margin: 15
 rofi.line-padding: 10
 !rofi.location: 4
-rofi.font: NotoSansDisplay-Regular 20
+rofi.font: NotoSans 20
 ! rofi.show-icons: true
 ! rofi.levenshtein-sort: true
 ! rofi.sidebar-mode: true
