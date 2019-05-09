@@ -9,7 +9,8 @@ alias wiki='cd ~/.vimwiki'
 # ---
 alias ls='ls --color=auto'
 alias segv='mosh -P 60001 segfault -t tmux a'
-alias kali='ssh relay'
+alias relay='ssh relay'
+alias kali='ssh kali'
 alias win64='rdesktop -g 1440x900 -P -z localhost'
 # ---
 alias torup='sudo systemctl start tor'
