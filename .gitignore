@@ -4,10 +4,12 @@
 .vim/lsp.log
 .gdb/__pycache__
 __pycache__
+.emacs.d/elpa
 
 # Don't track random and sensitive files
 .config
 .tmux/plugins
+
 
 # Allow only actual dotfiles from .config
 !.config/awesome
