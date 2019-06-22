@@ -1,4 +1,3 @@
-
 # Define login environment on first login shell.
 if [[ ! -v TMUX ]]; then
     export CODEPATH="$HOME/Code"
@@ -7,7 +6,7 @@ if [[ ! -v TMUX ]]; then
     export LC_ALL="en_CA.UTF-8"
     export TERM=xterm-256color
     export WORKSPACES="$HOME/Work:$CODEPATH" # workon
-    export PATH="$PATH:~/.cargo/bin:~/.gem/ruby/2.5.0/bin:$GOPATH/bin:$HOME/.bin/BurpSuitePro"
+    export PATH="$PATH:$HOME/.cargo/bin:$HOME/.gem/ruby/2.5.0/bin:$GOPATH/bin:$HOME/.bin/BurpSuitePro"
 
     PERLBASE="$CODEPATH/perl"
     PERL5LIB="$PERLBASE/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
@@ -20,5 +19,3 @@ fi
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   exec startx
 fi
-
-
