@@ -1,4 +1,4 @@
-source ~/Code/foss/pwndbg/gdbinit.py
+source ~/Host/Code/foss/pwndbg/gdbinit.py
 set follow-fork-mode parent
 
 # python
