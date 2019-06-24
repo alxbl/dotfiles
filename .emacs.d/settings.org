@@ -1,0 +1,79 @@
+#+TITLE: Emacs configuration file
+
+* Description
+
+  This file is a literate-programming based configuration file for Emacs. It can
+  be parsed with =org-babel-load-file= to replicate the configuration
+
+* Packages
+** Package Sources
+  First and foremost, configure =package.el= and the package repositories.
+
+  #+BEGIN_SRC emacs-lisp
+    (require 'package)
+
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+    (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+    (package-initialize)
+  #+END_SRC
+
+  It also helps when going from a clean install to automatically install all
+  required packages to go from a fresh setup to a fully configured one without
+  user interaction:
+
+  #+BEGIN_SRC emacs-lisp
+    (unless (package-installed-p 'use-package)
+      (package-refresh-contents)
+      (package-install 'use-package))
+
+    (eval-when-compile
+      (require 'use-package))
+  #+END_SRC
+
+** Required Packages
+   The following is a list of required packages that the configuration uses:
+   #+BEGIN_SRC emacs-lisp
+
+   #+END_SRC
+
+** Evil Mode
+   There is one thing that I cannot live without: Modal editing. My main
+   requirement for a succesful switch to Emacs is beyond a doubt =vim=-like
+   key bindings.
+
+* Look and Feel
+  This section configures the look and feel of Emacs.
+
+** Color Theme
+   I personally use =dracula= whenever possible:
+   #+BEGIN_SRC emacs-lisp
+     (require 'dracula-theme)
+   #+END_SRC
+* Key Bindings
+** Core Commands
+   Some old habits die hard: Use =Ctrl+S= to save the current buffer.
+** Window Management
+   First, define basic window navigation hotkeys
+#+BEGIN_SRC emacs-lisp
+   ;; Select from opened buffers with ;
+   (setq evil-want-C-u-scroll t)
+   (require 'evil)
+   (evil-mode t)
+   ;; Helm fuzzy matching config
+   (require 'helm-config)
+   (helm-mode 1)
+
+  (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
+  (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+  (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+
+#+END_SRC
+
+    Next, add some shortcuts to quickly navigate between open buffers
+
+
+
