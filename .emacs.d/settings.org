@@ -1,21 +1,22 @@
-#+TITLE: Emacs configuration file
+#+TITLE: Emacs Configuration File
 
-* Description
+This file is a literate-programming based configuration file for Emacs. It
+can be parsed with =org-babel-load-file= to extract the configuration from
+the prose and get a working emacs configuration.
 
-  This file is a literate-programming based configuration file for Emacs. It can
-  be parsed with =org-babel-load-file= to replicate the configuration
-
-* Packages
+* Core Configuration
 ** Package Sources
+
   First and foremost, configure =package.el= and the package repositories.
 
   #+BEGIN_SRC emacs-lisp
-    (require 'package)
+  (require 'package)
 
-    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-    (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-    (package-initialize)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+
+  (package-initialize)
   #+END_SRC
 
   It also helps when going from a clean install to automatically install all
@@ -31,50 +32,96 @@
       (require 'use-package))
   #+END_SRC
 
-** Required Packages
+** Default Packages
+
    The following is a list of required packages that the configuration uses:
-   #+BEGIN_SRC emacs-lisp
 
+   #+BEGIN_SRC emacs-lisp
+   ;; ... TODO ...
    #+END_SRC
 
-** Evil Mode
-   There is one thing that I cannot live without: Modal editing. My main
-   requirement for a succesful switch to Emacs is beyond a doubt =vim=-like
-   key bindings.
+** Evil Mode - vi(m) emulation
 
-* Look and Feel
-  This section configures the look and feel of Emacs.
+   There is one thing that I cannot live without: modal editing. My main
+   requirement for a succesful switch to Emacs is beyond a doubt =vim=-like key
+   bindings. All of the key bindings rely on Evil mode =states=, the equivalent
+   of vim mode
 
-** Color Theme
-   I personally use =dracula= whenever possible:
    #+BEGIN_SRC emacs-lisp
-     (require 'dracula-theme)
-   #+END_SRC
-* Key Bindings
-** Core Commands
-   Some old habits die hard: Use =Ctrl+S= to save the current buffer.
-** Window Management
-   First, define basic window navigation hotkeys
-#+BEGIN_SRC emacs-lisp
-   ;; Select from opened buffers with ;
-   (setq evil-want-C-u-scroll t)
+   (setq evil-want-C-u-scroll t) ; Use vim's C-u
    (require 'evil)
    (evil-mode t)
-   ;; Helm fuzzy matching config
+   #+END_SRC
+
+** Helm - Fuzzy Matching/Narrowing
+
+   #+BEGIN_SRC emacs-lisp
    (require 'helm-config)
    (helm-mode 1)
+   #+END_SRC
+   
+    Use the =fd= tool instead of the default file finder.
+
+** Backups
+
+   By default, emacs drops two backup files (=#file#= and =file~=)
+   next to every saved file. I don't like this approach as it leaves a
+   bunch of files lying around. I much prefer a centralized backup
+   directory:
+   
+   #+BEGIN_SRC emacs-lisp
    (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
+   #+END_SRC
 
-  (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
-  (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-  (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+* Look and Feel
 
-#+END_SRC
+    This section configures the look and feel of Emacs. The splash
+    screen is not necessary so it is turned off.
+    #+BEGIN_SRC emacs-lisp
+    (setq inhibit-startup-screen t)
+    #+END_SRC
 
-    Next, add some shortcuts to quickly navigate between open buffers
+    It goes without saying that a nice color scheme is mandatory. I
+    personally use =dracula= whenever possible for the retrofuture
+    vibe.
 
+    #+BEGIN_SRC emacs-lisp
+    (require 'dracula-theme)
+    #+END_SRC
 
+** Org Mode Settings
 
+* Editing
+
+* Key Bindings
+** Core Commands
+    Some old habits die hard: Use =Ctrl+S= to save the current buffer.
+    #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
+    #+END_SRC
+    
+** Navigation
+
+    First, define basic window navigation hotkeys:
+
+    #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+    (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+    (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+    (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+    #+END_SRC
+
+    Next, define functions to open files and buffers:
+
+    #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+    #+END_SRC
+
+    =Ctrl+P= is a very common "go to anything..." shortcut in modern
+    editors. Let's have the same. There are a few additional
+    considerations for cross-platform support here: The tool =fd= is
+    not always available.
+
+    #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
+    #+END_SRC

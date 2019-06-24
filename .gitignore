@@ -15,6 +15,7 @@ __pycache__
 .emacs.d/settings.el
 .emacs.d/bak
 .emacs.d/recentf
+.emacs.d/auto-save-list
 
 # Don't track random and sensitive files
 .config
