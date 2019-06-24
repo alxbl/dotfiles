@@ -1,17 +1,24 @@
+# Java stuff
 *.jar
+
+# vim stuff
 .netrwhist
 .vim/bundle
 .vim/lsp.log
+
+# Python stuff
 .gdb/__pycache__
 __pycache__
+
+# emacs stuff
 .emacs.d/elpa
 .emacs.d/settings.el
 .emacs.d/bak
+.emacs.d/recentf
 
 # Don't track random and sensitive files
 .config
 .tmux/plugins
-
 
 # Allow only actual dotfiles from .config
 !.config/awesome
