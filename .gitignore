@@ -5,6 +5,8 @@
 .gdb/__pycache__
 __pycache__
 .emacs.d/elpa
+.emacs.d/settings.el
+.emacs.d/bak
 
 # Don't track random and sensitive files
 .config
