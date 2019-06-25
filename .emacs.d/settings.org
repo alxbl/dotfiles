@@ -41,9 +41,10 @@ the prose and get a working emacs configuration.
    ;; ... TODO ...
    #+END_SRC
 
-   
+
    #+BEGIN_SRC emacs-lisp
    (use-package evil           :ensure t)
+   (use-package evil-leader    :ensure t)
    (use-package linum-relative :ensure t)
    (use-package helm           :ensure t)
    #+End_SRC
@@ -56,6 +57,7 @@ the prose and get a working emacs configuration.
    of vim mode
 
    #+BEGIN_SRC emacs-lisp
+   (global-evil-leader-mode)
    (require 'evil)
    (evil-mode t)
    #+END_SRC
@@ -66,7 +68,7 @@ the prose and get a working emacs configuration.
    (require 'helm-config)
    (helm-mode 1)
    #+END_SRC
-   
+
     Use the =fd= tool instead of the default file finder.
 
 ** Backups
@@ -75,7 +77,7 @@ the prose and get a working emacs configuration.
    next to every saved file. I don't like this approach as it leaves a
    bunch of files lying around. I much prefer a centralized backup
    directory:
-   
+
    #+BEGIN_SRC emacs-lisp
    (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
    #+END_SRC
@@ -106,12 +108,17 @@ the prose and get a working emacs configuration.
     #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
     #+END_SRC
-    
+
+    Bind a =<leader>= similar to vim:
+    #+BEGIN_SRC emacs-lisp
+    (evil-leader/set-leader "<SPC>")
+    #+END_SRC
+
     It's also a good idea to bind =M-x= to the helm variant
     #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "M-x") 'helm-M-x)
     #+END_SRC
-    
+
 ** Navigation
 
     First, define basic window navigation hotkeys:
@@ -121,6 +128,8 @@ the prose and get a working emacs configuration.
     (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
     (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
     (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+
+    (evil-leader/set-key "q" 'delete-window)
     #+END_SRC
 
     Next, define functions to open files and buffers:
