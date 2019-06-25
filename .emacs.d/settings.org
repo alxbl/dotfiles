@@ -10,6 +10,7 @@ the prose and get a working emacs configuration.
   First and foremost, configure =package.el= and the package repositories.
 
   #+BEGIN_SRC emacs-lisp
+  (setq evil-want-C-u-scroll t) ; Use vim's C-u
   (require 'package)
 
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
@@ -24,12 +25,12 @@ the prose and get a working emacs configuration.
   user interaction:
 
   #+BEGIN_SRC emacs-lisp
-    (unless (package-installed-p 'use-package)
-      (package-refresh-contents)
-      (package-install 'use-package))
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
 
-    (eval-when-compile
-      (require 'use-package))
+  (eval-when-compile
+    (require 'use-package))
   #+END_SRC
 
 ** Default Packages
@@ -40,6 +41,13 @@ the prose and get a working emacs configuration.
    ;; ... TODO ...
    #+END_SRC
 
+   
+   #+BEGIN_SRC emacs-lisp
+   (use-package evil           :ensure t)
+   (use-package linum-relative :ensure t)
+   (use-package helm           :ensure t)
+   #+End_SRC
+
 ** Evil Mode - vi(m) emulation
 
    There is one thing that I cannot live without: modal editing. My main
@@ -48,7 +56,6 @@ the prose and get a working emacs configuration.
    of vim mode
 
    #+BEGIN_SRC emacs-lisp
-   (setq evil-want-C-u-scroll t) ; Use vim's C-u
    (require 'evil)
    (evil-mode t)
    #+END_SRC
@@ -98,6 +105,11 @@ the prose and get a working emacs configuration.
     Some old habits die hard: Use =Ctrl+S= to save the current buffer.
     #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
+    #+END_SRC
+    
+    It's also a good idea to bind =M-x= to the helm variant
+    #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "M-x") 'helm-M-x)
     #+END_SRC
     
 ** Navigation
