@@ -47,6 +47,7 @@ the prose and get a working emacs configuration.
    (use-package evil-leader    :ensure t)
    (use-package linum-relative :ensure t)
    (use-package helm           :ensure t)
+   (use-package magit          :ensure t)
    #+End_SRC
 
 ** Evil Mode - vi(m) emulation
@@ -85,22 +86,39 @@ the prose and get a working emacs configuration.
 * Look and Feel
 
     This section configures the look and feel of Emacs. The splash
-    screen is not necessary so it is turned off.
+    screen is not necessary so it is turned off. So are the toolbar
+    and menu bar.
+
     #+BEGIN_SRC emacs-lisp
     (setq inhibit-startup-screen t)
+    (tool-bar-mode 0)
+    (menu-bar-mode 0)
+    (scroll-bar-mode 0)
     #+END_SRC
 
     It goes without saying that a nice color scheme is mandatory. I
     personally use =dracula= whenever possible for the retrofuture
-    vibe.
+    vibe. Also show relative line numbers for quick motions.
 
     #+BEGIN_SRC emacs-lisp
     (require 'dracula-theme)
+    (linum-relative-mode)
     #+END_SRC
 
 ** Org Mode Settings
 
 * Editing
+    The corner stone of modern IDEs is language services for intelligent
+    completions and refactors. Emacs has bindings for the language
+    server protocol in the form of =emacs-lsp=
+
+    #+BEGIN_SRC emacs-lisp
+    #+END_SRC
+    
+    And of course, spaces are superior to tabs for indentation.
+
+    #+BEGIN_SRC emacs-lisp
+    #+END_SRC
 
 * Key Bindings
 ** Core Commands
