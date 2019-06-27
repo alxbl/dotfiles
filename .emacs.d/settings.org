@@ -5,35 +5,31 @@ can be parsed with =org-babel-load-file= to extract the configuration from
 the prose and get a working emacs configuration.
 
 * Core Configuration
-** Package Sources
 
-  First and foremost, configure =package.el= and the package repositories.
+    First and foremost, configure =package.el= and the package repositories.
 
-  #+BEGIN_SRC emacs-lisp
-  (setq evil-want-C-u-scroll t) ; Use vim's C-u
-  (require 'package)
+    #+BEGIN_SRC emacs-lisp
+    (require 'package)
 
-  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+    (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
-  (package-initialize)
-  #+END_SRC
+    (package-initialize)
+    #+END_SRC
 
-  It also helps when going from a clean install to automatically install all
-  required packages to go from a fresh setup to a fully configured one without
-  user interaction:
+    It also helps when going from a clean install to automatically install all
+    required packages to go from a fresh setup to a fully configured one without
+    user interaction:
 
-  #+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
+    #+BEGIN_SRC emacs-lisp
+    (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
 
-  (eval-when-compile
+    (eval-when-compile
     (require 'use-package))
-  #+END_SRC
-
-** Default Packages
+    #+END_SRC
 
    The following is a list of required packages that the configuration uses:
 
@@ -50,19 +46,6 @@ the prose and get a working emacs configuration.
    (use-package magit          :ensure t)
    #+End_SRC
 
-** Evil Mode - vi(m) emulation
-
-   There is one thing that I cannot live without: modal editing. My main
-   requirement for a succesful switch to Emacs is beyond a doubt =vim=-like key
-   bindings. All of the key bindings rely on Evil mode =states=, the equivalent
-   of vim mode
-
-   #+BEGIN_SRC emacs-lisp
-   (global-evil-leader-mode)
-   (require 'evil)
-   (evil-mode t)
-   #+END_SRC
-
 ** Helm - Fuzzy Matching/Narrowing
 
    #+BEGIN_SRC emacs-lisp
@@ -70,9 +53,7 @@ the prose and get a working emacs configuration.
    (helm-mode 1)
    #+END_SRC
 
-    Use the =fd= tool instead of the default file finder.
-
-** Backups
+** Auxiliary files
 
    By default, emacs drops two backup files (=#file#= and =file~=)
    next to every saved file. I don't like this approach as it leaves a
@@ -82,12 +63,17 @@ the prose and get a working emacs configuration.
    #+BEGIN_SRC emacs-lisp
    (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
    #+END_SRC
+   
+    Prevent =customize.el= stuff from getting into =init.el=.
+    #+BEGIN_SRC emacs-lisp
+    (setq custom-file "~/.emacs.d/custom.el")
+    (load custom-file)
+    #+END_SRC
 
 * Look and Feel
 
-    This section configures the look and feel of Emacs. The splash
-    screen is not necessary so it is turned off. So are the toolbar
-    and menu bar.
+    Disable the emacs splash screen, toolbar and menu bar for maximum
+    minimalism.
 
     #+BEGIN_SRC emacs-lisp
     (setq inhibit-startup-screen t)
@@ -96,50 +82,64 @@ the prose and get a working emacs configuration.
     (scroll-bar-mode 0)
     #+END_SRC
 
-    It goes without saying that a nice color scheme is mandatory. I
-    personally use =dracula= whenever possible for the retrofuture
-    vibe. Also show relative line numbers for quick motions.
+    Use =dracula= and relative line numbering to faciliate vim motions.
 
     #+BEGIN_SRC emacs-lisp
     (require 'dracula-theme)
-    (linum-relative-mode)
-    #+END_SRC
-
-** Org Mode Settings
-
-* Editing
-    The corner stone of modern IDEs is language services for intelligent
-    completions and refactors. Emacs has bindings for the language
-    server protocol in the form of =emacs-lsp=
-
-    #+BEGIN_SRC emacs-lisp
+    (linum-relative-mode t)
     #+END_SRC
     
-    And of course, spaces are superior to tabs for indentation.
+   Set some default key bindings:
+    
+* Package Configuration
+
+    This section provides configuration for individual packages.
+
+** Org Mode
+** Helm
+
+    Open files and buffers with =;=.
 
     #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
     #+END_SRC
 
-* Key Bindings
-** Core Commands
-    Some old habits die hard: Use =Ctrl+S= to save the current buffer.
+    =Ctrl+P= is a very common "go to anything..." shortcut in modern
+    editors. Let's have the same. There are a few additional
+    considerations for cross-platform support here: The tool =fd= is
+    not always available. This still needs some work.
+
     #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd "C-s") 'save-buffer)
+    (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
     #+END_SRC
 
-    Bind a =<leader>= similar to vim:
+** Evil Mode
+
+    Evil mode must be the last package to be configured. This is
+    because it overrides several other mode's keystrokes.
+
+*** Key bindings
+    
+    =Ctrl-S= is almost universal for save file...
+
     #+BEGIN_SRC emacs-lisp
-    (evil-leader/set-leader "<SPC>")
+    (setq evil-want-C-u-scroll t) ; Use vim's C-u
+    (global-set-key (kbd "C-s") 'save-buffer)
     #+END_SRC
 
-    It's also a good idea to bind =M-x= to the helm variant
+    Bind =M-x= to the helm variant
+
     #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "M-x") 'helm-M-x)
     #+END_SRC
 
-** Navigation
+    Bind a =<leader>=-key similar to vim:
 
-    First, define basic window navigation hotkeys:
+    #+BEGIN_SRC emacs-lisp
+    (evil-leader/set-leader "<SPC>")
+    #+END_SRC
+
+    Define basic window navigation hotkeys:
 
     #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
@@ -150,17 +150,16 @@ the prose and get a working emacs configuration.
     (evil-leader/set-key "q" 'delete-window)
     #+END_SRC
 
-    Next, define functions to open files and buffers:
+* Enable Evil
+
+    There is one thing that I cannot live without: modal editing. My main
+    requirement for a succesful switch to Emacs is beyond a doubt =vim=-like key
+    bindings. All of the key bindings rely on Evil mode =states=, the equivalent
+    of vim mode. Evil needs to loaded last in order to properly override keyboard
+    shortcuts.
 
     #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-    #+END_SRC
-
-    =Ctrl+P= is a very common "go to anything..." shortcut in modern
-    editors. Let's have the same. There are a few additional
-    considerations for cross-platform support here: The tool =fd= is
-    not always available.
-
-    #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
+    (global-evil-leader-mode)
+    (require 'evil)
+    (evil-mode t)
     #+END_SRC
