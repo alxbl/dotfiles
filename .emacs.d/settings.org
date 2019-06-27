@@ -31,19 +31,9 @@ the prose and get a working emacs configuration.
     (require 'use-package))
     #+END_SRC
 
-   The following is a list of required packages that the configuration uses:
-
    #+BEGIN_SRC emacs-lisp
-   ;; ... TODO ...
-   #+END_SRC
-
-
-   #+BEGIN_SRC emacs-lisp
-   (use-package evil           :ensure t)
-   (use-package evil-leader    :ensure t)
-   (use-package linum-relative :ensure t)
-   (use-package helm           :ensure t)
-   (use-package magit          :ensure t)
+     (use-package linum-relative :ensure t)
+     (use-package helm           :ensure t)
    #+End_SRC
 
 ** Helm - Fuzzy Matching/Narrowing
@@ -91,11 +81,75 @@ the prose and get a working emacs configuration.
     
    Set some default key bindings:
     
-* Package Configuration
+* Keybindings
+  
+    Evil mode must be required last to ensure that it properly
+    overrides keybindings. All keybindings are thus defined after it
+    has been included.
 
-    This section provides configuration for individual packages.
+    #+BEGIN_SRC emacs-lisp
+    (setq evil-want-C-u-scroll t) ; Use vim's C-u
+    (global-evil-leader-mode)
+    (use-package evil           :ensure t)
+    (use-package evil-leader    :ensure t)
+    (evil-mode t)
+    #+END_SRC
+
+** Magit
+
+    This is largely a work in progress as I figure out which magit
+    bindings I am comfortable with.
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package magit
+	:ensure magit
+	:config
+	(progn
+	    (evil-leader/set-key "g" 'magit-status)
+
+	    (evil-set-initial-state 'magit-mode 'normal)
+	    (evil-set-initial-state 'magit-status-mode 'normal)
+	    (evil-set-initial-state 'magit-diff-mode 'normal)
+	    (evil-set-initial-state 'magit-log-mode 'normal)
+	    (evil-define-key  'normal magit-mode-map
+		(kbd "<TAB>") 'magit-section-toggle
+		"h"           'magit-section-hide
+		"l"           'magit-section-show
+		"j"           'magit-next-line
+		"k"           'magit-previous-line)
+	    (evil-define-key  'normal magit-log-mode-map
+		"j"           'magit-next-line
+		"k"           'magit-previous-line)
+	    (evil-define-key  'normal magit-diff-mode-map
+		"h"           'magit-section-hide
+		"l"           'magit-section-show
+		"j"           'magit-next-line
+		"k"           'magit-previous-line)
+    #+END_SRC
+** Dired
+    Rebind some keys to make =dired= easier to use with evil.
+
+    #+BEGIN_SRC emacs-lisp
+    ;; Same shortcut as vim's NERDTree for now...
+    (define-key evil-normal-state-map (kbd "C-b") 'dired)
+
+    (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
+    (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
+    (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
+    (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
+    (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
+    (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
+    (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
+    (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
+    (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
+    (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
+    (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer)
+    #+END_SRC
 
 ** Org Mode
+   #+BEGIN_SRC 
+   
+   #+END_SRC
 ** Helm
 
     Open files and buffers with =;=.
@@ -113,17 +167,11 @@ the prose and get a working emacs configuration.
     (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
     #+END_SRC
 
-** Evil Mode
+** Navigation
 
-    Evil mode must be the last package to be configured. This is
-    because it overrides several other mode's keystrokes.
-
-*** Key bindings
-    
     =Ctrl-S= is almost universal for save file...
 
     #+BEGIN_SRC emacs-lisp
-    (setq evil-want-C-u-scroll t) ; Use vim's C-u
     (global-set-key (kbd "C-s") 'save-buffer)
     #+END_SRC
 
@@ -147,19 +195,6 @@ the prose and get a working emacs configuration.
     (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
     (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-    (evil-leader/set-key "q" 'delete-window)
-    #+END_SRC
-
-* Enable Evil
-
-    There is one thing that I cannot live without: modal editing. My main
-    requirement for a succesful switch to Emacs is beyond a doubt =vim=-like key
-    bindings. All of the key bindings rely on Evil mode =states=, the equivalent
-    of vim mode. Evil needs to loaded last in order to properly override keyboard
-    shortcuts.
-
-    #+BEGIN_SRC emacs-lisp
-    (global-evil-leader-mode)
-    (require 'evil)
-    (evil-mode t)
+    (evil-leader/set-key "q" 'kill-buffer-and-window)
+    (evil-leader/set-key "e" 'pp-eval-last-sexp)
     #+END_SRC
