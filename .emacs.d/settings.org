@@ -188,7 +188,10 @@ the prose and get a working emacs configuration.
     #+BEGIN_SRC emacs-lisp
     (evil-define-key  'normal org-mode-map
         "gl" 'org-demote-subtree
-        "gh" 'org-promote-subtree)
+        "gh" 'org-promote-subtree
+        (kbd "RET") 'org-open-at-point)
+        
+    (setq org-return-follows-link t)
     #+END_SRC
 ** Helm
 
