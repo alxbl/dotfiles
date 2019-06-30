@@ -150,7 +150,6 @@ the prose and get a working emacs configuration.
             (evil-set-initial-state 'magit-diff-mode 'normal)
             (evil-set-initial-state 'magit-log-mode 'normal)
             (evil-define-key  'normal magit-mode-map
-                (kbd "<TAB>") 'magit-section-toggle
                 "h"           'magit-section-hide
                 "l"           'magit-section-show
                 "j"           'magit-next-line
@@ -192,6 +191,7 @@ the prose and get a working emacs configuration.
         (kbd "RET") 'org-open-at-point)
         
     (setq org-return-follows-link t)
+    (setq org-hide-leading-stars t)
     #+END_SRC
 ** Helm
 
@@ -199,6 +199,7 @@ the prose and get a working emacs configuration.
 
     #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+    (evil-define-key 'normal info-mode-map ";" 'helm-mini)
     #+END_SRC
 
     =Ctrl+P= is a very common "go to anything..." shortcut in modern
@@ -240,4 +241,10 @@ the prose and get a working emacs configuration.
 
     (evil-leader/set-key "q" 'kill-buffer-and-window)
     (evil-leader/set-key "e" 'pp-eval-last-sexp)
+
+    ; Org globals (<leader>-o)
+    (evil-leader/set-key "oa" 'org-agenda)
+    (evil-leader/set-key "oo" 'org-capture)
+    (evil-leader/set-key "ol" 'org-store-link)
+    (evil-leader/set-key "ob" 'org-switchb)
     #+END_SRC
