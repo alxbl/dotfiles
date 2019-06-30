@@ -153,7 +153,8 @@ the prose and get a working emacs configuration.
                 "h"           'magit-section-hide
                 "l"           'magit-section-show
                 "j"           'magit-next-line
-                "k"           'magit-previous-line)
+                "k"           'magit-previous-line
+                "c"           'magit-commit)
             (evil-define-key  'normal magit-log-mode-map
                 "j"           'magit-next-line
                 "k"           'magit-previous-line)
