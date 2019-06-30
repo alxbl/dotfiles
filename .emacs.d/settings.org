@@ -6,9 +6,9 @@ the prose and get a working emacs configuration.
 
 * Core Configuration
 
-    First and foremost, configure =package.el= and the package repositories.
+  First and foremost, configure =package.el= and the package repositories.
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (require 'package)
 
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
@@ -16,25 +16,25 @@ the prose and get a working emacs configuration.
     (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
     (package-initialize)
-    #+END_SRC
+  #+END_SRC
 
-    It also helps when going from a clean install to automatically install all
-    required packages to go from a fresh setup to a fully configured one without
-    user interaction:
+  It also helps when going from a clean install to automatically install all
+  required packages to go from a fresh setup to a fully configured one without
+  user interaction:
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
 
     (eval-when-compile
     (require 'use-package))
-    #+END_SRC
+  #+END_SRC
 
-   #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
      (use-package linum-relative :ensure t)
      (use-package helm           :ensure t)
-   #+End_SRC
+  #+End_SRC
 
 ** Helm - Fuzzy Matching/Narrowing
 
@@ -54,44 +54,44 @@ the prose and get a working emacs configuration.
    (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
    #+END_SRC
 
-    Prevent =customize.el= stuff from getting into =init.el=.
-    #+BEGIN_SRC emacs-lisp
+   Prevent =customize.el= stuff from getting into =init.el=.
+   #+BEGIN_SRC emacs-lisp
     (setq custom-file "~/.emacs.d/custom.el")
     (load custom-file)
-    #+END_SRC
+   #+END_SRC
 
 * Look and Feel
 
-    Disable the emacs splash screen, toolbar and menu bar for maximum
-    minimalism.
+  Disable the emacs splash screen, toolbar and menu bar for maximum
+  minimalism.
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (setq inhibit-startup-screen t)
     (tool-bar-mode 0)
     (menu-bar-mode 0)
     (scroll-bar-mode 0)
-    #+END_SRC
+  #+END_SRC
 
-    =dracula= looks very slick.
+  =dracula= looks very slick.
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (require 'dracula-theme)
-    #+END_SRC
+  #+END_SRC
 
-    Use relative line numbering to faciliate vim motions.
+  Use relative line numbering to faciliate vim motions.
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (linum-relative-global-mode)
-    #+END_SRC
+  #+END_SRC
 
-    Configure default indentation:
-    #+BEGIN_SRC emacs-lisp
+  Configure default indentation:
+  #+BEGIN_SRC emacs-lisp
     (setq-default indent-tabs-mode nil) ;; Use spaces
     (setq-default tab-width 4)
     ; C-specific stuff (move to its own section?)
     (defvaralias 'c-basic-offset 'tab-width)
     (defvaralias 'cperl-indent-level 'tab-width)
-    #+END_SRC
+  #+END_SRC
 
 * Languages
 
@@ -121,24 +121,24 @@ the prose and get a working emacs configuration.
 
 * Keybindings
 
-    Evil mode must be required last to ensure that it properly
-    overrides keybindings. All keybindings are thus defined after it
-    has been included.
+  Evil mode must be required last to ensure that it properly
+  overrides keybindings. All keybindings are thus defined after it
+  has been included.
 
-    #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (setq evil-want-C-u-scroll t) ; Use vim's C-u
     (global-evil-leader-mode)
     (use-package evil           :ensure t)
     (use-package evil-leader    :ensure t)
     (evil-mode t)
-    #+END_SRC
+  #+END_SRC
 
 ** Magit
 
-    This is largely a work in progress as I figure out which magit
-    bindings I am comfortable with.
+   This is largely a work in progress as I figure out which magit
+   bindings I am comfortable with.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (use-package magit
         :ensure magit
         :config
@@ -150,24 +150,27 @@ the prose and get a working emacs configuration.
             (evil-set-initial-state 'magit-diff-mode 'normal)
             (evil-set-initial-state 'magit-log-mode 'normal)
             (evil-define-key  'normal magit-mode-map
+                "?"           'magit-dispatch
                 "h"           'magit-section-hide
                 "l"           'magit-section-show
                 "j"           'magit-next-line
                 "k"           'magit-previous-line
                 "c"           'magit-commit)
             (evil-define-key  'normal magit-log-mode-map
+                "?"           'magit-dispatch
                 "j"           'magit-next-line
                 "k"           'magit-previous-line)
             (evil-define-key  'normal magit-diff-mode-map
+                "?"           'magit-dispatch
                 "h"           'magit-section-hide
                 "l"           'magit-section-show
                 "j"           'magit-next-line
                 "k"           'magit-previous-line)))
-    #+END_SRC
+   #+END_SRC
 ** Dired
-    Rebind some keys to make =dired= easier to use with evil.
+   Rebind some keys to make =dired= easier to use with evil.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     ;; Same shortcut as vim's NERDTree for now...
     (define-key evil-normal-state-map (kbd "C-b") 'dired)
 
@@ -182,10 +185,10 @@ the prose and get a working emacs configuration.
     (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
     (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
     (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer)
-    #+END_SRC
+   #+END_SRC
 
 ** Org Mode
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (evil-define-key  'normal org-mode-map
         "gl" 'org-demote-subtree
         "gh" 'org-promote-subtree
@@ -193,48 +196,48 @@ the prose and get a working emacs configuration.
         
     (setq org-return-follows-link t)
     (setq org-hide-leading-stars t)
-    #+END_SRC
+   #+END_SRC
 ** Helm
 
-    Open files and buffers with =;=.
+   Open files and buffers with =;=.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
     (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-    #+END_SRC
+   #+END_SRC
 
-    =Ctrl+P= is a very common "go to anything..." shortcut in modern
-    editors. Let's have the same. There are a few additional
-    considerations for cross-platform support here: The tool =fd= is
-    not always available. This still needs some work.
+   =Ctrl+P= is a very common "go to anything..." shortcut in modern
+   editors. Let's have the same. There are a few additional
+   considerations for cross-platform support here: The tool =fd= is
+   not always available. This still needs some work.
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
-    #+END_SRC
+   #+END_SRC
 
 ** Navigation
 
-    =Ctrl-S= is almost universal for save file...
+   =Ctrl-S= is almost universal for save file...
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "C-s") 'save-buffer)
-    #+END_SRC
+   #+END_SRC
 
-    Bind =M-x= to the helm variant
+   Bind =M-x= to the helm variant
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "M-x") 'helm-M-x)
-    #+END_SRC
+   #+END_SRC
 
-    Bind a =<leader>=-key similar to vim:
+   Bind a =<leader>=-key similar to vim:
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (evil-leader/set-leader "<SPC>")
-    #+END_SRC
+   #+END_SRC
 
-    Define basic window navigation hotkeys:
+   Define basic window navigation hotkeys:
 
-    #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
     (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
     (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
@@ -248,4 +251,4 @@ the prose and get a working emacs configuration.
     (evil-leader/set-key "oo" 'org-capture)
     (evil-leader/set-key "ol" 'org-store-link)
     (evil-leader/set-key "ob" 'org-switchb)
-    #+END_SRC
+   #+END_SRC
