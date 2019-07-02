@@ -128,9 +128,14 @@ the prose and get a working emacs configuration.
   #+BEGIN_SRC emacs-lisp
     (setq evil-want-C-u-scroll t) ; Use vim's C-u
     (global-evil-leader-mode)
-    (use-package evil           :ensure t)
-    (use-package evil-leader    :ensure t)
+    (use-package evil            :ensure t)
+    (use-package evil-leader     :ensure t)
+    (use-package evil-commentary :ensure t)
+    (use-package evil-surround   :ensure t
+      :config
+      (global-evil-surround-mode 1)
     (evil-mode t)
+    (evil-commentary-mode t)
   #+END_SRC
 
 ** Magit
@@ -186,69 +191,83 @@ the prose and get a working emacs configuration.
     (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
     (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer)
    #+END_SRC
-
-** Org Mode
+** Info
+   The default bindings are actually decent, but require switching to
+   =emacs-state=, which is an additional keystroke.
+   
+   #+BEGIN_SRC emacs-lisp
+     (evil-define-key 'motion 'info-mode-map
+       (kbd "C-o") 'Info-history-back
+       (kbd "C-i") 'Info-history-forward)
+   #+END_SRC
+** Org
    #+BEGIN_SRC emacs-lisp
     (evil-define-key  'normal org-mode-map
-        "gl" 'org-demote-subtree
-        "gh" 'org-promote-subtree
+        ">" 'org-demote-subtree
+        "<" 'org-promote-subtree
         (kbd "RET") 'org-open-at-point)
         
     (setq org-return-follows-link t)
     (setq org-hide-leading-stars t)
    #+END_SRC
-** Helm
+*** Helm
 
-   Open files and buffers with =;=.
+    Open files and buffers with =;=.
 
-   #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-    (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+     (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+    #+END_SRC
 
-   =Ctrl+P= is a very common "go to anything..." shortcut in modern
-   editors. Let's have the same. There are a few additional
-   considerations for cross-platform support here: The tool =fd= is
-   not always available. This still needs some work.
+    =Ctrl+P= is a very common "go to anything..." shortcut in modern
+    editors. Let's have the same. There are a few additional
+    considerations for cross-platform support here: The tool =fd= is
+    not always available. This still needs some work.
 
-   #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+     (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
+    #+END_SRC
 
-** Navigation
+*** Navigation
 
-   =Ctrl-S= is almost universal for save file...
+    =Ctrl-S= is almost universal for save file...
 
-   #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-s") 'save-buffer)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-s") 'save-buffer)
+    #+END_SRC
 
-   Bind =M-x= to the helm variant
+    Bind =M-x= to the helm variant
 
-   #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "M-x") 'helm-M-x)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "M-x") 'helm-M-x)
+    #+END_SRC
 
-   Bind a =<leader>=-key similar to vim:
+    Bind a =<leader>=-key similar to vim:
 
-   #+BEGIN_SRC emacs-lisp
-    (evil-leader/set-leader "<SPC>")
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+     (evil-leader/set-leader "<SPC>")
+    #+END_SRC
 
-   Define basic window navigation hotkeys:
+    Define basic window navigation hotkeys:
 
-   #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-    (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-    (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-    (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+    #+BEGIN_SRC emacs-lisp
+      (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+      (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+      (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+      (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-    (evil-leader/set-key "q" 'kill-buffer-and-window)
-    (evil-leader/set-key "e" 'pp-eval-last-sexp)
+      ; Motion mode shouldd behave like normal mode.
+      (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
+      (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
+      (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
+      (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right)
 
-    ; Org globals (<leader>-o)
-    (evil-leader/set-key "oa" 'org-agenda)
-    (evil-leader/set-key "oo" 'org-capture)
-    (evil-leader/set-key "ol" 'org-store-link)
-    (evil-leader/set-key "ob" 'org-switchb)
-   #+END_SRC
+      (evil-leader/set-key "q" 'kill-buffer-and-window)
+      (evil-leader/set-key "e" 'pp-eval-last-sexp)
+
+      ; Org globals (<leader>-o)
+      (evil-leader/set-key "oa" 'org-agenda)
+      (evil-leader/set-key "oo" 'org-capture)
+      (evil-leader/set-key "ol" 'org-store-link)
+      (evil-leader/set-key "ob" 'org-switchb)
+    #+END_SRC
