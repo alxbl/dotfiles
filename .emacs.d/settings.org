@@ -144,33 +144,37 @@ the prose and get a working emacs configuration.
    bindings I am comfortable with.
 
    #+BEGIN_SRC emacs-lisp
-    (use-package magit
-        :ensure magit
-        :config
-        (progn
-            (evil-leader/set-key "g" 'magit-status)
+         (use-package magit
+             :ensure magit
+             :config
+             (progn
+                 (evil-leader/set-key "g" 'magit-status)
 
-            (evil-set-initial-state 'magit-mode 'normal)
-            (evil-set-initial-state 'magit-status-mode 'normal)
-            (evil-set-initial-state 'magit-diff-mode 'normal)
-            (evil-set-initial-state 'magit-log-mode 'normal)
-            (evil-define-key  'normal magit-mode-map
-                "?"           'magit-dispatch
-                "h"           'magit-section-hide
-                "l"           'magit-section-show
-                "j"           'magit-next-line
-                "k"           'magit-previous-line
-                "c"           'magit-commit)
-            (evil-define-key  'normal magit-log-mode-map
-                "?"           'magit-dispatch
-                "j"           'magit-next-line
-                "k"           'magit-previous-line)
-            (evil-define-key  'normal magit-diff-mode-map
-                "?"           'magit-dispatch
-                "h"           'magit-section-hide
-                "l"           'magit-section-show
-                "j"           'magit-next-line
-                "k"           'magit-previous-line)))
+                 (evil-set-initial-state 'magit-mode 'normal)
+                 (evil-set-initial-state 'magit-status-mode 'normal)
+                 (evil-set-initial-state 'magit-diff-mode 'normal)
+                 (evil-set-initial-state 'magit-log-mode 'normal)
+                 (evil-define-key  'normal magit-mode-map
+                     "?"           'magit-dispatch
+                     "h"           'magit-section-hide
+                     "l"           'magit-section-show
+                     "j"           'magit-next-line
+                     "k"           'magit-previous-line
+                     "c"           'magit-commit
+                     "q"           'magit-mode-bury-buffer)
+                 (evil-define-key  'normal magit-log-mode-map
+                     "?"           'magit-dispatch
+                     "j"           'magit-next-line
+                     "k"           'magit-previous-line
+                     "q"           'magit-mode-bury-buffer)
+                 (evil-define-key  'normal magit-diff-mode-map
+                     "?"           'magit-dispatch
+                     "h"           'magit-section-hide
+                     "l"           'magit-section-show
+                     "j"           'magit-next-line
+                     "k"           'magit-previous-line
+                     "q"           'magit-mode-bury-buffer)
+         )))
    #+END_SRC
 ** Dired
    Rebind some keys to make =dired= easier to use with evil.
@@ -203,8 +207,8 @@ the prose and get a working emacs configuration.
 ** Org
    #+BEGIN_SRC emacs-lisp
     (evil-define-key  'normal org-mode-map
-        ">" 'org-demote-subtree
-        "<" 'org-promote-subtree
+        "gl" 'org-demote-subtree
+        "gh" 'org-promote-subtree
         (kbd "RET") 'org-open-at-point)
         
     (setq org-return-follows-link t)
@@ -257,6 +261,7 @@ the prose and get a working emacs configuration.
       (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
       ; Motion mode shouldd behave like normal mode.
+      ; FIXME: Does not work?
       (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
       (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
       (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
