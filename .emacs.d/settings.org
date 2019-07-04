@@ -32,8 +32,9 @@ the prose and get a working emacs configuration.
   #+END_SRC
 
   #+BEGIN_SRC emacs-lisp
+     (use-package diminish       :ensure t)
      (use-package linum-relative :ensure t)
-     (use-package helm           :ensure t)
+     (use-package helm           :ensure t :diminish)
   #+End_SRC
 
 ** Helm - Fuzzy Matching/Narrowing
@@ -41,15 +42,6 @@ the prose and get a working emacs configuration.
    #+BEGIN_SRC emacs-lisp
    (require 'helm-config)
    (helm-mode 1)
-   #+END_SRC
-
-** IDE Facilities
-   #+BEGIN_SRC emacs-lisp
-     (use-package lsp-rust :ensure t)
-     (use-package lsp-mode :ensure t
-       :hook (rust-mode . lsp-deferred)
-       :commands (lsp lsp-deferred)
-     )
    #+END_SRC
 
 ** Auxiliary files
@@ -104,7 +96,6 @@ the prose and get a working emacs configuration.
 
 * Languages
 
-** Language Server Protocol
 ** Elisp
    Seeing as this is the main language of Emacs, it's a good idea to
    configure it to some sane defaults.
@@ -214,7 +205,7 @@ the prose and get a working emacs configuration.
    #+END_SRC
 ** Info
    The default bindings are actually decent, but require switching to
-   =emacs-state=, which is an additional keystroke.
+   =emacs-state=, which is an additional keystroke. (This is currently broken)
    
    #+BEGIN_SRC emacs-lisp
      (evil-define-key 'motion 'info-mode-map
@@ -234,67 +225,107 @@ the prose and get a working emacs configuration.
      (setq org-return-follows-link t)
      (setq org-hide-leading-stars t)
    #+END_SRC
-*** Helm
+** Helm
 
-    Open files and buffers with =;=.
-    #+BEGIN_SRC emacs-lisp
-     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-     (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-    #+END_SRC
+   Open files and buffers with =;=.
+   #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+    (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+   #+END_SRC
 
-    =Ctrl+P= is a very common "go to anything..." shortcut in modern
-    editors. Let's have the same. There are a few additional
-    considerations for cross-platform support here: The tool =fd= is
-    not always available. This still needs some work.
+   =Ctrl+P= is a very common "go to anything..." shortcut in modern
+   editors. Let's have the same. There are a few additional
+   considerations for cross-platform support here: The tool =fd= is
+   not always available. This still needs some work.
 
-    #+BEGIN_SRC emacs-lisp
-     (define-key evil-normal-state-map (kbd "C-p") 'helm-for-files)
-    #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+    (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
+   #+END_SRC
 
-*** Navigation
+** Navigation
 
-    =Ctrl-S= is almost universal for save file...
+   =Ctrl-S= is almost universal for save file...
 
-    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-s") 'save-buffer)
-    #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "C-s") 'save-buffer)
+   #+END_SRC
    
-    Bind =M-x= to the helm variant
+   Bind =M-x= to the helm variant
 
-    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "M-x") 'helm-M-x)
-    #+END_SRC
+   #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "M-x") 'helm-M-x)
+   #+END_SRC
 
-    Define basic window navigation hotkeys:
+   Define basic window navigation hotkeys:
 
-    #+BEGIN_SRC emacs-lisp
-      (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-      (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-      (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-      (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+   #+BEGIN_SRC emacs-lisp
+     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+     (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+     (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+     (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-      ; Motion mode shouldd behave like normal mode.
-      ; FIXME: Does not work?
-      (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
-      (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
-      (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
-      (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right)
+     ; Motion mode shouldd behave like normal mode.
+     ; FIXME: Does not work?
+     (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
+     (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
+     (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
+     (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right)
 
-      (evil-leader/set-key "q" 'kill-buffer-and-window)
-      (evil-leader/set-key "e" 'pp-eval-last-sexp)
+     (evil-leader/set-key "q" 'kill-buffer-and-window)
+     (evil-leader/set-key "e" 'pp-eval-last-sexp)
 
-      ; Org globals (<leader>-o)
-      (evil-leader/set-key "oa" 'org-agenda)
-      (evil-leader/set-key "oo" 'org-capture)
-      (evil-leader/set-key "ol" 'org-store-link)
-      (evil-leader/set-key "ob" 'org-switchb)
+     ; Org globals (<leader>-o)
+     (evil-leader/set-key "oa" 'org-agenda)
+     (evil-leader/set-key "oo" 'org-capture)
+     (evil-leader/set-key "ol" 'org-store-link)
+     (evil-leader/set-key "ob" 'org-switchb)
 
-      ; Shortcut to clean up buffer list (vim equivalent of :bufdo bd<CR>)
-      (defun a/kill-all-buffers ()
-        (interactive)
-        (mapcar 'kill-buffer (buffer-list))
-        (delete-other-windows))
+     ; Shortcut to clean up buffer list (vim equivalent of :bufdo bd<CR>)
+     (defun a/kill-all-buffers ()
+       (interactive)
+       (mapcar 'kill-buffer (buffer-list))
+       (delete-other-windows))
 
-      (evil-leader/set-key "Q" 'a/kill-all-buffers)
+     (evil-leader/set-key "Q" 'a/kill-all-buffers)
 
-    #+END_SRC
+   #+END_SRC
+** IDE Facilities
+   This will need to be cleaned up and documented eventually.
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile :ensure t)
+     (use-package helm-projectile :ensure t)
+     (use-package yasnippet :ensure t)
+     (use-package company :ensure t
+       :diminish
+       :hook (rust-mode . company-mode)
+       :config (progn
+                 (evil-define-key  'insert company-mode-map
+                   "\t" 'company-complete)
+                 (evil-define-key  'insert company-capf-mode-map
+                   "\t" 'company-complete-common-or-cycle)
+                 ))
+
+     (use-package lsp-ui :commands lsp-ui-mode)
+     (use-package company-lsp :commands company-lsp
+       :init (push 'company-lsp company-backends)
+       :config (progn
+                 (setq company-lsp-enable-snippet 1))
+       :after lsp-mode company)
+     (use-package helm-lsp :commands helm-lsp-workspace-symbol)
+     ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+     (use-package lsp-mode :ensure t
+       :hook (rust-mode . lsp-deferred)
+       :commands (lsp lsp-deferred)
+       :config
+       (progn
+         (define-key evil-normal-state-map (kbd "<f2>") 'lsp-rename)
+         ))
+
+
+     (use-package flycheck :ensure t :diminish
+       :init (global-flycheck-mode))
+   #+END_SRC
+
+   
