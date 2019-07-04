@@ -43,6 +43,15 @@ the prose and get a working emacs configuration.
    (helm-mode 1)
    #+END_SRC
 
+** IDE Facilities
+   #+BEGIN_SRC emacs-lisp
+     (use-package lsp-rust :ensure t)
+     (use-package lsp-mode :ensure t
+       :hook (rust-mode . lsp-deferred)
+       :commands (lsp lsp-deferred)
+     )
+   #+END_SRC
+
 ** Auxiliary files
 
    By default, emacs drops two backup files (=#file#= and =file~=)
@@ -61,7 +70,7 @@ the prose and get a working emacs configuration.
    #+END_SRC
 
 * Look and Feel
-
+  
   Disable the emacs splash screen, toolbar and menu bar for maximum
   minimalism.
 
@@ -95,6 +104,7 @@ the prose and get a working emacs configuration.
 
 * Languages
 
+** Language Server Protocol
 ** Elisp
    Seeing as this is the main language of Emacs, it's a good idea to
    configure it to some sane defaults.
@@ -137,6 +147,13 @@ the prose and get a working emacs configuration.
     (evil-mode t)
     (evil-commentary-mode t)
   #+END_SRC
+
+  Bind a =<leader>=-key similar to vim:
+
+  #+BEGIN_SRC emacs-lisp
+    (evil-leader/set-leader "<SPC>")
+  #+END_SRC
+
 
 ** Magit
 
@@ -206,18 +223,20 @@ the prose and get a working emacs configuration.
    #+END_SRC
 ** Org
    #+BEGIN_SRC emacs-lisp
-    (evil-define-key  'normal org-mode-map
-        "gl" 'org-demote-subtree
-        "gh" 'org-promote-subtree
-        (kbd "RET") 'org-open-at-point)
-        
-    (setq org-return-follows-link t)
-    (setq org-hide-leading-stars t)
+     (evil-define-key  'normal org-mode-map
+         "gl" 'org-demote-subtree
+         "gh" 'org-promote-subtree
+         "]]" 'org-next-visible-heading
+         "[["'org-previous-visible-heading
+         (kbd "RET") 'org-open-at-point)
+
+     (evil-leader/set-key (kbd "SPC") 'org-cycle)
+     (setq org-return-follows-link t)
+     (setq org-hide-leading-stars t)
    #+END_SRC
 *** Helm
 
     Open files and buffers with =;=.
-
     #+BEGIN_SRC emacs-lisp
      (define-key evil-normal-state-map (kbd ";") 'helm-mini)
      (evil-define-key 'normal info-mode-map ";" 'helm-mini)
@@ -239,17 +258,11 @@ the prose and get a working emacs configuration.
     #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-s") 'save-buffer)
     #+END_SRC
-
+   
     Bind =M-x= to the helm variant
 
     #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "M-x") 'helm-M-x)
-    #+END_SRC
-
-    Bind a =<leader>=-key similar to vim:
-
-    #+BEGIN_SRC emacs-lisp
-     (evil-leader/set-leader "<SPC>")
     #+END_SRC
 
     Define basic window navigation hotkeys:
@@ -275,4 +288,13 @@ the prose and get a working emacs configuration.
       (evil-leader/set-key "oo" 'org-capture)
       (evil-leader/set-key "ol" 'org-store-link)
       (evil-leader/set-key "ob" 'org-switchb)
+
+      ; Shortcut to clean up buffer list (vim equivalent of :bufdo bd<CR>)
+      (defun a/kill-all-buffers ()
+        (interactive)
+        (mapcar 'kill-buffer (buffer-list))
+        (delete-other-windows))
+
+      (evil-leader/set-key "Q" 'a/kill-all-buffers)
+
     #+END_SRC
