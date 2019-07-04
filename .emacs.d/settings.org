@@ -92,6 +92,7 @@ the prose and get a working emacs configuration.
     ; C-specific stuff (move to its own section?)
     (defvaralias 'c-basic-offset 'tab-width)
     (defvaralias 'cperl-indent-level 'tab-width)
+    (diminish 'undo-tree)
   #+END_SRC
 
 * Languages
@@ -293,18 +294,25 @@ the prose and get a working emacs configuration.
    This will need to be cleaned up and documented eventually.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package projectile :ensure t)
+     (use-package projectile :ensure t :diminish)
      (use-package helm-projectile :ensure t)
-     (use-package yasnippet :ensure t)
+     (use-package yasnippet :ensure t :diminish
+       :hook (after-init . yas-global-mode))
      (use-package company :ensure t
        :diminish
-       :hook (rust-mode . company-mode)
-       :config (progn
-                 (evil-define-key  'insert company-mode-map
-                   "\t" 'company-complete)
-                 (evil-define-key  'insert company-capf-mode-map
-                   "\t" 'company-complete-common-or-cycle)
-                 ))
+       :bind 
+       (:map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("<tab>" . company-complete-common-or-cycle)
+             :map company-search-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
+       :custom
+       (company-idle-delay 0)
+       (company-echo-delay 0)
+       (company-minimum-prefix-length 1)
+       :hook (after-init . global-company-mode))
 
      (use-package lsp-ui :commands lsp-ui-mode)
      (use-package company-lsp :commands company-lsp
@@ -322,7 +330,6 @@ the prose and get a working emacs configuration.
        (progn
          (define-key evil-normal-state-map (kbd "<f2>") 'lsp-rename)
          ))
-
 
      (use-package flycheck :ensure t :diminish
        :init (global-flycheck-mode))
