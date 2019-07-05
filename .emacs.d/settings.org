@@ -1,124 +1,123 @@
 #+TITLE: Emacs Configuration File
 
-This file is a literate-programming based configuration file for Emacs. It
-can be parsed with =org-babel-load-file= to extract the configuration from
-the prose and get a working emacs configuration.
+Most of this should be self-explanatory. In places where it isn't,
+additional explanations are provided.
 
-* Core Configuration
-
-  First and foremost, configure =package.el= and the package repositories.
-
-  #+BEGIN_SRC emacs-lisp
+* Configuration
+** Package Management
+   #+BEGIN_SRC emacs-lisp
     (require 'package)
 
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
     (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
     (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-
     (package-initialize)
-  #+END_SRC
 
-  It also helps when going from a clean install to automatically install all
-  required packages to go from a fresh setup to a fully configured one without
-  user interaction:
-
-  #+BEGIN_SRC emacs-lisp
     (unless (package-installed-p 'use-package)
     (package-refresh-contents)
     (package-install 'use-package))
 
-    (eval-when-compile
-    (require 'use-package))
-  #+END_SRC
+    (eval-when-compile (require 'use-package))
 
-  #+BEGIN_SRC emacs-lisp
-     (use-package diminish       :ensure t)
-     (use-package linum-relative :ensure t)
-     (use-package helm           :ensure t :diminish)
-  #+End_SRC
-
-** Helm - Fuzzy Matching/Narrowing
-
-   #+BEGIN_SRC emacs-lisp
-   (require 'helm-config)
-   (helm-mode 1)
+    (setq use-package-always-ensure t)
+    (setq use-package-expand-minimally t)
    #+END_SRC
 
-** Auxiliary files
+** Core 
+*** Server-Mode
+    #+BEGIN_SRC emacs-lisp
+      (use-package server
+       :ensure nil
+       :hook (after-init . server-mode))   
+    #+END_SRC
+*** Editing
+    #+BEGIN_SRC emacs-lisp
+      (prefer-coding-system 'utf-8-unix)
+      (set-locale-environment "en_US.UTF-8")
+      (set-default-coding-systems 'utf-8-unix)
+      (set-selection-coding-system 'utf-8-unix)
+      (set-buffer-file-coding-system 'utf-8-unix)
+      (set-clipboard-coding-system 'utf-8)
+      (set-keyboard-coding-system 'utf-8)
+      (set-terminal-coding-system 'utf-8)
+      (setq buffer-file-coding-system 'utf-8)
+      (setq save-buffer-coding-system 'utf-8-unix)
 
-   By default, emacs drops two backup files (=#file#= and =file~=)
-   next to every saved file. I don't like this approach as it leaves a
-   bunch of files lying around. I much prefer a centralized backup
-   directory:
+      ;; Vertical Column
+      (set-fill-column 80) 
 
-   #+BEGIN_SRC emacs-lisp
-   (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
-   #+END_SRC
+      ;; Default tabs
+      (setq-default indent-tabs-mode nil) ;; Use spaces
+      (setq-default tab-width 4)
+      ; C-specific stuff (move to its own section?)
+      (defvaralias 'c-basic-offset 'tab-width)
+      (defvaralias 'cperl-indent-level 'tab-width)
+    #+END_SRC
+*** Look and Feel
+    Minimalism startup.
 
-   Prevent =customize.el= stuff from getting into =init.el=.
-   #+BEGIN_SRC emacs-lisp
-    (setq custom-file "~/.emacs.d/custom.el")
-    (load custom-file)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (setq inhibit-startup-screen t)
+      (setq inhibit-startup-message t)
+      (setq inhibit-startup-echo-area-message t)
+      (setq initial-scratch-message nil)
 
-* Look and Feel
-  
-  Disable the emacs splash screen, toolbar and menu bar for maximum
-  minimalism.
+      (tool-bar-mode 0)
+      (menu-bar-mode 0)
+      (scroll-bar-mode 0)
 
-  #+BEGIN_SRC emacs-lisp
-    (setq inhibit-startup-screen t)
-    (tool-bar-mode 0)
-    (menu-bar-mode 0)
-    (scroll-bar-mode 0)
-  #+END_SRC
+      ;; No Auto-save/backups
+      ;; (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
+      (setq make-backup-files nil)
+      (setq auto-save-default nil)  
 
-  =dracula= looks very slick.
+      ;; Separate Customize stuff.
+      (setq custom-file "~/.emacs.d/custom.el")
+      (load custom-file)
+    #+END_SRC
 
-  #+BEGIN_SRC emacs-lisp
-    (require 'dracula-theme)
-  #+END_SRC
+    Sprinke some colors.
 
-  Use relative line numbering to faciliate vim motions.
+    #+BEGIN_SRC emacs-lisp
+      (require 'dracula-theme)
+    #+END_SRC
 
-  #+BEGIN_SRC emacs-lisp
-    (linum-relative-global-mode)
-  #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      ;; Unclutter the mode HUD
+      (use-package diminish       :ensure t
+        :config
+        (diminish 'undo-tree-mode)
+        (diminish 'auto-revert-mode))
 
-  Configure default indentation:
-  #+BEGIN_SRC emacs-lisp
-    (setq-default indent-tabs-mode nil) ;; Use spaces
-    (setq-default tab-width 4)
-    ; C-specific stuff (move to its own section?)
-    (defvaralias 'c-basic-offset 'tab-width)
-    (defvaralias 'cperl-indent-level 'tab-width)
-    (diminish 'undo-tree)
-  #+END_SRC
+      ;; Reative  Line Numbering
+      (use-package linum-relative :ensure t :diminish
+        :config
+        (setq linum-relative-backend 'display-line-numbers-mode)
+        :hook (after-init . 'linum-relative-global-mode))
+
+      (use-package helm           :ensure t :diminish)
+    #+END_SRC
+
+
+**** Helm - Fuzzy Matching/Narrowing
+
+     #+BEGIN_SRC emacs-lisp
+     (require 'helm-config)
+     (helm-mode 1)
+     #+END_SRC
 
 * Languages
-
-** Elisp
-   Seeing as this is the main language of Emacs, it's a good idea to
-   configure it to some sane defaults.
-
-   #+BEGIN_SRC emacs-lisp
-
-   #+END_SRC
-
 ** Rust
    This section configures the rust language.
    #+BEGIN_SRC emacs-lisp
-    (use-package rust-mode
-        :ensure t
-        :config (progn
+    (use-package rust-mode :ensure t
+        :config 
             (setq rust-format-on-save t))
-    )
    #+END_SRC
 ** Python
 
    #+BEGIN_SRC emacs-lisp
-    (use-package python-mode
-        :ensure t)
+    (use-package python-mode :ensure t)
    #+END_SRC
 
 * Keybindings
@@ -134,10 +133,10 @@ the prose and get a working emacs configuration.
     (use-package evil-leader     :ensure t)
     (use-package evil-commentary :ensure t)
     (use-package evil-surround   :ensure t
-      :config
+      :config 
       (global-evil-surround-mode 1)
-    (evil-mode t)
-    (evil-commentary-mode t)
+      (evil-mode t)
+      (evil-commentary-mode t))
   #+END_SRC
 
   Bind a =<leader>=-key similar to vim:
@@ -145,7 +144,6 @@ the prose and get a working emacs configuration.
   #+BEGIN_SRC emacs-lisp
     (evil-leader/set-leader "<SPC>")
   #+END_SRC
-
 
 ** Magit
 
@@ -183,7 +181,7 @@ the prose and get a working emacs configuration.
                      "j"           'magit-next-line
                      "k"           'magit-previous-line
                      "q"           'magit-mode-bury-buffer)
-         )))
+         ))
    #+END_SRC
 ** Dired
    Rebind some keys to make =dired= easier to use with evil.
@@ -221,10 +219,16 @@ the prose and get a working emacs configuration.
          "]]" 'org-next-visible-heading
          "[["'org-previous-visible-heading
          (kbd "RET") 'org-open-at-point)
+     ;; (evil-define-key 'visual org-mode-map
+     ;;   "d" 'delete-region)
 
      (evil-leader/set-key (kbd "SPC") 'org-cycle)
      (setq org-return-follows-link t)
      (setq org-hide-leading-stars t)
+
+     ;; This breaks delete/yank line motions.
+     ;; "dab" 'org-cut-subtree
+     ;; "yab" 'org-copy-subtree
    #+END_SRC
 ** Helm
 
@@ -296,10 +300,9 @@ the prose and get a working emacs configuration.
    #+BEGIN_SRC emacs-lisp
      (use-package projectile :ensure t :diminish)
      (use-package helm-projectile :ensure t)
-     (use-package yasnippet :ensure t :diminish
+     (use-package yasnippet :ensure t :diminish 'yas-minor-mode
        :hook (after-init . yas-global-mode))
-     (use-package company :ensure t
-       :diminish
+     (use-package company :ensure t :diminish
        :bind 
        (:map company-active-map
              ("C-n" . company-select-next)
@@ -323,7 +326,7 @@ the prose and get a working emacs configuration.
      (use-package helm-lsp :commands helm-lsp-workspace-symbol)
      ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
-     (use-package lsp-mode :ensure t
+     (use-package lsp-mode :ensure t :diminish
        :hook (rust-mode . lsp-deferred)
        :commands (lsp lsp-deferred)
        :config
@@ -334,5 +337,7 @@ the prose and get a working emacs configuration.
      (use-package flycheck :ensure t :diminish
        :init (global-flycheck-mode))
    #+END_SRC
+
+   
 
    
