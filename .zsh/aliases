@@ -6,7 +6,6 @@ alias zshrc='$EDITOR ~/.zsh/zshrc'
 alias src="cd ~/Code"
 alias mux='tmuxinator'
 alias wiki='cd ~/.vimwiki'
-alias emacs='emacsclient -c'
 # ---
 alias ls='ls --color=auto'
 alias segv='mosh -P 60001 segfault -t tmux a'
