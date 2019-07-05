@@ -54,14 +54,14 @@ additional explanations are provided.
       (defvaralias 'cperl-indent-level 'tab-width)
     #+END_SRC
 *** Look and Feel
-    Minimalism startup.
-
     #+BEGIN_SRC emacs-lisp
+      ;; Minimalist startup.
       (setq inhibit-startup-screen t)
       (setq inhibit-startup-message t)
       (setq inhibit-startup-echo-area-message t)
       (setq initial-scratch-message nil)
 
+      ;; No clutter.
       (tool-bar-mode 0)
       (menu-bar-mode 0)
       (scroll-bar-mode 0)
@@ -74,53 +74,149 @@ additional explanations are provided.
       ;; Separate Customize stuff.
       (setq custom-file "~/.emacs.d/custom.el")
       (load custom-file)
-    #+END_SRC
-
-    Sprinke some colors.
-
-    #+BEGIN_SRC emacs-lisp
       (require 'dracula-theme)
-    #+END_SRC
 
-    #+BEGIN_SRC emacs-lisp
       ;; Unclutter the mode HUD
-      (use-package diminish       :ensure t
+      (use-package diminish
         :config
         (diminish 'undo-tree-mode)
         (diminish 'auto-revert-mode))
 
       ;; Reative  Line Numbering
-      (use-package linum-relative :ensure t :diminish
+      (use-package linum-relative :diminish
         :config
         (setq linum-relative-backend 'display-line-numbers-mode)
-        :hook (after-init . 'linum-relative-global-mode))
-
-      (use-package helm           :ensure t :diminish)
+        :hook (after-init . linum-relative-global-mode))
     #+END_SRC
 
-
-**** Helm - Fuzzy Matching/Narrowing
+*** IDE Functionality
+**** Fuzzy Completion / Helm
+     #+BEGIN_SRC emacs-lisp
+       (use-package helm :diminish
+         :config
+           (global-set-key (kbd "M-x") 'helm-M-x)
+         :hook (after-init . helm-mode))
+     #+END_SRC
+**** Git Integration / Magit
+     This is largely a work in progress as I figure out which magit
+     bindings I am comfortable with.
 
      #+BEGIN_SRC emacs-lisp
-     (require 'helm-config)
-     (helm-mode 1)
+       (use-package magit
+           :ensure t
+           :config
+           (progn
+               (evil-leader/set-key "g" 'magit-status)
+
+               (evil-set-initial-state 'magit-mode 'normal)
+               (evil-set-initial-state 'magit-status-mode 'normal)
+               (evil-set-initial-state 'magit-diff-mode 'normal)
+               (evil-set-initial-state 'magit-log-mode 'normal)
+               (evil-define-key  'normal magit-mode-map
+                   "?"           'magit-dispatch
+                   "h"           'magit-section-hide
+                   "l"           'magit-section-show
+                   "j"           'magit-next-line
+                   "k"           'magit-previous-line
+                   "c"           'magit-commit
+                   "q"           'magit-mode-bury-buffer)
+               (evil-define-key  'normal magit-log-mode-map
+                   "?"           'magit-dispatch
+                   "j"           'magit-next-line
+                   "k"           'magit-previous-line
+                   "q"           'magit-mode-bury-buffer)
+               (evil-define-key  'normal magit-diff-mode-map
+                   "?"           'magit-dispatch
+                   "h"           'magit-section-hide
+                   "l"           'magit-section-show
+                   "j"           'magit-next-line
+                   "k"           'magit-previous-line
+                   "q"           'magit-mode-bury-buffer)
+       ))
      #+END_SRC
 
-* Languages
+**** Auto-completion Framework
+
+     This will need to be cleaned up and documented eventually.
+
+     #+BEGIN_SRC emacs-lisp
+       ;; Snippets and Templates
+       (use-package yasnippet :ensure t :diminish 'yas-minor-mode
+         :hook (after-init . yas-global-mode))
+
+       ;; Tab Completion
+       (use-package company :ensure t :diminish
+         :bind 
+         (:map company-active-map
+               ("C-n" . company-select-next)
+               ("C-p" . company-select-previous)
+               ("<tab>" . company-complete-common-or-cycle)
+               :map company-search-map
+               ("C-n" . company-select-next)
+               ("C-p" . company-select-previous))
+         :custom
+         (company-idle-delay 0)
+         (company-echo-delay 0)
+         (company-minimum-prefix-length 1)
+         :hook (after-init . global-company-mode))
+
+     #+END_SRC
+
+**** Project Management
+
+     #+BEGIN_SRC emacs-lisp
+       (use-package projectile :ensure t :diminish)
+       (use-package helm-projectile :ensure t :after helm)
+
+
+       (use-package flycheck :ensure t :diminish
+         :init (global-flycheck-mode))
+     #+END_SRC
+**** Language Server Protocol
+     #+BEGIN_SRC emacs-lisp
+       (use-package lsp-mode :diminish
+         :commands (lsp lsp-deferred)
+         :config
+         (define-key evil-normal-state-map (kbd "<f2>") 'lsp-rename))
+
+       (use-package lsp-ui
+         :commands lsp-ui-mode
+         :after lsp-mode)
+
+       (use-package helm-lsp 
+         :commands helm-lsp-workspace-symbol
+         :after lsp-mode)
+       ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
+
+       ;; Company integration
+       (use-package company-lsp 
+         :commands company-lsp
+         :init
+           (push 'company-lsp company-backends)
+         :config 
+           (setq company-lsp-enable-snippet 1)
+         :after lsp-mode company)
+     #+END_SRC
+
+**** TODO Debugging Support
+* Language Support
 ** Rust
    This section configures the rust language.
    #+BEGIN_SRC emacs-lisp
-    (use-package rust-mode :ensure t
-        :config 
-            (setq rust-format-on-save t))
+     (use-package rust-mode 
+       :hook (rust-mode . lsp)
+       :config 
+       (setq rust-format-on-save t)
+       :after lsp-mode)
    #+END_SRC
 ** Python
 
    #+BEGIN_SRC emacs-lisp
-    (use-package python-mode :ensure t)
+     (use-package python-mode
+       :after lsp-mode)
    #+END_SRC
 
-* Keybindings
+* Evil Mode
 
   Evil mode must be required last to ensure that it properly
   overrides keybindings. All keybindings are thus defined after it
@@ -130,7 +226,7 @@ additional explanations are provided.
     (setq evil-want-C-u-scroll t) ; Use vim's C-u
     (global-evil-leader-mode)
     (use-package evil            :ensure t)
-    (use-package evil-leader     :ensure t)
+    (use-package evil-leader     :ensure t :after evil)
     (use-package evil-commentary :ensure t)
     (use-package evil-surround   :ensure t
       :config 
@@ -145,44 +241,6 @@ additional explanations are provided.
     (evil-leader/set-leader "<SPC>")
   #+END_SRC
 
-** Magit
-
-   This is largely a work in progress as I figure out which magit
-   bindings I am comfortable with.
-
-   #+BEGIN_SRC emacs-lisp
-         (use-package magit
-             :ensure magit
-             :config
-             (progn
-                 (evil-leader/set-key "g" 'magit-status)
-
-                 (evil-set-initial-state 'magit-mode 'normal)
-                 (evil-set-initial-state 'magit-status-mode 'normal)
-                 (evil-set-initial-state 'magit-diff-mode 'normal)
-                 (evil-set-initial-state 'magit-log-mode 'normal)
-                 (evil-define-key  'normal magit-mode-map
-                     "?"           'magit-dispatch
-                     "h"           'magit-section-hide
-                     "l"           'magit-section-show
-                     "j"           'magit-next-line
-                     "k"           'magit-previous-line
-                     "c"           'magit-commit
-                     "q"           'magit-mode-bury-buffer)
-                 (evil-define-key  'normal magit-log-mode-map
-                     "?"           'magit-dispatch
-                     "j"           'magit-next-line
-                     "k"           'magit-previous-line
-                     "q"           'magit-mode-bury-buffer)
-                 (evil-define-key  'normal magit-diff-mode-map
-                     "?"           'magit-dispatch
-                     "h"           'magit-section-hide
-                     "l"           'magit-section-show
-                     "j"           'magit-next-line
-                     "k"           'magit-previous-line
-                     "q"           'magit-mode-bury-buffer)
-         ))
-   #+END_SRC
 ** Dired
    Rebind some keys to make =dired= easier to use with evil.
 
@@ -234,8 +292,8 @@ additional explanations are provided.
 
    Open files and buffers with =;=.
    #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-    (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+     (evil-define-key 'normal info-mode-map ";" 'helm-mini)
    #+END_SRC
 
    =Ctrl+P= is a very common "go to anything..." shortcut in modern
@@ -255,12 +313,6 @@ additional explanations are provided.
     (global-set-key (kbd "C-s") 'save-buffer)
    #+END_SRC
    
-   Bind =M-x= to the helm variant
-
-   #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "M-x") 'helm-M-x)
-   #+END_SRC
-
    Define basic window navigation hotkeys:
 
    #+BEGIN_SRC emacs-lisp
@@ -270,7 +322,6 @@ additional explanations are provided.
      (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
      ; Motion mode shouldd behave like normal mode.
-     ; FIXME: Does not work?
      (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
      (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
      (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
@@ -294,50 +345,3 @@ additional explanations are provided.
      (evil-leader/set-key "Q" 'a/kill-all-buffers)
 
    #+END_SRC
-** IDE Facilities
-   This will need to be cleaned up and documented eventually.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package projectile :ensure t :diminish)
-     (use-package helm-projectile :ensure t)
-     (use-package yasnippet :ensure t :diminish 'yas-minor-mode
-       :hook (after-init . yas-global-mode))
-     (use-package company :ensure t :diminish
-       :bind 
-       (:map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)
-             ("<tab>" . company-complete-common-or-cycle)
-             :map company-search-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous))
-       :custom
-       (company-idle-delay 0)
-       (company-echo-delay 0)
-       (company-minimum-prefix-length 1)
-       :hook (after-init . global-company-mode))
-
-     (use-package lsp-ui :commands lsp-ui-mode)
-     (use-package company-lsp :commands company-lsp
-       :init (push 'company-lsp company-backends)
-       :config (progn
-                 (setq company-lsp-enable-snippet 1))
-       :after lsp-mode company)
-     (use-package helm-lsp :commands helm-lsp-workspace-symbol)
-     ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-     (use-package lsp-mode :ensure t :diminish
-       :hook (rust-mode . lsp-deferred)
-       :commands (lsp lsp-deferred)
-       :config
-       (progn
-         (define-key evil-normal-state-map (kbd "<f2>") 'lsp-rename)
-         ))
-
-     (use-package flycheck :ensure t :diminish
-       :init (global-flycheck-mode))
-   #+END_SRC
-
-   
-
-   
