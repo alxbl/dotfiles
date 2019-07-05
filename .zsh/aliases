@@ -5,7 +5,7 @@ alias aliases='$EDITOR ~/.zsh/aliases'
 alias zshrc='$EDITOR ~/.zsh/zshrc'
 alias src="cd ~/Code"
 alias mux='tmuxinator'
-alias wiki='cd ~/.vimwiki'
+alias wiki='cd $WIKI'
 # ---
 alias ls='ls --color=auto'
 alias segv='mosh -P 60001 segfault -t tmux a'
@@ -18,4 +18,12 @@ alias dhcp='cat /var/lib/dnsmasq/qemu0.leases | awk "{ printf \$3 \"\\t\" \$4  \
 # ---
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
 alias py3='source ~/.bin/py-3.7.0/bin/activate'
+
+# Burp
+if [[ -d "$HOME/.bin/BurpSuiteCommunity" ]]; then
+    alias burp='$HOME/.bin/BurpSuiteCommunity/BurpSuiteCommunity'
+fi
+if [[ -d "$HOME/.bin/BurpSuitePro" ]]; then
+    alias burp='$HOME/.bin/BurpSuitePro/BurpSuitePro'
+fi
 

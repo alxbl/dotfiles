@@ -2,7 +2,7 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
-plugins=(archlinux docker compleat git github ssh-agent gpg-agent nvm tmux fzf workon)
+plugins=(archlinux docker compleat git github gpg-agent nvm tmux fzf workon)
 
 setopt completealiases
 
@@ -27,6 +27,8 @@ if [[ -f $ZSHCFG/zsh_nocomp ]]; then
         alias $COMMAND="nocorrect $COMMAND"
     done < "$ZSHCFG/zsh_nocomp"
 fi
+
+
 
 [[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
 [[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.
