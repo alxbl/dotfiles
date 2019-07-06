@@ -4,6 +4,13 @@ Most of this should be self-explanatory. In places where it isn't,
 additional explanations are provided.
 
 * Configuration
+** Globals
+   Define some global variables that are used throughout the configuration.
+
+   #+BEGIN_SRC emacs-lisp
+     (setq evil-want-C-u-scroll t) ; Use vim's C-u
+     (setq alxbl-wiki (getenv "WIKI"))
+   #+END_SRC
 ** Package Management
    #+BEGIN_SRC emacs-lisp
     (require 'package)
@@ -52,6 +59,9 @@ additional explanations are provided.
       ; C-specific stuff (move to its own section?)
       (defvaralias 'c-basic-offset 'tab-width)
       (defvaralias 'cperl-indent-level 'tab-width)
+
+      ;; No C-S; No life
+      (global-set-key (kbd "C-s") 'save-buffer)
     #+END_SRC
 *** Look and Feel
     #+BEGIN_SRC emacs-lisp
@@ -87,6 +97,10 @@ additional explanations are provided.
         :config
         (setq linum-relative-backend 'display-line-numbers-mode)
         :hook (after-init . linum-relative-global-mode))
+
+      ;; Easy shortcuts to change font-size
+      (global-set-key (kbd "C-+") 'text-scale-increase)
+      (global-set-key (kbd "C--") 'text-scale-decrease)
     #+END_SRC
 
 *** IDE Functionality
@@ -199,6 +213,12 @@ additional explanations are provided.
      #+END_SRC
 
 **** TODO Debugging Support
+** Org-Mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package org
+       :custom
+       (org-agenda-files "~/.emacs.d/agenda"))
+   #+END_SRC
 * Language Support
 ** Rust
    This section configures the rust language.
@@ -223,24 +243,31 @@ additional explanations are provided.
   has been included.
 
   #+BEGIN_SRC emacs-lisp
-    (setq evil-want-C-u-scroll t) ; Use vim's C-u
-    (global-evil-leader-mode)
-    (use-package evil            :ensure t)
-    (use-package evil-leader     :ensure t :after evil)
-    (use-package evil-commentary :ensure t)
-    (use-package evil-surround   :ensure t
+    (use-package evil
+      :config
+        (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+        (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+        (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+        (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+
+        ; Motion mode shouldd behave like normal mode.
+        (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
+        (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
+        (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
+        (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
+    (use-package evil-leader :after evil
+      :config
+        (global-evil-leader-mode)
+        (evil-leader/set-leader "<SPC>")
+        (evil-leader/set-key "q" 'kill-buffer-and-window)
+        (evil-leader/set-key "e" 'pp-eval-last-sexp))
+    (use-package evil-commentary :after evil)
+    (use-package evil-surround :after evil 
       :config 
-      (global-evil-surround-mode 1)
-      (evil-mode t)
-      (evil-commentary-mode t))
+        (evil-mode t)
+        (evil-commentary-mode t)
+        (global-evil-surround-mode t))
   #+END_SRC
-
-  Bind a =<leader>=-key similar to vim:
-
-  #+BEGIN_SRC emacs-lisp
-    (evil-leader/set-leader "<SPC>")
-  #+END_SRC
-
 ** Dired
    Rebind some keys to make =dired= easier to use with evil.
 
@@ -310,25 +337,12 @@ additional explanations are provided.
    =Ctrl-S= is almost universal for save file...
 
    #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "C-s") 'save-buffer)
    #+END_SRC
    
    Define basic window navigation hotkeys:
 
    #+BEGIN_SRC emacs-lisp
-     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-     (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-     (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-     (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-     ; Motion mode shouldd behave like normal mode.
-     (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
-     (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
-     (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
-     (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right)
-
-     (evil-leader/set-key "q" 'kill-buffer-and-window)
-     (evil-leader/set-key "e" 'pp-eval-last-sexp)
 
      ; Org globals (<leader>-o)
      (evil-leader/set-key "oa" 'org-agenda)
