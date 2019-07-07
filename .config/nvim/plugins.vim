@@ -67,7 +67,7 @@ Plug 'tpope/vim-fugitive'
 Plug 'jceb/vim-orgmode'
 Plug 'vimwiki/vimwiki'
 
-let g:vimwiki_list = [{'path': '~/.vimwiki', 'path_html': '~/.vimwiki/html'}]
+let g:vimwiki_list = [{'path': '~/Documents/Wiki', 'path_html': '~/Documents/Wiki/html'}]
 let g:vimwiki_folding = 'syntax'
 let g:vimwiki_table_auto_fmt = 1
 " }}}
