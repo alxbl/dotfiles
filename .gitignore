@@ -16,6 +16,9 @@ __pycache__
 .emacs.d/bak
 .emacs.d/recentf
 .emacs.d/auto-save-list
+/.emacs.d/eshell/history
+/.emacs.d/transient
+/.emacs.d/.lsp-*
 
 # Don't track random and sensitive files
 .config
@@ -27,5 +30,3 @@ __pycache__
 !.gnupg/gpg.conf
 !.gnupg/gpg-agent.conf
 .gnupg/
-/.emacs.d/eshell/history
-/.emacs.d/transient/history.el
