@@ -193,8 +193,9 @@ additional explanations are provided.
     #+END_SRC
 *** TODO Debugging Support
 
-* GTD / org-mode
-  #+BEGIN_SRC emacs-lisp
+* GTD
+** Org mode
+   #+BEGIN_SRC emacs-lisp
     (use-package org
       :after evil
       :custom
@@ -202,6 +203,8 @@ additional explanations are provided.
         (org-todo-keywords '((sequence "TODO" "WIP(!)" "BLOCKED" "|" "DONE(!)" "DROPPED")))
         (org-return-follows-link t)
         (org-hide-leading-stars t)
+        (org-pretty-entities t)
+        (org-hide-emphasis-markers t)
         (org-todo-keyword-faces
          '(("TODO" . "orange")
            ("WIP" . "yellow")
@@ -228,8 +231,12 @@ additional explanations are provided.
         ;; (evil-define-key 'visual org-mode-map
         ;;   "d" 'delete-region)
       )
-  #+END_SRC
-
+   #+END_SRC
+** Ledger
+   Plaintext finance tracking in Emacs. Why not?
+   #+BEGIN_SRC emacs-lisp
+     (use-package ledger-mode)
+   #+END_SRC
 * Language Support / lsp-mode
 ** Language Server Protocol
    #+BEGIN_SRC emacs-lisp
@@ -338,10 +345,11 @@ additional explanations are provided.
    =emacs-state=, which is an additional keystroke. (This is currently broken)
    
    #+BEGIN_SRC emacs-lisp
-     (evil-define-key 'motion 'info-mode-map
+     (evil-define-key nil 'info-mode-map
        (kbd "C-o") 'Info-history-back
        (kbd "C-i") 'Info-history-forward)
    #+END_SRC
+
 ** Helm
 
    Open files and buffers with =;=.
