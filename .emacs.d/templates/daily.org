@@ -1,28 +1,28 @@
-* TODO Daily Review
-- [ ] Clean physical workspace
-- [ ] Declutter dump folders
-  #+BEGIN_SRC emacs-lisp
-  (dired "~/Downloads/")
-  (dired "~/Desktop/")
-  (image-dired "~/Desktop/")
-  #+END_SRC
-- [ ] Clear e-mail backlog
-  - [ ] Work
-  - [ ] Personal
-  - [ ] Open Source
-- [ ] Catch up on SNS
-  - [ ] Feedly
-  - [ ] Twitter
-  - [ ] Slack
-    - [ ] Montrehack
-    - [ ] Work
-    - [ ] Ringzer0
+**** TODO Daily Review
+     - [ ] Clean physical workspace
+     - [ ] Declutter dump folders
+       #+BEGIN_SRC emacs-lisp
+       (dired "~/Downloads/")
+       (dired "~/Desktop/")
+       (image-dired "~/Desktop/")
+       #+END_SRC
+     - [ ] Clear e-mail backlog
+       - [ ] Work
+       - [ ] Personal
+       - [ ] Open Source
+     - [ ] Catch up on SNS
+       - [ ] Feedly
+       - [ ] Twitter
+       - [ ] Slack
+         - [ ] Montrehack
+         - [ ] Work
+         - [ ] Ringzer0
 
-- [ ] Add tasks for loose ends
-- [ ] Prioritize day and tasks
-  #+BEGIN_SRC emacs-lisp
-    (progn
-      (org-agenda nil "a")
-      (org-agenda-day-view))
-  #+END_SRC
-- [ ] Clock out
+     - [ ] Add tasks for loose ends
+     - [ ] Prioritize day and tasks
+       #+BEGIN_SRC emacs-lisp
+         (progn
+           (org-agenda nil "a")
+           (org-agenda-day-view))
+       #+END_SRC
+     - [ ] Clock out

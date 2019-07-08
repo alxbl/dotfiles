@@ -196,42 +196,62 @@ additional explanations are provided.
 * GTD
 ** Org mode
    #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :after evil
-      :custom
-        (org-agenda-files "~/.emacs.d/agenda")
-        (org-todo-keywords '((sequence "TODO" "WIP(!)" "BLOCKED" "|" "DONE(!)" "DROPPED")))
-        (org-return-follows-link t)
-        (org-hide-leading-stars t)
-        (org-pretty-entities t)
-        (org-hide-emphasis-markers t)
-        (org-todo-keyword-faces
-         '(("TODO" . "orange")
-           ("WIP" . "yellow")
-           ("BLOCKED" . "red")))
-      :config
-        (evil-define-key  'normal org-mode-map
-            "gl" 'org-demote-subtree
-            "gh" 'org-promote-subtree
-            "L" 'org-next-visible-heading
-            "H" 'org-previous-visible-heading
-            "tt" 'org-todo
-            (kbd "RET") 'org-open-at-point)
+     (use-package org
+       :after evil
+       :custom
+         (tasks-file (concat alxbl-wiki "/log/tasks.org"))
+         (diary-file (concat alxbl-wiki "/log/personal.org"))
+         (work-file (concat alxbl-wiki "/log/work.org"))
+         (org-agenda-files "~/.emacs.d/agenda")
+         (org-todo-keywords '((sequence "TODO(t)" "WIP(s!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
+         (org-return-follows-link t)
+         (org-hide-leading-stars t)
+         (org-pretty-entities t)
+         (org-hide-emphasis-markers t)
+         (org-todo-keyword-faces
+          '(("TODO" . "orange")
+            ("WIP" . "yellow")
+            ("BLOCKED" . "red")
+            ("DROPPED" . "gray")))
+         (org-capture-templates
+          '(("t" "Add todo item" entry (file+headline tasks-file "Tasks")
+              "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n")
+            ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary"))
+            ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
+              (file "~/.emacs.d/templates/daily.org") :immediate-finish t) 
+            ("w" "Add Work Note" checkitem (file+olp+datetree work-file  "Diary"))
+            ))
+       :config
+         (evil-define-key  'normal org-mode-map
+             ;; Navigation
+             "gl" 'org-demote-subtree
+             "gh" 'org-promote-subtree
+             "L" 'org-next-visible-heading
+             "H" 'org-previous-visible-heading
+             ;; Task Management (t)
+             "tt" 'org-todo
+             "ts" 'org-schedule
+             (kbd "RET") 'org-open-at-point)
 
-         (evil-leader/set-key "oa" 'org-agenda)
-         (evil-leader/set-key "oo" 'org-capture)
-         (evil-leader/set-key "ol" 'org-store-link)
-         (evil-leader/set-key "ob" 'org-switchb)
-         (evil-leader/set-key "of" 'org-footnote-action)
+          (evil-leader/set-key "oa" 'org-agenda)
+          (evil-leader/set-key "oo" 'org-capture)
+          (evil-leader/set-key "ol" 'org-store-link)
+          (evil-leader/set-key "ob" 'org-switchb)
+          (evil-leader/set-key "of" 'org-footnote-action)
 
-        (evil-leader/set-key (kbd "SPC") 'org-cycle)
-         ;; This breaks delete/yank line motions.
-         ;; "dab" 'org-cut-subtree
-         ;; "yab" 'org-copy-subtree
-        ;; (evil-define-key 'visual org-mode-map
-        ;;   "d" 'delete-region)
-      )
+          (evil-leader/set-key (kbd "SPC") 'org-cycle)
+          ;; This breaks delete/yank line motions.
+          ;; "dab" 'org-cut-subtree
+          ;; "yab" 'org-copy-subtree
+          ;; (evil-define-key 'visual org-mode-map
+          ;;   "d" 'delete-region)
+       :preface
+          (defun alxbl/get-date ()
+            "Return the current time as a formatted string"
+            (format-time-string "%Y-%m-%d %H:%M" (current-time)))
+     )
    #+END_SRC
+
 ** Ledger
    Plaintext finance tracking in Emacs. Why not?
    #+BEGIN_SRC emacs-lisp
