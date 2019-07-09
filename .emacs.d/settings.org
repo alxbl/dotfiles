@@ -33,6 +33,9 @@ additional explanations are provided.
 
     (setq use-package-always-ensure t)
     (setq use-package-expand-minimally t)
+    ;; Taking control of our world.
+    (setq custom-file (make-temp-file "emacs-custom"))
+
    #+END_SRC
 
 ** Server-Mode
@@ -84,10 +87,6 @@ additional explanations are provided.
      ;; (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
      (setq make-backup-files nil)
      (setq auto-save-default nil)  
-
-     ;; Separate Customize stuff.
-     (setq custom-file "~/.emacs.d/custom.el")
-     (load custom-file)
 
      (require 'dracula-theme)
 
