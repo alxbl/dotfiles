@@ -1,5 +1,6 @@
 # Java stuff
 *.jar
+.cache
 
 # vim stuff
 .netrwhist

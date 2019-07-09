@@ -210,7 +210,7 @@ additional explanations are provided.
          (diary-file (concat alxbl-wiki "/log/personal.org"))
          (work-file (concat alxbl-wiki "/log/work.org"))
          (org-agenda-files "~/.emacs.d/agenda")
-         (org-todo-keywords '((sequence "TODO(t)" "WIP(s!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
+         (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
          (org-return-follows-link t)
          (org-hide-leading-stars t)
          (org-pretty-entities t)
@@ -222,11 +222,11 @@ additional explanations are provided.
             ("DROPPED" . "gray")))
          (org-capture-templates
           '(("t" "Add todo item" entry (file+headline tasks-file "Tasks")
-              "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n")
-            ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") :tree-type week)
+              "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
+            ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
-              (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week)
-            ("w" "Add Work Note" checkitem (file+olp+datetree work-file  "Diary") :tree-type week)
+              (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t)
+            ("w" "Add Work Note" checkitem (file+olp+datetree work-file  "Diary") " - [ ] %?" :tree-type week :kill-buffer t)
             ))
        :config
          (evil-define-key  'normal org-mode-map
@@ -258,9 +258,6 @@ additional explanations are provided.
             (format-time-string "%Y-%m-%d %H:%M" (current-time)))
      )
    #+END_SRC
-
-   #+RESULTS:
-   : t
 
 ** Ledger
    Plaintext finance tracking in Emacs. Why not?
