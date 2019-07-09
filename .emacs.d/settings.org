@@ -42,7 +42,7 @@ additional explanations are provided.
    #+BEGIN_SRC emacs-lisp
      (use-package server
       :ensure nil
-      :hook (after-init . server-mode))   
+      :hook (after-init . server-mode))
    #+END_SRC
 ** Editing / Defaults
    #+BEGIN_SRC emacs-lisp
@@ -58,7 +58,7 @@ additional explanations are provided.
      (setq save-buffer-coding-system 'utf-8-unix)
 
      ;; Vertical Column
-     (set-fill-column 80) 
+     (set-fill-column 80)
 
      ;; Default tabs
      (setq-default indent-tabs-mode nil) ;; Use spaces
@@ -86,7 +86,7 @@ additional explanations are provided.
      ;; No Auto-save/backups
      ;; (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
      (setq make-backup-files nil)
-     (setq auto-save-default nil)  
+     (setq auto-save-default nil)
 
      (require 'dracula-theme)
 
@@ -111,8 +111,12 @@ additional explanations are provided.
 *** Fuzzy Completion / Helm
     #+BEGIN_SRC emacs-lisp
       (use-package helm :diminish
+        :after evil
         :config
           (global-set-key (kbd "M-x") 'helm-M-x)
+          (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+          (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+          (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
         :hook (after-init . helm-mode))
     #+END_SRC
 *** Git Integration / Magit
@@ -164,7 +168,7 @@ additional explanations are provided.
 
       ;; Tab Completion
       (use-package company :ensure t :diminish
-        :bind 
+        :bind
         (:map company-active-map
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
@@ -186,9 +190,13 @@ additional explanations are provided.
       (use-package projectile :ensure t :diminish)
       (use-package helm-projectile :ensure t :after helm)
 
-
       (use-package flycheck :ensure t :diminish
         :init (global-flycheck-mode))
+
+      (use-package treemacs
+        :config
+          (define-key evil-normal-state-map (kbd "C-b") 'treemacs))
+
     #+END_SRC
 *** TODO Debugging Support
 
@@ -217,7 +225,7 @@ additional explanations are provided.
               "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n")
             ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") :tree-type week)
             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
-              (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week) 
+              (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week)
             ("w" "Add Work Note" checkitem (file+olp+datetree work-file  "Diary") :tree-type week)
             ))
        :config
@@ -271,17 +279,17 @@ additional explanations are provided.
        :commands lsp-ui-mode
        :after lsp-mode)
 
-     (use-package helm-lsp 
+     (use-package helm-lsp
        :commands helm-lsp-workspace-symbol
        :after lsp-mode)
      ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
 
      ;; Company integration
-     (use-package company-lsp 
+     (use-package company-lsp
        :commands company-lsp
        :init
          (push 'company-lsp company-backends)
-       :config 
+       :config
          (setq company-lsp-enable-snippet 1)
        :after lsp-mode company)
    #+END_SRC
@@ -289,9 +297,9 @@ additional explanations are provided.
 ** Rust
    This section configures the rust language.
    #+BEGIN_SRC emacs-lisp
-     (use-package rust-mode 
+     (use-package rust-mode
        :hook (rust-mode . lsp)
-       :config 
+       :config
        (setq rust-format-on-save t)
        :after lsp-mode)
    #+END_SRC
@@ -328,13 +336,13 @@ additional explanations are provided.
         (evil-leader/set-key "q" 'kill-buffer-and-window)
         (evil-leader/set-key "e" 'pp-eval-last-sexp))
     (use-package evil-commentary :after evil)
-    (use-package evil-surround :after evil 
+    (use-package evil-surround :after evil
       :preface
         (defun a/kill-all-buffers ()
         (interactive)
         (mapcar 'kill-buffer (buffer-list))
         (delete-other-windows))
-      :config 
+      :config
         (evil-mode t)
         (evil-commentary-mode t)
         (global-evil-surround-mode t)
@@ -347,9 +355,6 @@ additional explanations are provided.
    Rebind some keys to make =dired= easier to use with evil.
 
    #+BEGIN_SRC emacs-lisp
-    ;; Same shortcut as vim's NERDTree for now...
-    (define-key evil-normal-state-map (kbd "C-b") 'dired)
-
     (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
     (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
     (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
@@ -365,26 +370,9 @@ additional explanations are provided.
 ** Info
    The default bindings are actually decent, but require switching to
    =emacs-state=, which is an additional keystroke. (This is currently broken)
-   
+
    #+BEGIN_SRC emacs-lisp
      (evil-define-key nil 'info-mode-map
        (kbd "C-o") 'Info-history-back
        (kbd "C-i") 'Info-history-forward)
-   #+END_SRC
-
-** Helm
-
-   Open files and buffers with =;=.
-   #+BEGIN_SRC emacs-lisp
-     (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-     (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-   #+END_SRC
-
-   =Ctrl+P= is a very common "go to anything..." shortcut in modern
-   editors. Let's have the same. There are a few additional
-   considerations for cross-platform support here: The tool =fd= is
-   not always available. This still needs some work.
-
-   #+BEGIN_SRC emacs-lisp
-    (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
    #+END_SRC
