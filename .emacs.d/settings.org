@@ -245,6 +245,8 @@ additional explanations are provided.
           (evil-leader/set-key "ol" 'org-store-link)
           (evil-leader/set-key "ob" 'org-switchb)
           (evil-leader/set-key "of" 'org-footnote-action)
+          (evil-leader/set-key "on" 'org-narrow-to-subtree)
+          (evil-leader/set-key "ow" 'widen)
 
           (evil-leader/set-key (kbd "SPC") 'org-cycle)
           ;; This breaks delete/yank line motions.
