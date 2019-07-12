@@ -1,4 +1,5 @@
 #+TITLE: Emacs Configuration
+#+PROPERTY: header-args :results output silent
 
 Most of this should be self-explanatory. In places where it isn't,
 additional explanations are provided.
@@ -224,9 +225,12 @@ additional explanations are provided.
           '(("t" "Add todo item" entry (file+headline tasks-file "Tasks")
               "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
             ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
+            ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
               (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t)
-            ("w" "Add Work Note" checkitem (file+olp+datetree work-file  "Diary") " - [ ] %?" :tree-type week :kill-buffer t)
+            ("R" "Perform Weekly Review" entry (file+olp+datetree diary-file "Diary")
+              (file "~/.emacs.d/templates/weekly.org") :immediate-finish t :tree-type week :kill-buffer t)
+            ("w" "Add Work Note" entry (file+olp+datetree work-file  "Diary") "* TODO %?" :tree-type week :kill-buffer t)
             ))
        :config
          (evil-define-key  'normal org-mode-map
