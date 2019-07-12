@@ -25,4 +25,5 @@
            (org-agenda nil "a")
            (org-agenda-day-view))
        #+END_SRC
+     - [ ] Commit and synchronize wiki
      - [ ] Clock out
