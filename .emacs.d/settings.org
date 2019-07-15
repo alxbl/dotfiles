@@ -46,6 +46,7 @@ additional explanations are provided.
       :hook (after-init . server-mode))
    #+END_SRC
 ** Editing / Defaults
+*** Encoding and Whitespace
    #+BEGIN_SRC emacs-lisp
      (prefer-coding-system 'utf-8-unix)
      (set-locale-environment "en_US.UTF-8")
@@ -71,6 +72,53 @@ additional explanations are provided.
      ;; No C-S; No life
      (global-set-key (kbd "C-s") 'save-buffer)
    #+END_SRC
+*** Dired
+
+    Rebind some keys to make =dired= easier to use with evil.
+
+    #+BEGIN_SRC emacs-lisp
+    (use-package dired :ensure nil
+      :after evil
+      :config
+     (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
+     (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
+     (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
+     (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
+     (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
+     (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
+     (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
+     (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
+     (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
+     (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
+     (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer))
+    #+END_SRC
+
+*** Info
+    The default bindings are actually decent, but require switching to
+    =emacs-state=, which is an additional keystroke. (This is currently broken)
+
+    #+BEGIN_SRC emacs-lisp
+      (use-package info :ensure nil
+        :after evil
+        :config
+        (evil-define-key nil 'info-mode-map
+          (kbd "C-o") 'Info-history-back
+          (kbd "C-i") 'Info-history-forward))
+    #+END_SRC
+
+*** Disable Mouse
+    #+BEGIN_SRC emacs-lisp
+      (use-package disable-mouse :after evil
+        :config 
+          (global-disable-mouse-mode)
+          (mapc #'disable-mouse-in-keymap
+          (list evil-motion-state-map
+                  evil-normal-state-map
+                  evil-visual-state-map
+                  evil-insert-state-map)))
+
+
+    #+END_SRC
 ** Look and Feel
    #+BEGIN_SRC emacs-lisp
      ;; Minimalist startup.
@@ -222,7 +270,7 @@ additional explanations are provided.
             ("BLOCKED" . "red")
             ("DROPPED" . "gray")))
          (org-capture-templates
-          '(("t" "Add todo item" entry (file+headline tasks-file "Tasks")
+          '(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
               "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
             ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
             ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
@@ -352,30 +400,3 @@ additional explanations are provided.
 
         (evil-leader/set-key "Q" 'a/kill-all-buffers))
   #+END_SRC
-
-* TODO Unsorted
-** Dired
-   Rebind some keys to make =dired= easier to use with evil.
-
-   #+BEGIN_SRC emacs-lisp
-    (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
-    (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
-    (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
-    (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
-    (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
-    (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
-    (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
-    (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
-    (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
-    (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
-    (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer)
-   #+END_SRC
-** Info
-   The default bindings are actually decent, but require switching to
-   =emacs-state=, which is an additional keystroke. (This is currently broken)
-
-   #+BEGIN_SRC emacs-lisp
-     (evil-define-key nil 'info-mode-map
-       (kbd "C-o") 'Info-history-back
-       (kbd "C-i") 'Info-history-forward)
-   #+END_SRC
