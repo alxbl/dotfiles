@@ -315,7 +315,23 @@ additional explanations are provided.
        :preface
           (defun alxbl/get-date ()
             "Return the current time as a formatted string"
-            (format-time-string "%Y-%m-%d %H:%M" (current-time))))
+            (format-time-string "%Y-%m-%d %H:%M" (current-time)))
+
+          ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
+          (defun datetree-jump ()
+            "Jumps to the datetree heading that matches the current date."
+            (interactive)
+            (let ((point (point)))
+              (catch 'found
+                (goto-char (point-min))
+                (while (outline-next-heading)
+                  (let* ((hl (org-element-at-point))
+                         (title (org-element-property :raw-value hl)))
+                    (when (string= title (format-time-string "%F %A"))
+                      (org-show-context)
+                      (setq point (point))
+                      (throw 'found t)))))
+              (goto-char point))) )
    #+END_SRC
 
 ** Ledger
