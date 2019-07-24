@@ -2,7 +2,7 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
-plugins=(archlinux docker compleat git github gpg-agent nvm tmux fzf workon)
+plugins=(archlinux docker compleat git github gpg-agent ssh-agent nvm tmux fzf workon)
 
 setopt completealiases
 
