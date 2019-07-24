@@ -245,7 +245,7 @@ additional explanations are provided.
       (use-package treemacs
         :config
           (define-key evil-normal-state-map (kbd "C-b") 'treemacs))
-
+      (use-package treemacs-projectile :after treemacs projectile)
     #+END_SRC
 *** TODO Debugging Support
 
@@ -389,35 +389,42 @@ additional explanations are provided.
   has been included.
 
   #+BEGIN_SRC emacs-lisp
-    (use-package evil
-      :config
-        (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-        (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-        (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-        (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+        (use-package evil
+          :config
+            (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+            (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+            (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+            (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-        ; Motion mode shouldd behave like normal mode.
-        (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
-        (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
-        (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
-        (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
-    (use-package evil-leader :after evil
-      :config
-        (global-evil-leader-mode)
-        (evil-leader/set-leader "<SPC>")
-        (evil-leader/set-key "q" 'kill-buffer-and-window)
-        (evil-leader/set-key "e" 'pp-eval-last-sexp))
-    (use-package evil-commentary :after evil)
-    (use-package evil-surround :after evil
-      :preface
-        (defun a/kill-all-buffers ()
-        (interactive)
-        (mapcar 'kill-buffer (buffer-list))
-        (delete-other-windows))
-      :config
-        (evil-mode t)
-        (evil-commentary-mode t)
-        (global-evil-surround-mode t)
+            ; Motion mode shouldd behave like normal mode.
+            (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
+            (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
+            (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
+            (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
+        (use-package evil-leader :after evil
+          :config
+            (global-evil-leader-mode)
+            (evil-leader/set-leader "<SPC>")
+            (evil-leader/set-key "q" 'kill-buffer-and-window)
+            (evil-leader/set-key "e" 'pp-eval-last-sexp))
+        (use-package evil-commentary :after evil)
+        (use-package evil-surround :after evil
+          :preface
+            (defun a/kill-all-buffers ()
+            (interactive)
+            (mapcar 'kill-buffer (buffer-list))
+            (delete-other-windows))
+          :config
+            (evil-mode t)
+            (evil-commentary-mode t)
+            (global-evil-surround-mode t)
 
-        (evil-leader/set-key "Q" 'a/kill-all-buffers))
+            (evil-leader/set-key "Q" 'a/kill-all-buffers))
+        (use-package treemacs-evil :after treemacs evil
+          :bind
+          (:map treemacs-mode-map
+                ("zh"  . treemacs-show-hidden-files))
+
+          (:map evil-motion-state-map
+                ("C-b" . treemacs)))
   #+END_SRC
