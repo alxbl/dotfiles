@@ -1,6 +1,0 @@
-**** TODO Weekly Review
-     - [ ] Clean up Knowledge
-       - [ ] Browser - Sort new bookmarks
-       - [ ] Feedly - Tag and sort articles
-       - [ ] Archive completed tasks
-     - [ ] Review ideas and convert them to tasks or knowledge

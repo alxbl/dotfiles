@@ -1,0 +1,13 @@
+**** TODO Monthly Review [/]
+     - [ ] Knowledge
+       - [ ] Browser  - Sort new bookmarks
+       - [ ] Feedly   - Tag and sort articles
+       - [ ] Ideas    - Categorize ideas
+       - [ ] Tasks    - Clean up completed tasks
+       - [ ] Projects - Clean up and finished projects
+     - [ ] Finances
+       - [ ] Finalize and review budget
+       - [ ] Run reports
+       - [ ] Compare with previous month
+         - [ ] Which purchases could've been avoided?
+         - [ ] Set goals for next month

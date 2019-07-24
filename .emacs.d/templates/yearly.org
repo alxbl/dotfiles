@@ -1,0 +1,11 @@
+**** TODO Yearly Review [/]
+     - [ ] Objectives
+       - [ ] List completed objectives
+       - [ ] Post-mortem of failed objectives
+       - [ ] Write down next year's objectives
+     - [ ] Highlights
+       - [ ] What were this year's highlights?
+       - [ ] What were this year's challenges?
+     - [ ] Career
+       - [ ] What was satisfying?
+       - [ ] What could be improved?
