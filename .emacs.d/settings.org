@@ -16,6 +16,8 @@ additional explanations are provided.
 
      ;; Force Emacs to prompt for GPG key in-editor.
      (setenv "GPG_AGENT_INFO" nil)
+     ;; Prevent eldoc from popping up buffers everywhere. LSP will take care of this.
+     (global-eldoc-mode -1)
    #+END_SRC
 ** Package Management
    #+BEGIN_SRC emacs-lisp
@@ -108,7 +110,7 @@ additional explanations are provided.
 
 *** Disable Mouse
     #+BEGIN_SRC emacs-lisp
-      (use-package disable-mouse :after evil
+      (use-package disable-mouse :after evil :diminish 'disable-mouse-global-mode
         :config 
           (global-disable-mouse-mode)
           (mapc #'disable-mouse-in-keymap
@@ -116,8 +118,6 @@ additional explanations are provided.
                   evil-normal-state-map
                   evil-visual-state-map
                   evil-insert-state-map)))
-
-
     #+END_SRC
 ** Look and Feel
    #+BEGIN_SRC emacs-lisp
@@ -143,7 +143,8 @@ additional explanations are provided.
      (use-package diminish
        :config
        (diminish 'undo-tree-mode)
-       (diminish 'auto-revert-mode))
+       (diminish 'auto-revert-mode)
+       (diminish 'undo-tree-mode))
 
      ;; Reative  Line Numbering
      (use-package linum-relative :diminish
@@ -159,7 +160,7 @@ additional explanations are provided.
 ** IDE Functionality
 *** Fuzzy Completion / Helm
     #+BEGIN_SRC emacs-lisp
-      (use-package helm :diminish
+      (use-package helm :diminish 'helm-mode
         :after evil
         :config
           (global-set-key (kbd "M-x") 'helm-M-x)
@@ -230,6 +231,9 @@ additional explanations are provided.
         (company-echo-delay 0)
         (company-minimum-prefix-length 1)
         :hook (after-init . global-company-mode))
+
+      (use-package popwin)
+
 
     #+END_SRC
 
@@ -382,7 +386,10 @@ additional explanations are provided.
 
    #+BEGIN_SRC emacs-lisp
      (use-package python-mode
+       :hook (python-mode . lsp)
        :after lsp-mode)
+
+     ;; (use-package jedi-company)
    #+END_SRC
 
 * Modal Editing / evil-mode
@@ -392,42 +399,42 @@ additional explanations are provided.
   has been included.
 
   #+BEGIN_SRC emacs-lisp
-        (use-package evil
-          :config
-            (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-            (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
-            (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-            (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+    (use-package evil
+      :config
+        (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
+        (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+        (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
+        (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
 
-            ; Motion mode shouldd behave like normal mode.
-            (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
-            (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
-            (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
-            (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
-        (use-package evil-leader :after evil
-          :config
-            (global-evil-leader-mode)
-            (evil-leader/set-leader "<SPC>")
-            (evil-leader/set-key "q" 'kill-buffer-and-window)
-            (evil-leader/set-key "e" 'pp-eval-last-sexp))
-        (use-package evil-commentary :after evil)
-        (use-package evil-surround :after evil
-          :preface
-            (defun a/kill-all-buffers ()
-            (interactive)
-            (mapcar 'kill-buffer (buffer-list))
-            (delete-other-windows))
-          :config
-            (evil-mode t)
-            (evil-commentary-mode t)
-            (global-evil-surround-mode t)
+        ; Motion mode shouldd behave like normal mode.
+        (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
+        (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
+        (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
+        (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
+    (use-package evil-leader :after evil
+      :config
+        (global-evil-leader-mode)
+        (evil-leader/set-leader "<SPC>")
+        (evil-leader/set-key "q" 'kill-buffer-and-window)
+        (evil-leader/set-key "e" 'pp-eval-last-sexp))
+    (use-package evil-commentary :after evil :diminish)
+    (use-package evil-surround :after evil
+      :preface
+        (defun a/kill-all-buffers ()
+        (interactive)
+        (mapcar 'kill-buffer (buffer-list))
+        (delete-other-windows))
+      :config
+        (evil-mode t)
+        (evil-commentary-mode t)
+        (global-evil-surround-mode t)
 
-            (evil-leader/set-key "Q" 'a/kill-all-buffers))
-        (use-package treemacs-evil :after treemacs evil
-          :bind
-          (:map treemacs-mode-map
-                ("zh"  . treemacs-show-hidden-files))
+        (evil-leader/set-key "Q" 'a/kill-all-buffers))
+    (use-package treemacs-evil :after treemacs evil
+      :bind
+      (:map treemacs-mode-map
+            ("zh"  . treemacs-show-hidden-files))
 
-          (:map evil-motion-state-map
-                ("C-b" . treemacs)))
+      (:map evil-motion-state-map
+            ("C-b" . treemacs)))
   #+END_SRC
