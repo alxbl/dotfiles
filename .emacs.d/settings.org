@@ -140,6 +140,7 @@ additional explanations are provided.
      (require 'dracula-theme)
 
      ;; Unclutter the mode HUD
+     ;; FIXME: This is being overridden.
      (use-package diminish
        :config
        (diminish 'undo-tree-mode)
@@ -212,29 +213,28 @@ additional explanations are provided.
     This will need to be cleaned up and documented eventually.
 
     #+BEGIN_SRC emacs-lisp
-      ;; Snippets and Templates
-      (use-package yasnippet :ensure t :diminish 'yas-minor-mode
-        :hook (after-init . yas-global-mode))
+            ;; Snippets and Templates
+            (use-package yasnippet :ensure t :diminish 'yas-minor-mode
+              :hook (after-init . yas-global-mode))
 
-      ;; Tab Completion
-      (use-package company :ensure t :diminish
-        :bind
-        (:map company-active-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)
-              ("<tab>" . company-complete-common-or-cycle)
-              :map company-search-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
-        :custom
-        (company-idle-delay 0)
-        (company-echo-delay 0)
-        (company-minimum-prefix-length 1)
-        :hook (after-init . global-company-mode))
+            ;; Tab Completion
+            (use-package company :ensure t :diminish
+              :bind
+              (:map company-active-map
+                    ("C-n" . company-select-next)
+                    ("C-p" . company-select-previous)
+                    ("<tab>" . company-complete-common-or-cycle)
+                    :map company-search-map
+                    ("C-n" . company-select-next)
+                    ("C-p" . company-select-previous))
+              :custom
+              (company-idle-delay 0)
+              (company-echo-delay 0)
+              (company-minimum-prefix-length 1)
+              :hook (after-init . global-company-mode))
 
-      (use-package popwin)
-
-
+            (use-package popwin
+              :hook (after-init . popwin-mode))
     #+END_SRC
 
 *** Project Management
@@ -278,7 +278,7 @@ additional explanations are provided.
             ("DROPPED" . "gray")))
          (org-capture-templates
           `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
-              "* TODO %?\n - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
+              "* TODO %?\n  - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
             ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
             ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
@@ -296,16 +296,22 @@ additional explanations are provided.
              "L" 'org-next-visible-heading
              "H" 'org-previous-visible-heading
              ;; <leader>t: Task Management
-             "tt" 'org-todo
+             "T" 'org-todo
              "ts" 'org-schedule
+             "tci" 'org-clock-in
+             "tco" 'org-clock-out
+             "tcg" 'org-clock-goto
              (kbd "RET") 'org-open-at-point)
 
           ;; <leader>o: Organization
           (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
           (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
 
+
+
           (evil-leader/set-key "oa" 'org-agenda)
           (evil-leader/set-key "oo" 'org-capture)
+          (evil-leader/set-key "or" 'org-refile)
           (evil-leader/set-key "oO" 'org-capture-goto-target)
           (evil-leader/set-key "ol" 'org-store-link)
           (evil-leader/set-key "ob" 'org-switchb)
@@ -319,6 +325,9 @@ additional explanations are provided.
           ;; "yab" 'org-copy-subtree
           ;; (evil-define-key 'visual org-mode-map
           ;;   "d" 'delete-region)
+       :hook
+         (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
+         (org-mode . auto-fill-mode)
        :preface
           (defun alxbl/get-date ()
             "Return the current time as a formatted string"
@@ -338,7 +347,13 @@ additional explanations are provided.
                       (org-show-context)
                       (setq point (point))
                       (throw 'found t)))))
-              (goto-char point))) )
+              (goto-char point)))
+
+         (defun ladicle/org-clock-out-and-save-when-exit ()
+             "Save buffers and stop clocking when kill emacs."
+               (ignore-errors (org-clock-out) t)
+               (save-some-buffers t))
+       )
    #+END_SRC
 
 ** Ledger
@@ -367,7 +382,7 @@ additional explanations are provided.
      (use-package company-lsp
        :commands company-lsp
        :init
-         (push 'company-lsp company-backends)
+         (add-to-list 'company-backends 'company-lsp)
        :config
          (setq company-lsp-enable-snippet 1)
        :after lsp-mode company)
@@ -385,11 +400,13 @@ additional explanations are provided.
 ** Python
 
    #+BEGIN_SRC emacs-lisp
-     (use-package python-mode
-       :hook (python-mode . lsp)
-       :after lsp-mode)
+          (use-package python-mode
+            :hook (python-mode . lsp)
+            :after lsp-mode)
 
-     ;; (use-package jedi-company)
+            (use-package company-jedi :after company python-mode
+              :init
+                (add-to-list 'company-backends 'company-jedi))
    #+END_SRC
 
 * Modal Editing / evil-mode
