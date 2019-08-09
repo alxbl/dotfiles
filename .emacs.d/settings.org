@@ -11,7 +11,7 @@ additional explanations are provided.
    Define some global variables that are used throughout the configuration.
 
    #+BEGIN_SRC emacs-lisp
-     (load-file "secrets.el")
+     (load-file (concat user-emacs-directory "/secrets.el"))
      (setq evil-want-C-u-scroll t) ; Use vim's C-u
      ;; Base location of the orgmode files. It's called WIKI
      ;; because I used to use VimWiki and was too lazy to rename it.
@@ -118,7 +118,7 @@ additional explanations are provided.
 *** Disable Mouse
     #+BEGIN_SRC emacs-lisp
       (use-package disable-mouse :after evil :diminish 'disable-mouse-global-mode
-        :config 
+        :config
           (global-disable-mouse-mode)
           (mapc #'disable-mouse-in-keymap
           (list evil-motion-state-map
@@ -266,9 +266,9 @@ additional explanations are provided.
 
 * GTD
 ** Org mode
-   Basic org-mode configuration
+   Basic org-mode configuration.
    #+BEGIN_SRC emacs-lisp
-     (use-package org
+   (use-package org
        :after evil
        :custom
          (tasks-file (concat alxbl-wiki "/log/tasks.org"))
@@ -367,6 +367,18 @@ additional explanations are provided.
                (ignore-errors (org-clock-out) t)
                (save-some-buffers t))
        )
+   #+END_SRC
+
+   Support for Google Calendar Integration. Secrets are defined in
+   =secrets.el= and should not be published to source control ;)
+
+   #+BEGIN_SRC emacs-lisp
+     (use-package org-gcal
+       :custom
+       (org-gcal-client-id gcal-id)
+       (org-gcal-client-secret gcal-api-key)
+       :config
+       (setq org-gcal-file-alist `((,gcal-email . ,(concat alxbl-wiki "/log/calendar.org")))))
    #+END_SRC
 
 ** Ledger
