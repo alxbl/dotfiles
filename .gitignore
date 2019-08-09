@@ -16,6 +16,7 @@ __pycache__
 .emacs.d/settings.el
 .emacs.d/bak
 .emacs.d/recentf
+.emacs.d/secrets.el
 .emacs.d/auto-save-list
 /.emacs.d/eshell/history
 /.emacs.d/transient

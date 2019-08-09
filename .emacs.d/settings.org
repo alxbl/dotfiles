@@ -4,11 +4,14 @@
 Most of this should be self-explanatory. In places where it isn't,
 additional explanations are provided.
 
+(PS: I can't lisp.)
+
 * General Settings
 ** Globals
    Define some global variables that are used throughout the configuration.
 
    #+BEGIN_SRC emacs-lisp
+     (load-file "secrets.el")
      (setq evil-want-C-u-scroll t) ; Use vim's C-u
      ;; Base location of the orgmode files. It's called WIKI
      ;; because I used to use VimWiki and was too lazy to rename it.
@@ -169,6 +172,10 @@ additional explanations are provided.
           (evil-define-key 'normal info-mode-map ";" 'helm-mini)
           (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
         :hook (after-init . helm-mode))
+
+      (use-package helm-ag :after helm
+        :config
+          (evil-leader/set-key "f" 'helm-ag))
     #+END_SRC
 *** Git Integration / Magit
     This is largely a work in progress as I figure out which magit
@@ -255,6 +262,7 @@ additional explanations are provided.
 
 * GTD
 ** Org mode
+   Basic org-mode configuration
    #+BEGIN_SRC emacs-lisp
      (use-package org
        :after evil
@@ -286,7 +294,7 @@ additional explanations are provided.
             ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
               (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
             ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
-              (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t)
+              (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
             ))
        :config
          (evil-define-key  'normal org-mode-map
@@ -349,6 +357,7 @@ additional explanations are provided.
                       (throw 'found t)))))
               (goto-char point)))
 
+         ;; https://ladicle.com/post/config/#org
          (defun ladicle/org-clock-out-and-save-when-exit ()
              "Save buffers and stop clocking when kill emacs."
                (ignore-errors (org-clock-out) t)
