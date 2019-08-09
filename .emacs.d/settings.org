@@ -19,8 +19,12 @@ additional explanations are provided.
 
      ;; Force Emacs to prompt for GPG key in-editor.
      (setenv "GPG_AGENT_INFO" nil)
+
      ;; Prevent eldoc from popping up buffers everywhere. LSP will take care of this.
      (global-eldoc-mode -1)
+
+     ;; No lock file symlinks.
+     (setq create-lockfiles nil)
    #+END_SRC
 ** Package Management
    #+BEGIN_SRC emacs-lisp

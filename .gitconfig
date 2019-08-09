@@ -4,7 +4,7 @@
     signingkey = E3FC7081
 
 [color]
-    status = auto
+    status = always
     diff = auto
     interactive = auto
     branch = auto
