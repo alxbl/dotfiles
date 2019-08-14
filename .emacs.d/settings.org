@@ -224,28 +224,30 @@ additional explanations are provided.
     This will need to be cleaned up and documented eventually.
 
     #+BEGIN_SRC emacs-lisp
-            ;; Snippets and Templates
-            (use-package yasnippet :ensure t :diminish 'yas-minor-mode
-              :hook (after-init . yas-global-mode))
+      ;; Snippets and Templates
+      (use-package yasnippet :ensure t :diminish 'yas-minor-mode
+        :hook (after-init . yas-global-mode))
 
-            ;; Tab Completion
-            (use-package company :ensure t :diminish
-              :bind
-              (:map company-active-map
-                    ("C-n" . company-select-next)
-                    ("C-p" . company-select-previous)
-                    ("<tab>" . company-complete-common-or-cycle)
-                    :map company-search-map
-                    ("C-n" . company-select-next)
-                    ("C-p" . company-select-previous))
-              :custom
-              (company-idle-delay 0)
-              (company-echo-delay 0)
-              (company-minimum-prefix-length 1)
-              :hook (after-init . global-company-mode))
+      ;; Tab Completion
+      (use-package company :ensure t :diminish
+        :bind
+        (:map company-active-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous)
+              ("<tab>" . company-complete-common-or-cycle)
+              :map company-search-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous))
+        :custom
+        (company-idle-delay 0)
+        (company-echo-delay 0)
+        (company-minimum-prefix-length 1)
+        :hook (after-init . global-company-mode))
 
-            (use-package popwin
-              :hook (after-init . popwin-mode))
+      (use-package popwin
+        :config 
+          (push '("^*helm.*" :regexp t) popwin:special-display-config)
+        :hook (after-init . popwin-mode))
     #+END_SRC
 
 *** Project Management
