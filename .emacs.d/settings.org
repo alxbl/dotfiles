@@ -261,8 +261,11 @@ additional explanations are provided.
 
       (use-package treemacs
         :config
-          (define-key evil-normal-state-map (kbd "C-b") 'treemacs))
+          (define-key evil-normal-state-map (kbd "C-b") 'treemacs)
+          (define-key evil-motion-state-map (kbd "C-b") 'treemacs))
       (use-package treemacs-projectile :after treemacs projectile)
+
+    (use-package treemacs-evil :after treemacs evil)
     #+END_SRC
 *** TODO Debugging Support
 
@@ -271,124 +274,125 @@ additional explanations are provided.
    Basic org-mode configuration.
 
    #+BEGIN_SRC emacs-lisp
-        (use-package org
-            :after evil
-            :custom
-              (tasks-file (concat alxbl-wiki "/log/tasks.org"))
-              (diary-file (concat alxbl-wiki "/log/personal.org"))
-              (work-file (concat alxbl-wiki "/log/work.org"))
-              (wiki-file (concat alxbl-wiki "/wiki.org"))
-              (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
-              (config-file (concat user-emacs-directory "/settings.org"))
-              (org-agenda-files "~/.emacs.d/agenda")
-              (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
-              (org-return-follows-link t)
-              (org-hide-leading-stars t)
-              (org-pretty-entities t)
-              (org-hide-emphasis-markers t)
-              (org-todo-keyword-faces
-               '(("TODO" . "orange")
-                 ("WIP" . "yellow")
-                 ("BLOCKED" . "red")
-                 ("DROPPED" . "gray")))
-              (org-capture-templates
-               `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
-                   "* TODO %?\n  - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
-                 ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
-                 ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
-                 ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
-                   (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-                 ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
-                   (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-                 ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
-                   (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
-                 ))
-            :config
-              (evil-define-key  'normal org-mode-map
-                  ;; Navigation
-                  "gl" 'org-demote-subtree
-                  "gh" 'org-promote-subtree
-                  "L" 'org-next-visible-heading
-                  "H" 'org-previous-visible-heading
-                  ;; <leader>t: Task Management
-                  "T" 'org-todo
-                  "ts" 'org-schedule
-                  "tci" 'org-clock-in
-                  "tco" 'org-clock-out
-                  "tcg" 'org-clock-goto
-                  (kbd "RET") 'org-open-at-point)
+     (use-package org-capture :after org)
+     (use-package org
+         :after evil
+         :custom
+           (tasks-file (concat alxbl-wiki "/log/tasks.org"))
+           (diary-file (concat alxbl-wiki "/log/personal.org"))
+           (work-file (concat alxbl-wiki "/log/work.org"))
+           (wiki-file (concat alxbl-wiki "/wiki.org"))
+           (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
+           (config-file (concat user-emacs-directory "/settings.org"))
+           (org-agenda-files "~/.emacs.d/agenda")
+           (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
+           (org-return-follows-link t)
+           (org-hide-leading-stars t)
+           (org-pretty-entities t)
+           (org-hide-emphasis-markers t)
+           (org-todo-keyword-faces
+            '(("TODO" . "orange")
+              ("WIP" . "yellow")
+              ("BLOCKED" . "red")
+              ("DROPPED" . "gray")))
+           (org-capture-templates
+            `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
+                "* TODO %?\n  - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
+              ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
+              ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
+              ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
+                (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+              ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
+                (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+              ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
+                (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
+              ))
+         :config
+           (evil-define-key  'normal org-mode-map
+               ;; Navigation
+               "gl" 'org-demote-subtree
+               "gh" 'org-promote-subtree
+               "L" 'org-next-visible-heading
+               "H" 'org-previous-visible-heading
+               ;; <leader>t: Task Management
+               "T" 'org-todo
+               "ts" 'org-schedule
+               "tci" 'org-clock-in
+               "tco" 'org-clock-out
+               "tcg" 'org-clock-goto
+               (kbd "RET") 'org-open-at-point)
 
-               ;; <leader>o: Organization
-               (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
-               (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
+            ;; <leader>o: Organization
+            (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
+            (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
 
 
 
-               (evil-leader/set-key "oa" 'org-agenda)
-               (evil-leader/set-key "oo" 'org-capture)
-               (evil-leader/set-key "or" 'org-refile)
-               (evil-leader/set-key "oO" 'org-capture-goto-target)
-               (evil-leader/set-key "ol" 'org-store-link)
-               (evil-leader/set-key "ob" 'org-switchb)
-               (evil-leader/set-key "of" 'org-footnote-action)
-               (evil-leader/set-key "on" 'org-narrow-to-subtree)
-               (evil-leader/set-key "oN" 'widen)
+            (evil-leader/set-key "oa" 'org-agenda)
+            (evil-leader/set-key "oo" 'org-capture)
+            (evil-leader/set-key "or" 'org-refile)
+            (evil-leader/set-key "oO" 'org-capture-goto-target)
+            (evil-leader/set-key "ol" 'org-store-link)
+            (evil-leader/set-key "ob" 'org-switchb)
+            (evil-leader/set-key "of" 'org-footnote-action)
+            (evil-leader/set-key "on" 'org-narrow-to-subtree)
+            (evil-leader/set-key "oN" 'widen)
 
-               (evil-leader/set-key "p" 'org-capture-screenshot)
+            (evil-leader/set-key "p" 'org-capture-screenshot)
 
-               (evil-leader/set-key "SPC" 'evil-toggle-fold)
-               ;; This breaks delete/yank line motions.
-               ;; "dab" 'org-cut-subtree
-               ;; "yab" 'org-copy-subtree
-               ;; (evil-define-key 'visual org-mode-map
-               ;;   "d" 'delete-region)
-            :hook
-              (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
-              (org-mode . auto-fill-mode)
-            :preface
-               (defun alxbl/get-date ()
-                 "Return the current time as a formatted string"
-                 (format-time-string "%Y-%m-%d %H:%M" (current-time)))
+            (evil-leader/set-key "SPC" 'evil-toggle-fold)
+            ;; This breaks delete/yank line motions.
+            ;; "dab" 'org-cut-subtree
+            ;; "yab" 'org-copy-subtree
+            ;; (evil-define-key 'visual org-mode-map
+            ;;   "d" 'delete-region)
+         :hook
+           (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
+           (org-mode . auto-fill-mode)
+         :preface
+            (defun alxbl/get-date ()
+              "Return the current time as a formatted string"
+              (format-time-string "%Y-%m-%d %H:%M" (current-time)))
 
-               ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
-               (defun datetree-jump ()
-                 "Jumps to the datetree heading that matches the current date."
-                 (interactive)
-                 (let ((point (point)))
-                   (catch 'found
-                     (goto-char (point-min))
-                     (while (outline-next-heading)
-                       (let* ((hl (org-element-at-point))
-                              (title (org-element-property :raw-value hl)))
-                         (when (string= title (format-time-string "%F %A"))
-                           (org-show-context)
-                           (setq point (point))
-                           (throw 'found t)))))
-                   (goto-char point)))
+            ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
+            (defun datetree-jump ()
+              "Jumps to the datetree heading that matches the current date."
+              (interactive)
+              (let ((point (point)))
+                (catch 'found
+                  (goto-char (point-min))
+                  (while (outline-next-heading)
+                    (let* ((hl (org-element-at-point))
+                           (title (org-element-property :raw-value hl)))
+                      (when (string= title (format-time-string "%F %A"))
+                        (org-show-context)
+                        (setq point (point))
+                        (throw 'found t)))))
+                (goto-char point)))
 
-              ;; https://ladicle.com/post/config/#org
-              (defun ladicle/org-clock-out-and-save-when-exit ()
-                  "Save buffers and stop clocking when kill emacs."
-                    (ignore-errors (org-clock-out) t)
-                    (save-some-buffers t))
-              (defun org-capture-screenshot (&optional caption)
-                (interactive "P")
-                (let* ((image-dir
-                        (if (not (buffer-file-name))
-                            (let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
-                              (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
-                          "screens")))
-                  (unless (file-exists-p image-dir)
-                    (make-directory image-dir))
-                  (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
-                         (exit-status (call-process "flameshot" nil nil nil "gui"))
-                         (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
-                         )
-                    (if caption
-                        (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
-                    (org-insert-link nil (concat "file:" image-file) "")
-                    (org-display-inline-images))))
-            )
+           ;; https://ladicle.com/post/config/#org
+           (defun ladicle/org-clock-out-and-save-when-exit ()
+               "Save buffers and stop clocking when kill emacs."
+                 (ignore-errors (org-clock-out) t)
+                 (save-some-buffers t))
+           (defun org-capture-screenshot (&optional caption)
+             (interactive "P")
+             (let* ((image-dir
+                     (if (not (buffer-file-name))
+                         (let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
+                           (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
+                       "screens")))
+               (unless (file-exists-p image-dir)
+                 (make-directory image-dir))
+               (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
+                      (exit-status (call-process "flameshot" nil nil nil "gui"))
+                      (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
+                      )
+                 (if caption
+                     (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
+                 (org-insert-link nil (concat "file:" image-file) "")
+                 (org-display-inline-images))))
+         )
    #+END_SRC
 
    Support for Google Calendar Integration. Secrets are defined in
@@ -494,11 +498,4 @@ additional explanations are provided.
         (global-evil-surround-mode t)
 
         (evil-leader/set-key "Q" 'a/kill-all-buffers))
-    (use-package treemacs-evil :after treemacs evil
-      :bind
-      (:map treemacs-mode-map
-            ("zh"  . treemacs-show-hidden-files))
-
-      (:map evil-motion-state-map
-            ("C-b" . treemacs)))
   #+END_SRC
