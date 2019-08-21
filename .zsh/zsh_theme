@@ -1,14 +1,18 @@
-GEOMETRY_PROMPT_PLUGINS=(virtualenv exec_time git jobs exit_code)
-PROMPT_GEOMETRY_COLORIZE_ROOT=true          # colorize root differently
-PROMPT_GEOMETRY_COLORIZE_SYMBOL=true        # colorize by hostname.
+GEOMETRY_PROMPT=(geometry_hostname geometry_path geometry_status)
+GEOMETRY_RPROMPT+=(geometry_git geometry_virtualenv geometry_exec_time geometry_jobs)
+GEOMETRY_INFO=()
 
-GEOMETRY_SYMBOL_PROMPT="$"                  # default prompt symbol
-GEOMETRY_SYMBOL_ROOT="#"                    # when logged in user is root
-GEOMETRY_SYMBOL_RPROMPT="> "                # multiline prompts
-GEOMETRY_SYMBOL_EXIT_VALUE="!"              # displayed when exit value is != 0
+# PROMPT_GEOMETRY_COLORIZE_ROOT=true          # colorize root differently
+# PROMPT_GEOMETRY_COLORIZE_SYMBOL=true        # colorize by hostname.
+GEOMETRY_STATUS_SYMBOL_COLOR_HASH=true
+GEOMETRY_STATUS_SHOW_CODE=true
 
-# GEOMETRY_PLUGIN_HOSTNAME_PREFIX=" @ "
+GEOMETRY_STATUS_SYMBOL='$ '         # default prompt symbol
+GEOMETRY_STATUS_SYMBOL_ERROR='\$! '  # default prompt symbol
+GEOMETRY_STATUS_SYMBOL_ROOT="# "           # when logged in user is root
+GEOMETRY_STATUS_SYMBOL_ROOT_ERROR="#! "    # when logged in user is root
 
 # oh-my-zsh
 ZSH_THEME="geometry/geometry"
 source "$ZSH/oh-my-zsh.sh"
+
