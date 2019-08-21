@@ -48,3 +48,5 @@ else
 fi
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
+
+source "$ZSHCFG/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"

@@ -43,3 +43,6 @@
 [submodule ".zsh/extra/plugins/workon"]
 	path = .zsh/plugins/workon
 	url = https://github.com/alxbl/workon
+[submodule ".zsh/zsh-syntax-highlighting"]
+	path = .zsh/zsh-syntax-highlighting
+	url = https://github.com/zsh-users/zsh-syntax-highlighting
