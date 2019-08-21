@@ -247,6 +247,7 @@ additional explanations are provided.
       (use-package popwin
         :config 
           (push '("^*helm.*" :regexp t) popwin:special-display-config)
+          (push '("*Python-Help*") popwin:special-display-config)
         :hook (after-init . popwin-mode))
     #+END_SRC
 
@@ -274,7 +275,6 @@ additional explanations are provided.
    Basic org-mode configuration.
 
    #+BEGIN_SRC emacs-lisp
-     (use-package org-capture :after org)
      (use-package org
          :after evil
          :custom
@@ -459,7 +459,6 @@ additional explanations are provided.
               :init
                 (add-to-list 'company-backends 'company-jedi))
    #+END_SRC
-
 * Modal Editing / evil-mode
 
   Evil mode must be required last to ensure that it properly
