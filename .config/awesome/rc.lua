@@ -10,19 +10,11 @@ local hotkeys_popup = require("awful.hotkeys_popup").widget
 -- Extensions
 local lain          = require("lain")
 local markup        = lain.util.markup
+local utils         = require("utils")
+local settings      = require("settings")
 -- -----------------------------------------------------------------------------
 -- -----------------------------------------------------------------------------
 local AUTO_FOCUS = false
-local function run_once(cmd_arr)
-    for _, cmd in ipairs(cmd_arr) do
-        findme = cmd
-        firstspace = cmd:find(" ")
-        if firstspace then
-            findme = cmd:sub(0, firstspace-1)
-        end
-        awful.spawn.with_shell(string.format("pgrep -u $USER -x %s > /dev/null || (%s)", findme, cmd))
-    end
-end
 
 local function set_wallpaper(s)
     if beautiful.wallpaper then
@@ -56,11 +48,12 @@ end
 -- FIXME: Doesn't seem to work.
 naughty.config.defaults.screen = awful.screen.primary
 naughty.config.screen = awful.screen.primary
+
 -- }}}
 -- 1. Basic Configuration {{{
 local MOD    = "Mod4"
-local HOME   = os.getenv("HOME")
-local CONFIG = HOME .. "/.config/awesome/"
+local HOME   = settings.HOME
+local CONFIG = settings.CONFIG
 local EDITOR = os.getenv("EDITOR") or "vi"
 local TERM   = os.getenv("TERMINAL") or "termite"
 
@@ -68,72 +61,23 @@ beautiful.init(CONFIG .. "themes/neo/theme.lua")
 
 awful.layout.layouts = {
     awful.layout.suit.tile,
-    -- awful.layout.suit.tile.bottom,
-    -- awful.layout.suit.fair,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.corner.nw,
+    awful.layout.suit.tile.bottom,
     lain.layout.centerwork,
-    -- lain.layout.cascade.tile
+    -- awful.layout.suit.fair,
+    -- awful.layout.suit.corner.nw,
+    -- lain.layout.cascade.tile,
+    -- awful.layout.suit.magnifier,
 }
 -- }}}
 -- 2. Startup {{{
-local lock_cmd = "i3lock -c1f67b1 -u -i " .. CONFIG .. "lock.png"
 awful.spawn("setxkbmap -option ctrl:nocaps")
 awful.spawn("xset r rate 350 70")
-run_once({
-    -- "unclutter -root",
-    "compton -i 0.95", -- -i 0.8
-    "fcitx",
-    "flameshot",
-    "nm-applet",
-    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1",
-    "xautolock -time 5 -locker \"" .. lock_cmd .. "\""
-})
+utils.run_once(settings.autoruns)
 
-local function pick_wnd()    awful.spawn("rofi -show window") end
-local function run_cmd()     awful.spawn("rofi -show run") end
-local function lock_screen() awful.spawn(lock_cmd) end
 
 -- }}}
 -- 3. Workspace {{{
 -- Create a wibox for each screen and add it
-local taglist_buttons = gears.table.join(
-                    awful.button({ }, 1, function(t) t:view_only() end),
-                    awful.button({ MOD }, 1, function(t)
-                                              if client.focus then
-                                                  client.focus:move_to_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 3, awful.tag.viewtoggle),
-                    awful.button({ MOD }, 3, function(t)
-                                              if client.focus then
-                                                  client.focus:toggle_tag(t)
-                                              end
-                                          end),
-                    awful.button({ }, 4, function(t) awful.tag.viewnext(t.screen) end),
-                    awful.button({ }, 5, function(t) awful.tag.viewprev(t.screen) end)
-                )
-
-local taskbar_buttons = gears.table.join(
-                     awful.button({ }, 1, function (c)
-                                              if c == client.focus then
-                                                  c.minimized = true
-                                              else
-                                                  c.minimized = false
-                                                  if not c:isvisible() and c.first_tag then
-                                                      c.first_tag:view_only()
-                                                  end
-                                                  client.focus = c
-                                                  c:raise()
-                                              end
-                                          end),
-                     awful.button({ }, 4, function ()
-                                              awful.client.focus.byidx(1)
-                                          end),
-                     awful.button({ }, 5, function ()
-                                              awful.client.focus.byidx(-1)
-                                          end))
-
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
@@ -162,15 +106,6 @@ cpu = lain.widget.cpu({
 })
 -- }}}
 
-function filter_tag(tag)
-    -- Show tags with urgent clients and the selected tag.
-    local urgent = false
-    local clients = tag:clients()
-    for k, c in pairs(clients) do
-        if c.urgent then return true end
-    end
-    return tag.selected
-end
 
 -- TODO: Global taglist?
 -- TODO: screen added/removed signals to dynamically add/remove screens.
@@ -432,6 +367,8 @@ awful.rules.rules = {
 
     -- Workspace
     { rule = { class = "Firefox" }, properties = { screen = 1, tag = "2" } },
+    { rule = { class = "Emacs" }, properties = { screen = 1, tag = "1" } },
+    { rule = { class = "Termite" }, properties = { screen = 1, tag = "1" } },
     { rule = { class = "Spotify" }, properties = { screen = 1, tag = "9" } },
     -- Chat
     { rule = { class = "Keybase" }, properties = { screen = 2, tag = "3" } },
