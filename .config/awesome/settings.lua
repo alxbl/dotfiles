@@ -9,6 +9,9 @@ settings.theme = "neo" -- Theme to load
 -- Key Modifiers
 settings.keys = { super = "Mod4", alt = "Mod1", ctrl = "Control", shift = "Shift" }
 
+-- Programs
+settings.terminal = os.getenv("TERMINAL") or "termite"
+
 -- Lock command
 settings.lock_cmd = "i3lock -c1f67b1 -u -i " .. settings.CONFIG .. "lock.png"
 
