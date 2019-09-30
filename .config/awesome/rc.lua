@@ -5,8 +5,6 @@ local awful         = require("awful")
 local wibox         = require("wibox")
 local beautiful     = require("beautiful")
 local naughty       = require("naughty")
-local hotkeys_popup = require("awful.hotkeys_popup").widget
-                      require("awful.hotkeys_popup.keys")
 -- Extensions
 local lain          = require("lain")
 local markup        = lain.util.markup
@@ -113,7 +111,7 @@ awful.screen.connect_for_each_screen(function(s)
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
     s.layout  = awful.widget.layoutbox(s)
-    s.taglist = awful.widget.taglist(s, filter_tag, keys.taglist_buttons)
+    s.taglist = awful.widget.taglist(s, utils.filter_tag, keys.taglist_buttons)
 
     local bar = {
         layout = wibox.layout.align.horizontal,
