@@ -15,7 +15,8 @@ rofi.font: NotoSans 20
 ! rofi.auto-select: true
 
 ! Window             'background'  'border'      'separator'
-rofi.color-window:    #a0282a36,    #00000000,    #87b6b7
+rofi.color-window:     #dd282a36,    #00000000,    #87b6b7
+;rofi.color-window:    #cc1a1a1a,    #00000000,    #87b6b7
 
 ! State              'bg',      'fg',     'altbg',   'hlbg',    'hlfg'
 rofi.color-normal:    #00000000, #87b6b7, #00000000, #0affffff, #b9fafc
