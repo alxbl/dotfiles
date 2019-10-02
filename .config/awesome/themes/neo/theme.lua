@@ -30,7 +30,7 @@ theme.border_width  = 1
 theme.border_normal = "#282a36"
 theme.border_focus  = "#bd93f9"
 theme.border_marked = "#f1fa8c"
-theme.wallpaper = HOME .. "/.config/awesome/wall.png"
+theme.wallpaper = settings.HOME .. "/.config/awesome/wall.png"
 theme.tasklist_bg_focus = dark -- No accent on active task
 
 -- Generate taglist squares:
