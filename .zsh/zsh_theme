@@ -1,9 +1,7 @@
 GEOMETRY_PROMPT=(geometry_hostname geometry_path geometry_status)
-GEOMETRY_RPROMPT=(geometry_git geometry_virtualenv geometry_exec_time geometry_jobs)
+GEOMETRY_RPROMPT=(geometry_git geometry_virtualenv geometry_exec_time geometry_jobs geometry_exitcode)
 GEOMETRY_INFO=()
 
-# PROMPT_GEOMETRY_COLORIZE_ROOT=true          # colorize root differently
-# PROMPT_GEOMETRY_COLORIZE_SYMBOL=true        # colorize by hostname.
 GEOMETRY_STATUS_SYMBOL_COLOR_HASH=true
 GEOMETRY_STATUS_SHOW_CODE=true
 

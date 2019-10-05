@@ -133,6 +133,11 @@ additional explanations are provided.
      (setq inhibit-startup-message t)
      (setq inhibit-startup-echo-area-message t)
      (setq initial-scratch-message nil)
+     (setq-default display-line-numbers-type 'relative
+                   display-line-numbers-current-absolute t
+                   display-line-numbers-width 4
+                   display-line-numbers-widen t)
+     (global-display-line-numbers-mode t)
 
      ;; No clutter.
      (tool-bar-mode 0)
@@ -153,12 +158,6 @@ additional explanations are provided.
        (diminish 'undo-tree-mode)
        (diminish 'auto-revert-mode)
        (diminish 'undo-tree-mode))
-
-     ;; Reative  Line Numbering
-     (use-package linum-relative :diminish
-       :config
-       (setq linum-relative-backend 'display-line-numbers-mode)
-       :hook (after-init . linum-relative-global-mode))
 
      ;; Easy shortcuts to change font-size
      (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -308,6 +307,23 @@ additional explanations are provided.
                 (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
               ))
          :config
+            ;; LaTeX export settings
+            (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
+            (add-to-list 'org-latex-packages-alist '("" "minted"))
+            (setq org-latex-listings 'minted)
+            (setq org-latex-pdf-process
+                    '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                    "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                    "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+            (setq org-src-fontify-natively t)
+
+            (org-babel-do-load-languages
+                'org-babel-load-languages
+                '((python . t)
+                (latex . t)))
+            ;; --
+
            (evil-define-key  'normal org-mode-map
                ;; Navigation
                "gl" 'org-demote-subtree
@@ -399,12 +415,12 @@ additional explanations are provided.
    =secrets.el= and should not be published to source control ;)
 
    #+BEGIN_SRC emacs-lisp
-     (use-package org-gcal
-       :custom
-       (org-gcal-client-id gcal-id)
-       (org-gcal-client-secret gcal-api-key)
-       :config
-       (setq org-gcal-file-alist `((,gcal-email . ,(concat alxbl-wiki "/log/calendar.org")))))
+     ;; (use-package org-gcal
+     ;;   :custom
+     ;;   (org-gcal-client-id gcal-id)
+     ;;   (org-gcal-client-secret gcal-api-key)
+     ;;   :config
+     ;;   (setq org-gcal-file-alist `((,gcal-email . ,(concat alxbl-wiki "/log/calendar.org")))))
    #+END_SRC
 
 ** Ledger

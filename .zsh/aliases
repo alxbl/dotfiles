@@ -21,6 +21,9 @@ alias dhcp='cat /var/lib/dnsmasq/qemu0.leases | awk "{ printf \$3 \"\\t\" \$4  \
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
 alias py3='source ~/.bin/py-3.7.0/bin/activate'
 
+# Emacs
+if _has emacsclient; then alias vim='emacsclient -t'; fi
+
 # Burp
 if [[ -d "$HOME/.bin/BurpSuiteCommunity" ]]; then
     alias burp='$HOME/.bin/BurpSuiteCommunity/BurpSuiteCommunity'
