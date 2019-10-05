@@ -1,7 +1,10 @@
 # Define login environment on first login shell.
+#
+export LANG="en_CA.UTF-8"
+export LC_ALL="en_CA.UTF-8"
+export LC_CTYPE="UTF-8"
+
 if [[ ! -v TMUX ]]; then
-    export LANG="en_CA.UTF-8"
-    export LC_ALL="en_CA.UTF-8"
     export TERM=xterm-256color
 
     export GOPATH="$CODEPATH/go"
@@ -22,6 +25,7 @@ if [[ ! -v TMUX ]]; then
     #
     # Process overrides for a specific host.
     [[ -f "$HOME/.zsh/override/$HOST" ]] && source "$HOME/.zsh/override/$HOST"
+    tmux
 fi
 
 # START X IF REQUIRED
