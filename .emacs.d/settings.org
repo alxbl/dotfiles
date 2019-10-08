@@ -6,129 +6,67 @@ additional explanations are provided.
 
 (PS: I can't lisp.)
 
-* General Settings
-** Globals
-   Define some global variables that are used throughout the configuration.
-
+* Base
+** Core
+   
+   Define a few global variables.
+   
    #+BEGIN_SRC emacs-lisp
-     (load-file (concat user-emacs-directory "/secrets.el"))
      (setq evil-want-C-u-scroll t) ; Use vim's C-u
+
      ;; Base location of the orgmode files. It's called WIKI
      ;; because I used to use VimWiki and was too lazy to rename it.
      (setq alxbl-wiki (getenv "WIKI"))
 
-     ;; Force Emacs to prompt for GPG key in-editor.
-     (setenv "GPG_AGENT_INFO" nil)
-
-     ;; Prevent eldoc from popping up buffers everywhere. LSP will take care of this.
-     (global-eldoc-mode -1)
-
-     ;; No lock file symlinks.
+     ;; No clutter.
      (setq create-lockfiles nil)
-   #+END_SRC
-** Package Management
-   #+BEGIN_SRC emacs-lisp
-    (require 'package)
-
-    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-    (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
-    (package-initialize)
-
-    (unless (package-installed-p 'use-package)
-    (package-refresh-contents)
-    (package-install 'use-package))
-
-    (eval-when-compile (require 'use-package))
-
-    (setq use-package-always-ensure t)
-    (setq use-package-expand-minimally t)
-    ;; Taking control of our world.
-    (setq custom-file (make-temp-file "emacs-custom"))
-
+     (setq custom-file (make-temp-file "emacs-custom"))
+     (setq make-backup-files nil)
+     (setq auto-save-default nil)
    #+END_SRC
 
-** Server-Mode
+   Setup =use-package= and MELPA sources.
+
    #+BEGIN_SRC emacs-lisp
+     (eval-and-compile
+       (setq load-prefer-newer t
+             package-user-dir "~/emacs.d/elpa"
+             package--init-file-ensured t
+             package-enable-at-startup nil)
+
+       ;; Create package directory.
+       (unless (file-directory-p package-user-dir)
+         (make-directory package-user-dir t)))
+
+     (eval-and-compile
+       (setq load-path (append load-path (directory-files package-user-dir t "^[^.]" t))))
+
+     (eval-when-compile
+       (require 'package)
+       (package-initialize)
+       (add-to-list 'package-archives '("gnu"   . "https://elpa.gnu.org/packages/") t)
+       (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"   ) t)
+       (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/"      ) t)
+
+       ;; Install use-package and core packages on clean run.
+       (unless (package-installed-p 'use-package)
+         (package-refresh-contents)
+         (package-install 'use-package)
+         (package-install 'diminish))
+
+       (setq use-package-always-ensure t)
+       (setq use-package-expand-minimally t)
+
+       (require 'use-package))
+
+     ;; Start the Emacs server.
      (use-package server
-      :ensure nil
-      :hook (after-init . server-mode))
+       :ensure nil
+       :hook (after-init . server-mode))
    #+END_SRC
-** Editing / Defaults
-*** Encoding and Whitespace
+
+** Editor
    #+BEGIN_SRC emacs-lisp
-     (prefer-coding-system 'utf-8-unix)
-     (set-locale-environment "en_US.UTF-8")
-     (set-default-coding-systems 'utf-8-unix)
-     (set-selection-coding-system 'utf-8-unix)
-     (set-buffer-file-coding-system 'utf-8-unix)
-     (set-clipboard-coding-system 'utf-8)
-     (set-keyboard-coding-system 'utf-8)
-     (set-terminal-coding-system 'utf-8)
-     (setq buffer-file-coding-system 'utf-8)
-     (setq save-buffer-coding-system 'utf-8-unix)
-
-     ;; Vertical Column
-     (set-fill-column 80)
-
-     ;; Default tabs
-     (setq-default indent-tabs-mode nil) ;; Use spaces
-     (setq-default tab-width 4)
-     ; C-specific stuff (move to its own section?)
-     (defvaralias 'c-basic-offset 'tab-width)
-     (defvaralias 'cperl-indent-level 'tab-width)
-
-     ;; No C-S; No life
-     (global-set-key (kbd "C-s") 'save-buffer)
-   #+END_SRC
-*** Dired
-
-    Rebind some keys to make =dired= easier to use with evil.
-
-    #+BEGIN_SRC emacs-lisp
-    (use-package dired :ensure nil
-      :after evil
-      :config
-     (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
-     (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
-     (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
-     (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
-     (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
-     (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
-     (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
-     (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
-     (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
-     (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
-     (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer))
-    #+END_SRC
-
-*** Info
-    The default bindings are actually decent, but require switching to
-    =emacs-state=, which is an additional keystroke. (This is currently broken)
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package info :ensure nil
-        :after evil
-        :config
-        (evil-define-key nil 'info-mode-map
-          (kbd "C-o") 'Info-history-back
-          (kbd "C-i") 'Info-history-forward))
-    #+END_SRC
-
-*** Disable Mouse
-    #+BEGIN_SRC emacs-lisp
-      (use-package disable-mouse :after evil :diminish 'disable-mouse-global-mode
-        :config
-          (global-disable-mouse-mode)
-          (mapc #'disable-mouse-in-keymap
-          (list evil-motion-state-map
-                  evil-normal-state-map
-                  evil-visual-state-map
-                  evil-insert-state-map)))
-    #+END_SRC
-** Look and Feel
-   #+BEGIN_SRC emacs-lisp
-     ;; Minimalist startup.
      (setq inhibit-startup-screen t)
      (setq inhibit-startup-message t)
      (setq inhibit-startup-echo-area-message t)
@@ -144,342 +82,48 @@ additional explanations are provided.
      (menu-bar-mode 0)
      (scroll-bar-mode 0)
 
-     ;; No Auto-save/backups
-     ;; (setq backup-directory-alist '(("." . "~/.emacs.d/bak")))
-     (setq make-backup-files nil)
-     (setq auto-save-default nil)
-
-     (require 'dracula-theme)
-
-     ;; Unclutter the mode HUD
-     ;; FIXME: This is being overridden.
-     (use-package diminish
+     (use-package disable-mouse 
+       :diminish 'disable-mouse-global-mode
+       :after evil
        :config
-       (diminish 'undo-tree-mode)
-       (diminish 'auto-revert-mode)
-       (diminish 'undo-tree-mode))
+       (global-disable-mouse-mode)
+       (mapc #'disable-mouse-in-keymap
+             (list evil-motion-state-map
+                   evil-normal-state-map
+                   evil-visual-state-map
+                   evil-insert-state-map)))
 
-     ;; Easy shortcuts to change font-size
+     (use-package dracula-theme)
+
+     (prefer-coding-system 'utf-8-unix)
+     (set-locale-environment "en_US.UTF-8")
+     (set-default-coding-systems 'utf-8-unix)
+     (set-selection-coding-system 'utf-8-unix)
+     (set-buffer-file-coding-system 'utf-8-unix)
+     (set-clipboard-coding-system 'utf-8)
+     (set-keyboard-coding-system 'utf-8)
+     (set-terminal-coding-system 'utf-8)
+     (setq buffer-file-coding-system 'utf-8)
+     (setq save-buffer-coding-system 'utf-8-unix)
+
+     ;; Vertical Column
+     (set-fill-column 120)
+
      (global-set-key (kbd "C-+") 'text-scale-increase)
      (global-set-key (kbd "C--") 'text-scale-decrease)
+
+     (global-set-key (kbd "C-s") 'save-buffer)
+
+     ;; Tidy up pop-up windows.
+     (use-package popwin
+       :config 
+       (push '("^*helm.*" :regexp t) popwin:special-display-config)
+       (push '("*Python-Help*") popwin:special-display-config)
+       :hook (after-init . popwin-mode))
    #+END_SRC
+** Evil Mode
 
-** IDE Functionality
-*** Fuzzy Completion / Helm
-    #+BEGIN_SRC emacs-lisp
-      (use-package helm :diminish 'helm-mode
-        :after evil
-        :config
-          (global-set-key (kbd "M-x") 'helm-M-x)
-          (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-          (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-          (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
-        :hook (after-init . helm-mode))
-
-      (use-package helm-ag :after helm
-        :config
-          (evil-leader/set-key "f" 'helm-ag))
-    #+END_SRC
-*** Git Integration / Magit
-    This is largely a work in progress as I figure out which magit
-    bindings I am comfortable with.
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package magit
-          :ensure t
-          :config
-          (progn
-              (evil-leader/set-key "g" 'magit-status)
-
-              (evil-set-initial-state 'magit-mode 'normal)
-              (evil-set-initial-state 'magit-status-mode 'normal)
-              (evil-set-initial-state 'magit-diff-mode 'normal)
-              (evil-set-initial-state 'magit-log-mode 'normal)
-              (evil-define-key  'normal magit-mode-map
-                  "?"           'magit-dispatch
-                  "h"           'magit-section-hide
-                  "l"           'magit-section-show
-                  "j"           'magit-next-line
-                  "k"           'magit-previous-line
-                  "c"           'magit-commit
-                  "q"           'magit-mode-bury-buffer)
-              (evil-define-key  'normal magit-log-mode-map
-                  "?"           'magit-dispatch
-                  "j"           'magit-next-line
-                  "k"           'magit-previous-line
-                  "q"           'magit-mode-bury-buffer)
-              (evil-define-key  'normal magit-diff-mode-map
-                  "?"           'magit-dispatch
-                  "h"           'magit-section-hide
-                  "l"           'magit-section-show
-                  "j"           'magit-next-line
-                  "k"           'magit-previous-line
-                  "q"           'magit-mode-bury-buffer)
-      ))
-    #+END_SRC
-
-*** Auto-completion Framework
-
-    This will need to be cleaned up and documented eventually.
-
-    #+BEGIN_SRC emacs-lisp
-      ;; Snippets and Templates
-      (use-package yasnippet :ensure t :diminish 'yas-minor-mode
-        :hook (after-init . yas-global-mode))
-
-      ;; Tab Completion
-      (use-package company :ensure t :diminish
-        :bind
-        (:map company-active-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)
-              ("<tab>" . company-complete-common-or-cycle)
-              :map company-search-map
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous))
-        :custom
-        (company-idle-delay 0)
-        (company-echo-delay 0)
-        (company-minimum-prefix-length 1)
-        :hook (after-init . global-company-mode))
-
-      (use-package popwin
-        :config 
-          (push '("^*helm.*" :regexp t) popwin:special-display-config)
-          (push '("*Python-Help*") popwin:special-display-config)
-        :hook (after-init . popwin-mode))
-    #+END_SRC
-
-*** Project Management
-
-    #+BEGIN_SRC emacs-lisp
-      (use-package projectile :ensure t :diminish)
-      (use-package helm-projectile :ensure t :after helm)
-
-      (use-package flycheck :ensure t :diminish
-        :init (global-flycheck-mode))
-
-      (use-package treemacs
-        :config
-          (define-key evil-normal-state-map (kbd "C-b") 'treemacs)
-          (define-key evil-motion-state-map (kbd "C-b") 'treemacs))
-      (use-package treemacs-projectile :after treemacs projectile)
-
-    (use-package treemacs-evil :after treemacs evil)
-    #+END_SRC
-*** TODO Debugging Support
-
-* GTD
-** Org mode
-   Basic org-mode configuration.
-
-   #+BEGIN_SRC emacs-lisp
-     (use-package org
-         :after evil
-         :custom
-           (tasks-file (concat alxbl-wiki "/log/tasks.org"))
-           (diary-file (concat alxbl-wiki "/log/personal.org"))
-           (work-file (concat alxbl-wiki "/log/work.org"))
-           (wiki-file (concat alxbl-wiki "/wiki.org"))
-           (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
-           (config-file (concat user-emacs-directory "/settings.org"))
-           (org-agenda-files "~/.emacs.d/agenda")
-           (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
-           (org-return-follows-link t)
-           (org-hide-leading-stars t)
-           (org-pretty-entities t)
-           (org-hide-emphasis-markers t)
-           (org-todo-keyword-faces
-            '(("TODO" . "orange")
-              ("WIP" . "yellow")
-              ("BLOCKED" . "red")
-              ("DROPPED" . "gray")))
-           (org-capture-templates
-            `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
-                "* TODO %?\n  - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
-              ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
-              ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
-              ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
-                (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-              ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
-                (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-              ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
-                (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
-              ))
-         :config
-            ;; LaTeX export settings
-            (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
-            (add-to-list 'org-latex-packages-alist '("" "minted"))
-            (setq org-latex-listings 'minted)
-            (setq org-latex-pdf-process
-                    '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                    "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                    "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
-            (setq org-src-fontify-natively t)
-
-            (org-babel-do-load-languages
-                'org-babel-load-languages
-                '((python . t)
-                (latex . t)))
-            ;; --
-
-           (evil-define-key  'normal org-mode-map
-               ;; Navigation
-               "gl" 'org-demote-subtree
-               "gh" 'org-promote-subtree
-               "L" 'org-next-visible-heading
-               "H" 'org-previous-visible-heading
-               ;; <leader>t: Task Management
-               "T" 'org-todo
-               "ts" 'org-schedule
-               "tci" 'org-clock-in
-               "tco" 'org-clock-out
-               "tcg" 'org-clock-goto
-               (kbd "RET") 'org-open-at-point)
-
-            ;; <leader>o: Organization
-            (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
-            (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
-
-
-
-            (evil-leader/set-key "oa" 'org-agenda)
-            (evil-leader/set-key "oo" 'org-capture)
-            (evil-leader/set-key "or" 'org-refile)
-            (evil-leader/set-key "oO" 'org-capture-goto-target)
-            (evil-leader/set-key "ol" 'org-store-link)
-            (evil-leader/set-key "ob" 'org-switchb)
-            (evil-leader/set-key "of" 'org-footnote-action)
-            (evil-leader/set-key "on" 'org-narrow-to-subtree)
-            (evil-leader/set-key "oN" 'widen)
-
-            (evil-leader/set-key "p" 'org-capture-screenshot)
-
-            (evil-leader/set-key "SPC" 'evil-toggle-fold)
-            ;; This breaks delete/yank line motions.
-            ;; "dab" 'org-cut-subtree
-            ;; "yab" 'org-copy-subtree
-            ;; (evil-define-key 'visual org-mode-map
-            ;;   "d" 'delete-region)
-         :hook
-           (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
-           (org-mode . auto-fill-mode)
-         :preface
-            (defun alxbl/get-date ()
-              "Return the current time as a formatted string"
-              (format-time-string "%Y-%m-%d %H:%M" (current-time)))
-
-            ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
-            (defun datetree-jump ()
-              "Jumps to the datetree heading that matches the current date."
-              (interactive)
-              (let ((point (point)))
-                (catch 'found
-                  (goto-char (point-min))
-                  (while (outline-next-heading)
-                    (let* ((hl (org-element-at-point))
-                           (title (org-element-property :raw-value hl)))
-                      (when (string= title (format-time-string "%F %A"))
-                        (org-show-context)
-                        (setq point (point))
-                        (throw 'found t)))))
-                (goto-char point)))
-
-           ;; https://ladicle.com/post/config/#org
-           (defun ladicle/org-clock-out-and-save-when-exit ()
-               "Save buffers and stop clocking when kill emacs."
-                 (ignore-errors (org-clock-out) t)
-                 (save-some-buffers t))
-           (defun org-capture-screenshot (&optional caption)
-             (interactive "P")
-             (let* ((image-dir
-                     (if (not (buffer-file-name))
-                         (let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
-                           (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
-                       "screens")))
-               (unless (file-exists-p image-dir)
-                 (make-directory image-dir))
-               (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
-                      (exit-status (call-process "flameshot" nil nil nil "gui"))
-                      (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
-                      )
-                 (if caption
-                     (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
-                 (org-insert-link nil (concat "file:" image-file) "")
-                 (org-display-inline-images))))
-         )
-   #+END_SRC
-
-   Support for Google Calendar Integration. Secrets are defined in
-   =secrets.el= and should not be published to source control ;)
-
-   #+BEGIN_SRC emacs-lisp
-     ;; (use-package org-gcal
-     ;;   :custom
-     ;;   (org-gcal-client-id gcal-id)
-     ;;   (org-gcal-client-secret gcal-api-key)
-     ;;   :config
-     ;;   (setq org-gcal-file-alist `((,gcal-email . ,(concat alxbl-wiki "/log/calendar.org")))))
-   #+END_SRC
-
-** Ledger
-   Plaintext finance tracking in Emacs. Why not?
-   #+BEGIN_SRC emacs-lisp
-     (use-package ledger-mode)
-   #+END_SRC
-* Language Support / lsp-mode
-** Language Server Protocol
-   #+BEGIN_SRC emacs-lisp
-     (use-package lsp-mode :diminish
-       :commands (lsp lsp-deferred)
-       :config
-       (define-key evil-normal-state-map (kbd "<f2>") 'lsp-rename))
-
-     (use-package lsp-ui
-       :commands lsp-ui-mode
-       :after lsp-mode)
-
-     (use-package helm-lsp
-       :commands helm-lsp-workspace-symbol
-       :after lsp-mode)
-     ;; (use-package lsp-treemacs :commands lsp-treemacs-errors-list)
-
-     ;; Company integration
-     (use-package company-lsp
-       :commands company-lsp
-       :init
-         (add-to-list 'company-backends 'company-lsp)
-       :config
-         (setq company-lsp-enable-snippet 1)
-       :after lsp-mode company)
-   #+END_SRC
-
-** Rust
-   This section configures the rust language.
-   #+BEGIN_SRC emacs-lisp
-     (use-package rust-mode
-       :hook (rust-mode . lsp)
-       :config
-       (setq rust-format-on-save t)
-       :after lsp-mode)
-   #+END_SRC
-** Python
-
-   #+BEGIN_SRC emacs-lisp
-          (use-package python-mode
-            :hook (python-mode . lsp)
-            :after lsp-mode)
-
-            (use-package company-jedi :after company python-mode
-              :init
-                (add-to-list 'company-backends 'company-jedi))
-   #+END_SRC
-* Modal Editing / evil-mode
-
-  Evil mode must be required last to ensure that it properly
-  overrides keybindings. All keybindings are thus defined after it
-  has been included.
+   The best of vim's modal editing in Emacs.
 
   #+BEGIN_SRC emacs-lisp
     (use-package evil
@@ -494,16 +138,19 @@ additional explanations are provided.
         (define-key evil-motion-state-map (kbd "M-j") 'evil-window-down)
         (define-key evil-motion-state-map (kbd "M-k") 'evil-window-up)
         (define-key evil-motion-state-map (kbd "M-l") 'evil-window-right))
+
     (use-package evil-leader :after evil
       :config
         (global-evil-leader-mode)
         (evil-leader/set-leader "<SPC>")
         (evil-leader/set-key "q" 'kill-buffer-and-window)
         (evil-leader/set-key "e" 'pp-eval-last-sexp))
+
     (use-package evil-commentary :after evil :diminish)
+
     (use-package evil-surround :after evil
       :preface
-        (defun a/kill-all-buffers ()
+        (defun alxbl/kill-all-buffers ()
         (interactive)
         (mapcar 'kill-buffer (buffer-list))
         (delete-other-windows))
@@ -512,5 +159,287 @@ additional explanations are provided.
         (evil-commentary-mode t)
         (global-evil-surround-mode t)
 
-        (evil-leader/set-key "Q" 'a/kill-all-buffers))
+        (evil-leader/set-key "Q" 'alxbl/kill-all-buffers))
   #+END_SRC
+* IDE
+** Dired
+
+   Rebind some keys to make =dired= easier to use with evil.
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package dired :ensure nil
+     :after evil
+     :config
+    (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
+    (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
+    (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
+    (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
+    (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
+    (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
+    (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
+    (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
+    (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
+    (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
+    (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer))
+   #+END_SRC
+** Source Control
+   #+BEGIN_SRC emacs-lisp
+     (use-package magit
+       :config
+       (progn
+         (evil-leader/set-key "g" 'magit-status)
+
+         (evil-set-initial-state 'magit-mode 'normal)
+         (evil-set-initial-state 'magit-status-mode 'normal)
+         (evil-set-initial-state 'magit-diff-mode 'normal)
+         (evil-set-initial-state 'magit-log-mode 'normal)
+         (evil-define-key  'normal magit-mode-map
+           "?"           'magit-dispatch
+           "h"           'magit-section-hide
+           "l"           'magit-section-show
+           "j"           'magit-next-line
+           "k"           'magit-previous-line
+           "c"           'magit-commit
+           "q"           'magit-mode-bury-buffer)
+         (evil-define-key  'normal magit-log-mode-map
+           "?"           'magit-dispatch
+           "j"           'magit-next-line
+           "k"           'magit-previous-line
+           "q"           'magit-mode-bury-buffer)
+         (evil-define-key  'normal magit-diff-mode-map
+           "?"           'magit-dispatch
+           "h"           'magit-section-hide
+           "l"           'magit-section-show
+           "j"           'magit-next-line
+           "k"           'magit-previous-line
+           "q"           'magit-mode-bury-buffer)
+         ))
+   #+END_SRC
+** Project Management
+   #+BEGIN_SRC emacs-lisp
+     (use-package projectile :diminish)
+     (use-package treemacs
+       :after evil
+       :config
+       (define-key evil-normal-state-map (kbd "C-b") 'treemacs)
+       (define-key evil-motion-state-map (kbd "C-b") 'treemacs))
+
+     ;; Integration packages.
+     (use-package treemacs-projectile :after treemacs projectile)
+     (use-package treemacs-evil :after treemacs evil)
+   #+END_SRC
+** Auto-Completion / Language Services
+   #+BEGIN_SRC emacs-lisp
+     (use-package yasnippet :diminish yas-minor-mode
+       :hook (after-init . yas-global-mode))
+
+     (use-package company :diminish
+       :bind
+       (:map company-active-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("<tab>" . company-complete-common-or-cycle)
+             :map company-search-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
+       :custom
+       (company-idle-delay 0)
+       (company-echo-delay 0)
+       (company-minimum-prefix-length 1)
+       :hook
+       (after-init . global-company-mode))
+
+     (use-package lsp-mode
+       :custom
+       (lsp-print-io nil)
+       (lsp-trace nil)
+       (lsp-print-performance nil)
+       (lsp-auto-guess-root t)
+       (lsp-document-sync-method 'incremental)
+       (lsp-response-timeout 10)
+       (lsp-prefer-flymake t) 
+       :hook
+       ((rust-mode python-mode c++-mode) . lsp)
+       :bind
+       (:map lsp-mode-map
+             ("<f2>" . lsp-rename)))
+
+     (use-package lsp-ui
+       :commands lsp-ui-mode
+       :config
+       (lsp-ui-doc-max-width 120)
+       (lsp-ui-doc-max-height 30)
+       (lsp-ui-sideline-show-code-actions t)
+       :hook
+       (lsp-mode . lsp-ui-mode))
+
+
+     (use-package flycheck :diminish
+       :hook ((rust-mode python-mode). global-flycheck-mode))
+
+     (use-package helm :diminish 'helm-mode
+       :after evil
+       :demand t
+       :config
+       (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+       (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
+       (diminish 'helm-mode)
+       (global-set-key (kbd "M-x") 'helm-M-x)
+       :hook (after-init . helm-mode))
+
+     (use-package helm-ag :after helm
+       :config
+       (evil-leader/set-key "f" 'helm-ag))
+
+     (use-package helm-projectile :ensure t :after helm)
+   #+END_SRC
+** Languages
+   #+BEGIN_SRC emacs-lisp
+     (use-package rust-mode
+       :mode "\\.rs\\'"
+       :custom
+       (rust-format-on-save t))
+
+     (use-package python
+       :mode ("\\.py\\'" . python-mode)
+       :interpreter ("python" . python-mode))
+   #+END_SRC
+* Org Mode 
+  #+BEGIN_SRC emacs-lisp
+    (use-package org
+        :after evil
+        :custom
+          (tasks-file (concat alxbl-wiki "/log/tasks.org"))
+          (diary-file (concat alxbl-wiki "/log/personal.org"))
+          (work-file (concat alxbl-wiki "/log/work.org"))
+          (wiki-file (concat alxbl-wiki "/wiki.org"))
+          (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
+          (config-file (concat user-emacs-directory "/settings.org"))
+          (org-agenda-files "~/.emacs.d/agenda")
+          (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
+          (org-return-follows-link t)
+          (org-hide-leading-stars t)
+          (org-pretty-entities t)
+          (org-hide-emphasis-markers t)
+          (org-todo-keyword-faces
+           '(("TODO" . "orange")
+             ("WIP" . "yellow")
+             ("BLOCKED" . "red")
+             ("DROPPED" . "gray")))
+          (org-capture-templates
+           `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
+               "* TODO %?\n  - Added on %(alxbl/get-date)\n %i\n" :kill-buffer t)
+             ("p" "Add Personal Note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
+             ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
+             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
+               (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+             ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
+               (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+             ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
+               (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
+             ))
+        :config
+           ;; LaTeX export settings
+           (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
+           (add-to-list 'org-latex-packages-alist '("" "minted"))
+           (setq org-latex-listings 'minted)
+           (setq org-latex-pdf-process
+                   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+                   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+           (setq org-src-fontify-natively t)
+
+           (org-babel-do-load-languages
+               'org-babel-load-languages
+               '((python . t)
+               (latex . t)))
+           ;; --
+
+          (evil-define-key  'normal org-mode-map
+              ;; Navigation
+              "gl" 'org-demote-subtree
+              "gh" 'org-promote-subtree
+              "L" 'org-next-visible-heading
+              "H" 'org-previous-visible-heading
+              ;; <leader>t: Task Management
+              "T" 'org-todo
+              "ts" 'org-schedule
+              "tci" 'org-clock-in
+              "tco" 'org-clock-out
+              "tcg" 'org-clock-goto
+              (kbd "RET") 'org-open-at-point)
+
+           ;; <leader>o: Organization
+           (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
+           (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
+
+
+
+           (evil-leader/set-key "oa" 'org-agenda)
+           (evil-leader/set-key "oo" 'org-capture)
+           (evil-leader/set-key "or" 'org-refile)
+           (evil-leader/set-key "oO" 'org-capture-goto-target)
+           (evil-leader/set-key "ol" 'org-store-link)
+           (evil-leader/set-key "ob" 'org-switchb)
+           (evil-leader/set-key "of" 'org-footnote-action)
+           (evil-leader/set-key "on" 'org-narrow-to-subtree)
+           (evil-leader/set-key "oN" 'widen)
+
+           (evil-leader/set-key "p" 'org-capture-screenshot)
+
+           (evil-leader/set-key "SPC" 'evil-toggle-fold)
+           ;; This breaks delete/yank line motions.
+           ;; "dab" 'org-cut-subtree
+           ;; "yab" 'org-copy-subtree
+           ;; (evil-define-key 'visual org-mode-map
+           ;;   "d" 'delete-region)
+        :hook
+          (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
+          (org-mode . auto-fill-mode)
+        :preface
+           (defun alxbl/get-date ()
+             "Return the current time as a formatted string"
+             (format-time-string "%Y-%m-%d %H:%M" (current-time)))
+
+           ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
+           (defun datetree-jump ()
+             "Jumps to the datetree heading that matches the current date."
+             (interactive)
+             (let ((point (point)))
+               (catch 'found
+                 (goto-char (point-min))
+                 (while (outline-next-heading)
+                   (let* ((hl (org-element-at-point))
+                          (title (org-element-property :raw-value hl)))
+                     (when (string= title (format-time-string "%F %A"))
+                       (org-show-context)
+                       (setq point (point))
+                       (throw 'found t)))))
+               (goto-char point)))
+
+          ;; https://ladicle.com/post/config/#org
+          (defun ladicle/org-clock-out-and-save-when-exit ()
+              "Save buffers and stop clocking when kill emacs."
+                (ignore-errors (org-clock-out) t)
+                (save-some-buffers t))
+          (defun org-capture-screenshot (&optional caption)
+            (interactive "P")
+            (let* ((image-dir
+                    (if (not (buffer-file-name))
+                        (let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
+                          (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
+                      "screens")))
+              (unless (file-exists-p image-dir)
+                (make-directory image-dir))
+              (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
+                     (exit-status (call-process "flameshot" nil nil nil "gui"))
+                     (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
+                     )
+                (if caption
+                    (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
+                (org-insert-link nil (concat "file:" image-file) "")
+                (org-display-inline-images))))
+        )
+   #+END_SRC
