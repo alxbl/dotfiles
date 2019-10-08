@@ -258,6 +258,8 @@ additional explanations are provided.
        (lsp-document-sync-method 'incremental)
        (lsp-response-timeout 10)
        (lsp-prefer-flymake t) 
+       :config
+       (require 'lsp-clients)
        :hook
        ((rust-mode python-mode c++-mode) . lsp)
        :bind
@@ -266,10 +268,6 @@ additional explanations are provided.
 
      (use-package lsp-ui
        :commands lsp-ui-mode
-       :config
-       (lsp-ui-doc-max-width 120)
-       (lsp-ui-doc-max-height 30)
-       (lsp-ui-sideline-show-code-actions t)
        :hook
        (lsp-mode . lsp-ui-mode))
 
@@ -295,16 +293,36 @@ additional explanations are provided.
      (use-package helm-projectile :ensure t :after helm)
    #+END_SRC
 ** Languages
-   #+BEGIN_SRC emacs-lisp
-     (use-package rust-mode :mode "\\.rs\\'"
-       :custom
-       (rust-format-on-save t))
+*** Rust
 
+    #+BEGIN_SRC emacs-lisp
+      (use-package rust-mode :mode "\\.rs\\'"
+	:custom
+	(rust-format-on-save t))
+
+      (use-package cargo
+	:after rust-mode
+	:hook (rust-mode . cargo-minor-mode))
+
+      (use-package toml-mode :mode "\\.toml\\'")
+
+      (use-package flycheck-rust
+	:hook (flycheck-mode . flycheck-rust-setup))
+    #+END_SRC
+
+*** Python
+
+   #+BEGIN_SRC emacs-lisp
      (use-package python :mode ("\\.py\\'" . python-mode)
        :interpreter ("python" . python-mode))
+   #+END_SRC
 
+*** Lua
+
+   #+BEGIN_SRC emacs-lisp
      (use-package lua-mode :mode "\\.lua\\'")
    #+END_SRC
+
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
     (use-package org
