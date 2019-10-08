@@ -1,0 +1,6 @@
+#!/usr/bin/zsh
+
+export WIKI="$HOME/Host/Documents/Wiki"
+
+# Spawn tmux on all shells.
+[[ ! -v TMUX ]] && tmux

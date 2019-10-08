@@ -2,7 +2,7 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
-plugins=(archlinux docker compleat git github gpg-agent ssh-agent nvm tmux fzf workon navi)
+plugins=(archlinux docker compleat git github gpg-agent nvm tmux fzf workon navi)
 
 setopt completealiases
 
@@ -48,3 +48,6 @@ fi
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
 source "$ZSHCFG/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# Process overrides for a specific host.
+[[ -f "$HOME/.zsh/override/$HOST" ]] && source "$HOME/.zsh/override/$HOST"

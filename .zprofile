@@ -21,11 +21,6 @@ if [[ ! -v TMUX ]]; then
     PERL_LOCAL_LIB_ROOT="$PERLBASE${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
     PERL_MB_OPT="--install_base \"/$PERLBASE\""; export PERL_MB_OPT;
     PERL_MM_OPT="INSTALL_BASE=$PERLBASE"; export PERL_MM_OPT;
-
-    #
-    # Process overrides for a specific host.
-    [[ -f "$HOME/.zsh/override/$HOST" ]] && source "$HOME/.zsh/override/$HOST"
-    tmux
 fi
 
 # START X IF REQUIRED
