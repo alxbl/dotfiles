@@ -30,7 +30,7 @@ additional explanations are provided.
    #+BEGIN_SRC emacs-lisp
      (eval-and-compile
        (setq load-prefer-newer t
-             package-user-dir "~/emacs.d/elpa"
+             package-user-dir "~/.emacs.d/elpa"
              package--init-file-ensured t
              package-enable-at-startup nil)
 
@@ -296,14 +296,14 @@ additional explanations are provided.
    #+END_SRC
 ** Languages
    #+BEGIN_SRC emacs-lisp
-     (use-package rust-mode
-       :mode "\\.rs\\'"
+     (use-package rust-mode :mode "\\.rs\\'"
        :custom
        (rust-format-on-save t))
 
-     (use-package python
-       :mode ("\\.py\\'" . python-mode)
+     (use-package python :mode ("\\.py\\'" . python-mode)
        :interpreter ("python" . python-mode))
+
+     (use-package lua-mode :mode "\\.lua\\'")
    #+END_SRC
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
