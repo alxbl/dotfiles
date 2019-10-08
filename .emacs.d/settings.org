@@ -61,7 +61,6 @@ additional explanations are provided.
 
      ;; Start the Emacs server.
      (use-package server
-       :ensure nil
        :hook (after-init . server-mode))
    #+END_SRC
 
@@ -71,11 +70,6 @@ additional explanations are provided.
      (setq inhibit-startup-message t)
      (setq inhibit-startup-echo-area-message t)
      (setq initial-scratch-message nil)
-     (setq-default display-line-numbers-type 'relative
-                   display-line-numbers-current-absolute t
-                   display-line-numbers-width 4
-                   display-line-numbers-widen t)
-     (global-display-line-numbers-mode t)
 
      ;; No clutter.
      (tool-bar-mode 0)
@@ -88,12 +82,10 @@ additional explanations are provided.
        :config
        (global-disable-mouse-mode)
        (mapc #'disable-mouse-in-keymap
-             (list evil-motion-state-map
-                   evil-normal-state-map
-                   evil-visual-state-map
-                   evil-insert-state-map)))
-
-     (use-package dracula-theme)
+	     (list evil-motion-state-map
+		   evil-normal-state-map
+		   evil-visual-state-map
+		   evil-insert-state-map)))
 
      (prefer-coding-system 'utf-8-unix)
      (set-locale-environment "en_US.UTF-8")
@@ -120,6 +112,16 @@ additional explanations are provided.
        (push '("^*helm.*" :regexp t) popwin:special-display-config)
        (push '("*Python-Help*") popwin:special-display-config)
        :hook (after-init . popwin-mode))
+
+     ;; Display line numbers where convenient
+     (use-package display-line-numbers
+     :hook ((prog-mode rust-mode python-mode) . display-line-numbers-mode)
+     :custom
+     (display-line-numbers-type 'relative)
+     (display-line-numbers-current-absolute t)
+     (display-line-numbers-width 4)
+     (display-line-numbers-widen t))
+
    #+END_SRC
 ** Evil Mode
 
@@ -162,6 +164,36 @@ additional explanations are provided.
         (evil-leader/set-key "Q" 'alxbl/kill-all-buffers))
   #+END_SRC
 * IDE
+** Appearance
+   #+BEGIN_SRC emacs-lisp
+     (use-package doom-themes
+       :custom
+       (doom-themes-enable-italic t)
+       (doom-themes-enable-bold t)
+       :custom-face
+       ;; (vertical-bar   (doom-darken base5 0.4))
+       ;; (doom-darken bg 0.4)
+       :config
+       (load-theme 'doom-dracula t)
+       (doom-themes-org-config)
+       ;; Modeline
+       (use-package doom-modeline
+	 :custom
+	 (doom-modeline-buffer-file-name-style 'truncate-with-project)
+	 (doom-modeline-icon t)
+	 (doom-modeline-major-mode-icon nil)
+	 (doom-modeline-minor-modes nil)
+	 :hook
+	 (after-init . doom-modeline-mode)
+	 :config
+	 ;; (set-cursor-color "cyan")
+	 (line-number-mode 0)
+	 (column-number-mode 0)
+	 ;; (doom-modeline-def-modeline 'main
+	 ;; 				'(bar window-number evil-state matches buffer-info remote-host buffer-position parrot selection-info)
+	 ;; 				'(misc-info lsp github debug minor-modes input-method major-mode process vcs checker))
+				     ))
+   #+END_SRC
 ** Dired
 
    Rebind some keys to make =dired= easier to use with evil.
