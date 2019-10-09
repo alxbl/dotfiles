@@ -115,7 +115,7 @@ for i = 1, 9 do
                       if client.focus then
                           local tag = client.focus.screen.tags[i]
                           if tag then
-
+			     client.focus:toggle_tag(tag)
                           end
                       end
                   end,
