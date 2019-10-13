@@ -111,6 +111,7 @@ additional explanations are provided.
        :config 
        (push '("^*helm.*" :regexp t) popwin:special-display-config)
        (push '("*Python-Help*") popwin:special-display-config)
+       (push '("*Cargo Build*") popwin:special-display-config)
        :hook (after-init . popwin-mode))
 
      ;; Display line numbers where convenient
@@ -193,6 +194,9 @@ additional explanations are provided.
 	 ;; 				'(bar window-number evil-state matches buffer-info remote-host buffer-position parrot selection-info)
 	 ;; 				'(misc-info lsp github debug minor-modes input-method major-mode process vcs checker))
 				     ))
+
+
+     (use-package rainbow-delimiters)
    #+END_SRC
 ** Dired
 
@@ -268,17 +272,27 @@ additional explanations are provided.
      (use-package company :diminish
        :bind
        (:map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)
-             ("<tab>" . company-complete-common-or-cycle)
-             :map company-search-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous))
+	     ("C-n" . company-select-next)
+	     ("C-p" . company-select-previous)
+	     ("<tab>" . company-complete-common-or-cycle)
+	     :map company-search-map
+	     ("C-n" . company-select-next)
+	     ("C-p" . company-select-previous))
        :custom
        (company-idle-delay 0)
        (company-echo-delay 0)
        (company-minimum-prefix-length 1)
        :hook
+       ((rust-mode
+	 go-mode
+	 c++-mode
+	 c-mode
+	 objc-mode) . (lambda () (set (make-local-variable 'company-backends)
+				 '((company-yasnippet
+				    company-lsp
+				    company-files
+				    ;; company-dabbrev-code
+				    )))))
        (after-init . global-company-mode))
 
      (use-package lsp-mode
@@ -296,12 +310,19 @@ additional explanations are provided.
        ((rust-mode python-mode c++-mode) . lsp)
        :bind
        (:map lsp-mode-map
-             ("<f2>" . lsp-rename)))
+	     ("<f2>" . lsp-rename)))
 
      (use-package lsp-ui
        :commands lsp-ui-mode
        :hook
        (lsp-mode . lsp-ui-mode))
+
+     (use-package company-lsp :after company
+       :custom
+       (company-lsp-cache-candidates t)
+       (company-lsp-async t)
+       (company-lsp-enable-snippet t)
+       (company-lsp-enable-recompletion t))
 
 
      (use-package flycheck :diminish
@@ -329,6 +350,7 @@ additional explanations are provided.
 
     #+BEGIN_SRC emacs-lisp
       (use-package rust-mode :mode "\\.rs\\'"
+	:hook (rust-mode . hs-minor-mode)
 	:custom
 	(rust-format-on-save t))
 
@@ -355,6 +377,10 @@ additional explanations are provided.
      (use-package lua-mode :mode "\\.lua\\'")
    #+END_SRC
 
+*** YAML
+    #+BEGIN_SRC emacs-lisp
+    (use-package yaml-mode :mode "\\.(yaml|yml)\\'")
+    #+END_SRC
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
     (use-package org
