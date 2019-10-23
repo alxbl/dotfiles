@@ -2,7 +2,7 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
-plugins=(archlinux docker compleat git github gpg-agent nvm tmux fzf workon navi)
+plugins=(docker gpg-agent ssh-agent fzf workon navi)
 
 setopt completealiases
 
@@ -13,10 +13,9 @@ _has() {
 # EXPORTS
 #########################################################
 if _has fzf && _has ag; then
-  export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
-  # export FZF_BASE=$(dirname $(which fzf))
-  export FZF_CTRL_T_COMMAND="fd . 2>/dev/null"
-  export FZF_ALT_C_COMMAND="fd -t d 2>/dev/null"
+  (( ${+commands[ag]} )) && export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
+  (( ${+commands[fd]} )) && export FZF_CTRL_T_COMMAND="fd . 2>/dev/null"
+  (( ${+commands[fd]} )) && export FZF_ALT_C_COMMAND="fd -t d 2>/dev/null"
   export FZF_DEFAULT_OPTS='--height 30% --layout=reverse'
 fi
 ##########################################################
@@ -50,4 +49,7 @@ stty -ixon # stop C-Q, C-S from freezing terminal.
 source "$ZSHCFG/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # Process overrides for a specific host.
-[[ -f "$HOME/.zsh/override/$HOST" ]] && source "$HOME/.zsh/override/$HOST"
+if [[ -f "$HOME/.zsh/override/$HOST" ]]; then
+    source "$HOME/.zsh/override/$HOST"
+fi
+
