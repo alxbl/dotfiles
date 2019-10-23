@@ -18,9 +18,13 @@ __pycache__
 .emacs.d/recentf
 .emacs.d/secrets.el
 .emacs.d/auto-save-list
-/.emacs.d/eshell/history
-/.emacs.d/transient
-/.emacs.d/.lsp-*
+.emacs.d/eshell/history
+.emacs.d/transient
+.emacs.d/.lsp-*
+.emacs.d/.org-id-locations
+.emacs.d/bookmarks
+.emacs.d/projectile-bookmarks.eld
+.emacs.d/request/
 
 # Don't track random and sensitive files
 .config
