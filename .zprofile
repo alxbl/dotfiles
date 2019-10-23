@@ -7,13 +7,13 @@ export LC_CTYPE="UTF-8"
 if [[ ! -v TMUX ]]; then
     export TERM=xterm-256color
 
-    export GOPATH="$CODEPATH/go"
     export PATH="$PATH:$HOME/.cargo/bin:$HOME/.gem/ruby/2.5.0/bin:$GOPATH/bin"
     export LUA_PATH="$HOME/.luarocks/share/lua/5.3/?.lua;;"
 
     export WIKI="$HOME/Documents/Wiki"
     export CODEPATH="$HOME/Code"
     export WORKSPACES="$HOME/Work:$CODEPATH" # workon
+    export GOPATH="$CODEPATH/go"
 
     # Perl.
     PERLBASE="$CODEPATH/perl"
