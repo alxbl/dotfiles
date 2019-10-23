@@ -195,8 +195,10 @@ additional explanations are provided.
 	 ;; 				'(misc-info lsp github debug minor-modes input-method major-mode process vcs checker))
 				     ))
 
-
-     (use-package rainbow-delimiters)
+     ;; Make parentheses easier to navigate.
+     (use-package rainbow-delimiters
+       :hook
+       (prog-mode . rainbow-delimiters-mode))
    #+END_SRC
 ** Dired
 
