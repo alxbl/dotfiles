@@ -36,12 +36,17 @@ if [ $EUID -eq 0 ]; then
 fi
 source "$ZSHCFG/zsh_theme"
 
-# use nvim if available.
-if command -v nvim &>/dev/null; then
+# Pick an editor.
+if _has emacsclient; then
+    export VISUAL='emacsclient -n -a emacs'
+    export EDITOR='emacsclient -t -a emacs'
+elif _has nvim; then
     export EDITOR=nvim
     alias vim='nvim'
-else
+elif _has vim; then
     export EDITOR=vim
+elif _has vi; then
+    export EDITOR=vi
 fi
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
