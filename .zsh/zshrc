@@ -2,7 +2,14 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
-plugins=(docker gpg-agent ssh-agent fzf workon navi)
+
+
+# Process overrides for a specific host.
+if [[ -f "$HOME/.zsh/override/$HOST" ]]; then
+    source "$HOME/.zsh/override/$HOST"
+fi
+
+plugins=(docker gpg-agent ssh-agent fzf workon navi zsh-syntax-highlighting)
 
 setopt completealiases
 
@@ -20,7 +27,7 @@ if _has fzf && _has ag; then
 fi
 ##########################################################
 
-# Disable annoying auto-correct.
+# Disable annoying/dangerous auto-correct.
 if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     while read -r COMMAND; do
         alias $COMMAND="nocorrect $COMMAND"
@@ -51,10 +58,4 @@ fi
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
-source "$ZSHCFG/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-
-# Process overrides for a specific host.
-if [[ -f "$HOME/.zsh/override/$HOST" ]]; then
-    source "$HOME/.zsh/override/$HOST"
-fi
 
