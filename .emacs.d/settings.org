@@ -312,7 +312,9 @@ additional explanations are provided.
        ((rust-mode python-mode c++-mode) . lsp)
        :bind
        (:map lsp-mode-map
-	     ("<f2>" . lsp-rename)))
+	     ("<f2>" . lsp-rename)
+	     ("C-." .  lsp-execute-code-action)
+	     ))
 
      (use-package lsp-ui
        :commands lsp-ui-mode
@@ -349,7 +351,6 @@ additional explanations are provided.
    #+END_SRC
 ** Languages
 *** Rust
-
     #+BEGIN_SRC emacs-lisp
       (use-package rust-mode :mode "\\.rs\\'"
 	:hook (rust-mode . hs-minor-mode)
@@ -367,14 +368,12 @@ additional explanations are provided.
     #+END_SRC
 
 *** Python
-
    #+BEGIN_SRC emacs-lisp
      (use-package python :mode ("\\.py\\'" . python-mode)
        :interpreter ("python" . python-mode))
    #+END_SRC
 
 *** Lua
-
    #+BEGIN_SRC emacs-lisp
      (use-package lua-mode :mode "\\.lua\\'")
    #+END_SRC
@@ -382,6 +381,11 @@ additional explanations are provided.
 *** YAML
     #+BEGIN_SRC emacs-lisp
     (use-package yaml-mode :mode "\\.(yaml|yml)\\'")
+    #+END_SRC
+
+*** Powershell
+    #+BEGIN_SRC emacs-lisp
+    (use-package powershell :mode "\\.(ps1|psm1|psd1)\\'")
     #+END_SRC
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
