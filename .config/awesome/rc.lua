@@ -90,7 +90,7 @@ bat =   lain.widget.bat({
 })
 mem = lain.widget.mem({
     settings = function()
-        local fmt = string.format("<b>MEM></b> %.1f/%.1fG (%d%%)", (mem_now.used / 1024.0), (mem_now.total / 1024.0), mem_now.perc)
+        local fmt = string.format("<b>MEM></b> %.1f/%.1fGB (%d%%)", (mem_now.used / 1024.0), (mem_now.total / 1024.0), mem_now.perc)
         widget:set_markup(fmt)
     end
 })
@@ -103,7 +103,6 @@ cpu = lain.widget.cpu({
 })
 -- }}}
 
-
 -- TODO: Global taglist?
 -- TODO: screen added/removed signals to dynamically add/remove screens.
 awful.screen.connect_for_each_screen(function(s)
@@ -111,14 +110,14 @@ awful.screen.connect_for_each_screen(function(s)
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 
     s.layout  = awful.widget.layoutbox(s)
-    s.taglist = awful.widget.taglist(s, utils.filter_tag, keys.taglist_buttons)
+    s.taglist = awful.widget.taglist(s, function() return true end, keys.taglist_buttons)
 
     local bar = {
         layout = wibox.layout.align.horizontal,
         {
 
             layout = wibox.layout.fixed.horizontal,
-            s.layout,
+            -- s.layout,
             s.taglist,
             wibox.container.margin(wibox.widget.systray(), 7),
         },
@@ -138,7 +137,7 @@ awful.screen.connect_for_each_screen(function(s)
         }
     }
 
-    s.taskbar = awful.wibar({ position = "top", screen = s, })
+    s.taskbar = awful.wibar({ position = "bottom", screen = s, })
     s.taskbar:setup(bar)
 
     s.layout:buttons(gears.table.join(
@@ -147,9 +146,6 @@ awful.screen.connect_for_each_screen(function(s)
        awful.button({ }, 4, function () awful.layout.inc( 1) end),
        awful.button({ }, 5, function () awful.layout.inc(-1) end)))
 end)
-
--- vim:foldmethod=marker:foldlevel=0
-
 
 require("rules")
 
@@ -163,6 +159,7 @@ function on_focus_change(c, focused)
         c.border_color = beautiful.border_normal
     end
 end
+
 client.connect_signal("manage", function (c) -- New client.
     -- if not awesome.startup then awful.client.setslave(c) end
     if awesome.startup and
@@ -179,42 +176,3 @@ if AUTO_FOCUS then
         end
     end)
 end
-
-client.connect_signal("focus", function(c) on_focus_change(c, true) end)
-client.connect_signal("unfocus", function (c) on_focus_change(c, false) end)
-
--- Title bars
-client.connect_signal("request::titlebars", function(c)
-    if beautiful.titlebar_fun then
-        beautiful.titlebar_fun(c)
-        return
-    end
-
-    local buttons = awful.util.table.join( -- Mouse button handler
-    awful.button({ }, 1, function()
-        client.focus = c
-        c:raise()
-        awful.mouse.client.move(c)
-    end),
-    awful.button({ }, 3, function()
-        client.focus = c
-        c:raise()
-        awful.mouse.client.resize(c)
-    end)
-    )
-
-    awful.titlebar(c, {size = 16}) : setup {
-        { layout = wibox.layout.fixed.horizontal() },
-        {
-            {
-                align  = "center",
-                widget = awful.titlebar.widget.titlewidget(c)
-            },
-            buttons = buttons,
-            layout  = wibox.layout.flex.horizontal
-        },
-        { layout = wibox.layout.fixed.horizontal() },
-        layout = wibox.layout.align.horizontal
-    }
-end)
-
