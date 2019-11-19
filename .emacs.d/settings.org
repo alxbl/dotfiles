@@ -388,9 +388,15 @@ additional explanations are provided.
     (use-package powershell :mode "\\.(ps1|psm1|psd1)\\'")
     #+END_SRC
 
-*** PHP
+*** Web
     #+BEGIN_SRC emacs-lisp
     (use-package php-mode :mode "\\.(php)\\'")
+
+    (use-package rainbow-mode 
+      :hook (css-mode . rainbow-mode)
+	    (html-mode . rainbow-mode)
+	    (php-mode . rainbow-mode)
+    )
     #+END_SRC
 
 * Org Mode 
