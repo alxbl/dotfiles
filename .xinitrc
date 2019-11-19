@@ -7,4 +7,5 @@ export DefaultIMModule=fcitx
 stty -xion
 setxkbmap -option ctrl:nocaps
 
-exec awesome
+#exec awesome
+exec i3
