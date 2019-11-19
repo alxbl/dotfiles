@@ -387,6 +387,12 @@ additional explanations are provided.
     #+BEGIN_SRC emacs-lisp
     (use-package powershell :mode "\\.(ps1|psm1|psd1)\\'")
     #+END_SRC
+
+*** PHP
+    #+BEGIN_SRC emacs-lisp
+    (use-package php-mode :mode "\\.(php)\\'")
+    #+END_SRC
+
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
     (use-package org
