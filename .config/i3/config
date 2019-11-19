@@ -23,6 +23,10 @@ default_border pixel 1
 
 # RULES
 # assign [class="URxvt"] 2
+# Dialogs and Popups
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [class="Arandr"] floating enable
 
 
 # KEYBINDINGS
@@ -75,6 +79,7 @@ bindsym $mod+space focus mode_toggle
 
 bindsym $mod+a focus parent
 bindsym $mod+z focus child
+bindsym $mod+u [urgent=latest] focus
 
 # Layout Management
 bindsym $mod+f   fullscreen toggle
