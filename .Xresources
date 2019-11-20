@@ -49,5 +49,5 @@ URxvt.urlLauncher: firefox
 URxvt.matcher.button: 1
 
 URxvt.clipboard.autocopy: true
-URxvt.keysym.S-C-c: perl:clipboard:copy
-URxvt.keysym.S-C-v: perl:clipboard:paste
+URxvt.keysym.Shift-Control-V: eval:paste_clipboard
+URxvt.keysym.Shift-Control-C: eval:selection_to_clipboard
