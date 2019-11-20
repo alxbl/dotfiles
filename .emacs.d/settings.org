@@ -178,6 +178,7 @@ additional explanations are provided.
        (load-theme 'doom-dracula t)
        (doom-themes-org-config)
        ;; Modeline
+       (use-package all-the-icons)
        (use-package doom-modeline
 	 :custom
 	 (doom-modeline-buffer-file-name-style 'truncate-with-project)
