@@ -34,8 +34,6 @@ if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     done < "$ZSHCFG/zsh_nocomp"
 fi
 
-[[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
-[[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.
 
 DISABLE_AUTO_TITLE=true
 if [ $EUID -eq 0 ]; then
@@ -45,8 +43,8 @@ source "$ZSHCFG/zsh_theme"
 
 # Pick an editor.
 if _has emacsclient; then
-    export VISUAL='emacsclient -n -a emacs'
-    export EDITOR='emacsclient -t -a emacs'
+    export VISUAL='emacsclient'
+    export EDITOR='emacsclient'
 elif _has nvim; then
     export EDITOR=nvim
     alias vim='nvim'
@@ -59,3 +57,6 @@ fi
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
 
+# Source aliases last to make sure they don't get overwritten.
+[[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
+[[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.

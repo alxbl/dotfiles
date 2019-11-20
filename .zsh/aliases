@@ -9,20 +9,20 @@ alias wiki='cd $WIKI'
 alias ed='emacsclient -t'
 alias e='emacsclient -n'
 # ---
-alias ls='ls --color=auto'
+
+if _has exa; then
+    alias ls='exa'
+else
+    alias ls='ls --color=auto'
+fi
+
 alias segv='mosh -P 60001 segfault -t tmux a'
-alias relay='ssh relay'
-alias kali='ssh kali'
-alias win64='rdesktop -g 1440x900 -P -z localhost'
 # ---
 alias svc='sudo systemctl'
 alias dhcp='cat /var/lib/dnsmasq/qemu0.leases | awk "{ printf \$3 \"\\t\" \$4  \"\\n\" }"'
 # ---
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
 alias py3='source ~/.bin/py-3.7.0/bin/activate'
-
-# Emacs
-if _has emacsclient; then alias vim='emacsclient -t'; fi
 
 # Burp
 if [[ -d "$HOME/.bin/BurpSuiteCommunity" ]]; then

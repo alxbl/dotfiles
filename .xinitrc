@@ -6,6 +6,7 @@ export DefaultIMModule=fcitx
 [[ -f ~/.Xresources ]] && xrdb -merge ~/.Xresources
 stty -xion
 setxkbmap -option ctrl:nocaps
+# Start emacs server at login
+emacs --daemon
 
-#exec awesome
 exec i3
