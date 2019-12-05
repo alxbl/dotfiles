@@ -175,7 +175,7 @@ additional explanations are provided.
        ;; (vertical-bar   (doom-darken base5 0.4))
        ;; (doom-darken bg 0.4)
        :config
-       (load-theme 'doom-dracula t)
+       (load-theme 'doom-one t)
        (doom-themes-org-config)
        ;; Modeline
        (use-package all-the-icons)
