@@ -4,11 +4,7 @@ floating_modifier $mod
 focus_follows_mouse no
 
 # AUTORUNS
-exec --no-startup-id compton -i 0.85
-exec --no-startup-id fcitx
-exec --no-startup-id flameshot
-exec --no-startup-id xautolock -time 5 -locker \"$lock\"
-exec --no-startup-id "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+exec --no-startup-id "~/.config/autorun.sh" 
 exec_always --no-startup-id "setxkbmap -option ctrl:nocaps"
 exec_always --no-startup-id "xset r rate 350 70"
 exec_always --no-startup-id "~/.config/wallpaper.sh"
@@ -16,11 +12,40 @@ exec_always --no-startup-id "~/.config/wallpaper.sh"
 # THEME
 gaps inner 10
 for_window [class=".*"] border pixel 1
-font pango:Noto Sans 11
 default_border pixel 1
-# Colors from Xresources
-# set_from_resource $black i3wm.color0 #000000
+font pango:Noto Sans 11
 
+# Colors from Xresources
+set_from_resource $fg i3wm.foreground      #F8F8F2
+set_from_resource $bg i3wm.background      #282A36
+set_from_resource $cursor i3wm.cursorColor #61AFEF
+set_from_resource $hl i3wm.highlightColor  #3A3F4B
+set_from_resource $color0 i3wm.color0      #212121
+set_from_resource $color8 i3wm.color8      #4D4D4D
+set_from_resource $color1 i3wm.color1      #FF5555
+set_from_resource $color9 i3wm.color9      #FF6E67
+set_from_resource $color2 i3wm.color2      #50FA7B
+set_from_resource $color10 i3wm.color10    #5AF78E
+set_from_resource $color3 i3wm.color3      #F1FA8C
+set_from_resource $color11 i3wm.color11    #F4F99D
+set_from_resource $color4 i3wm.color4      #BD93F9
+set_from_resource $color12 i3wm.color12    #CAA9FA
+set_from_resource $color5 i3wm.color5      #FF79C6
+set_from_resource $color13 i3wm.color13    #FF92D0
+set_from_resource $color6 i3wm.color6      #8BE9FD
+set_from_resource $color14 i3wm.color14    #9AEDFE
+set_from_resource $color7 i3wm.color7      #BFBFBF
+set_from_resource $color15 i3wm.color15    #E6E6E6
+
+
+# class                 border  backgr. text    indicator child_border
+client.focused          $cursor #285577 $fg     #2e9ef4   #285577
+client.focused_inactive $hl     $color8 $fg     #484e50   #5f676a
+client.unfocused        #333333 #222222 #888888 #292d2e   #222222
+client.urgent           #2f343a $color1 $fg     $color1   $color1
+client.placeholder      $color0 $bg     $fg     $color0   $bg    
+
+client.background       $color0
 # RULES
 # assign [class="URxvt"] 2
 # Dialogs and Popups
@@ -28,10 +53,9 @@ for_window [window_role="pop-up"] floating enable
 for_window [window_role="task_dialog"] floating enable
 for_window [class="Arandr"] floating enable
 
-
 # KEYBINDINGS
 bindsym $mod+q      kill
-bindsym $mod+Return exec urxvt
+bindsym $mod+Return exec "st"
 
 bindsym $mod+r      exec "rofi -show run"
 bindsym $mod+w      exec "rofi -show window"
