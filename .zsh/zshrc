@@ -42,17 +42,23 @@ fi
 source "$ZSHCFG/zsh_theme"
 
 # Pick an editor.
-if _has emacsclient; then
-    export VISUAL='emacsclient'
-    export EDITOR='emacsclient'
-elif _has nvim; then
-    export EDITOR=nvim
-    alias vim='nvim'
-elif _has vim; then
-    export EDITOR=vim
-elif _has vi; then
-    export EDITOR=vi
-fi
+local editors=(emacsclient nvim vim vi nano)
+for e in $editors; do
+    if _has $e; then
+	export EDITOR=$e
+	break
+    fi
+done 
+
+# Pick a terminal.
+local terms=(st termite)
+for t in $terms; do
+    if _has $t; then
+	export TERMINAL=$t
+	break
+    fi
+done 
+
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 

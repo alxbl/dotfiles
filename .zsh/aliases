@@ -20,9 +20,11 @@ alias segv='mosh -P 60001 segfault -t tmux a'
 # ---
 alias svc='sudo systemctl'
 alias dhcp='cat /var/lib/dnsmasq/qemu0.leases | awk "{ printf \$3 \"\\t\" \$4  \"\\n\" }"'
-# ---
+# --- Global python environments
 alias py2='source ~/.bin/py-2.7.15/bin/activate'
 alias py3='source ~/.bin/py-3.7.0/bin/activate'
+
+_has nvim && alias vim='nvim'
 
 # Burp
 if [[ -d "$HOME/.bin/BurpSuiteCommunity" ]]; then
@@ -31,4 +33,10 @@ fi
 if [[ -d "$HOME/.bin/BurpSuitePro" ]]; then
     alias burp='$HOME/.bin/BurpSuitePro/BurpSuitePro'
 fi
+
+# 010
+if [[ -d "$HOME/.bin/010Editor" ]]; then
+    alias 010='$HOME/.bin/010Editor/010Editor'
+fi
+
 
