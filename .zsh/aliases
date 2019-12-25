@@ -36,7 +36,7 @@ fi
 
 # 010
 if [[ -d "$HOME/.bin/010" ]]; then
-    alias 010='$HOME/.bin/010/010Editor'
+    alias 010='$HOME/.bin/010/010editor'
 fi
 
 
