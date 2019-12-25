@@ -35,8 +35,8 @@ if [[ -d "$HOME/.bin/BurpSuitePro" ]]; then
 fi
 
 # 010
-if [[ -d "$HOME/.bin/010Editor" ]]; then
-    alias 010='$HOME/.bin/010Editor/010Editor'
+if [[ -d "$HOME/.bin/010" ]]; then
+    alias 010='$HOME/.bin/010/010Editor'
 fi
 
 
