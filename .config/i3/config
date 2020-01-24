@@ -176,6 +176,16 @@ bindsym $mod+Ctrl+l resize grow width 10 px or 10 ppt
 bindsym $mod+Ctrl+j resize shrink height 10 px or 10 ppt
 bindsym $mod+Ctrl+k resize grow height 10 px or 10 ppt
 
+# Window Assignment
+assign [class="Eclipse"] 5
+assign [class="virt-manager"] 9
+
+assign [class="^st-"] 1
+assign [class="Emacs"] 1
+
+assign [class="firefox"] 2
+
+
 bar {
         status_command i3status
 }
