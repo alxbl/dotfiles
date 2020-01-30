@@ -384,9 +384,10 @@ additional explanations are provided.
     (use-package yaml-mode :mode "\\.(yaml|yml)\\'")
     #+END_SRC
 
-*** Powershell
+*** Windows
     #+BEGIN_SRC emacs-lisp
     (use-package powershell :mode "\\.(ps1|psm1|psd1)\\'")
+    (use-package csharp-mode :mode "\\.(cs)\\'")
     #+END_SRC
 
 *** Web
@@ -398,6 +399,10 @@ additional explanations are provided.
 	    (html-mode . rainbow-mode)
 	    (php-mode . rainbow-mode)
     )
+    
+    (use-package javascript-mode :mode "\\.(js)\\'"
+     :custom
+     (js-indent-level 2))
     #+END_SRC
 
 * Org Mode 
