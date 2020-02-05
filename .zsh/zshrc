@@ -19,10 +19,10 @@ _has() {
 
 # EXPORTS
 #########################################################
-if _has fzf && _has ag; then
-  (( ${+commands[ag]} )) && export FZF_DEFAULT_COMMAND='ag --nocolor -g ""'
-  (( ${+commands[fd]} )) && export FZF_CTRL_T_COMMAND="fd . 2>/dev/null"
-  (( ${+commands[fd]} )) && export FZF_ALT_C_COMMAND="fd -t d 2>/dev/null"
+if _has fzf && _has rg; then
+  export FZF_DEFAULT_COMMAND='rg --color never --files'
+  export FZF_CTRL_T_COMMAND="rg --files . 2>/dev/null"
+  export FZF_ALT_C_COMMAND="fd -t d 2>/dev/null"
   export FZF_DEFAULT_OPTS='--height 30% --layout=reverse'
 fi
 ##########################################################
@@ -62,7 +62,8 @@ done
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
-
 # Source aliases last to make sure they don't get overwritten.
 [[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
 [[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.
+
+export GHIDRA_INSTALL_DIR="$HOME/.bin/Ghidra/"

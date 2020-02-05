@@ -39,4 +39,9 @@ if [[ -d "$HOME/.bin/010" ]]; then
     alias 010='$HOME/.bin/010/010editor'
 fi
 
+# Ghidra
+if [[ -d "$HOME/.bin/Ghidra" ]]; then
+    alias ghidra='$HOME/.bin/Ghidra/ghidraRun'
+fi
+
 
