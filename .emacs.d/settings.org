@@ -70,6 +70,7 @@ additional explanations are provided.
      (setq inhibit-startup-message t)
      (setq inhibit-startup-echo-area-message t)
      (setq initial-scratch-message nil)
+     (setq-default indent-tabs-mode nil)
 
      ;; No clutter.
      (tool-bar-mode 0)
@@ -542,4 +543,5 @@ additional explanations are provided.
                 (org-insert-link nil (concat "file:" image-file) "")
                 (org-display-inline-images))))
         )
+    (use-package htmlize)
    #+END_SRC
