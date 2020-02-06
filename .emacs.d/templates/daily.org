@@ -3,8 +3,6 @@
      - [ ] Declutter dump folders
        #+BEGIN_SRC emacs-lisp
        (dired "~/Downloads/")
-       (dired "~/Desktop/")
-       (image-dired "~/Desktop/")
        #+END_SRC
      - [ ] Clear e-mail backlog
        - [ ] Work
