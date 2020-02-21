@@ -4,7 +4,7 @@ floating_modifier $mod
 focus_follows_mouse no
 
 # AUTORUNS
-exec --no-startup-id "~/.config/autorun.sh" 
+exec        --no-startup-id "~/.config/autorun.sh" 
 exec_always --no-startup-id "setxkbmap -option ctrl:nocaps"
 exec_always --no-startup-id "xset r rate 350 70"
 exec_always --no-startup-id "~/.config/wallpaper.sh"
@@ -55,7 +55,7 @@ for_window [class="Arandr"] floating enable
 
 # KEYBINDINGS
 bindsym $mod+q      kill
-bindsym $mod+Return exec "st"
+bindsym $mod+Return exec "i3-sensible-terminal"
 
 bindsym $mod+r      exec "rofi -show run"
 bindsym $mod+w      exec "rofi -show window"
