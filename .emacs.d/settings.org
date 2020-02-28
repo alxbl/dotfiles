@@ -90,16 +90,16 @@ additional explanations are provided.
      (scroll-bar-mode 0)
 
      ;; Disable mouse use in most cases.
-     (use-package disable-mouse 
-       :diminish 'disable-mouse-global-mode
-       :after evil
-       :config
-       (global-disable-mouse-mode)
-       (mapc #'disable-mouse-in-keymap
-	     (list evil-motion-state-map
-		   evil-normal-state-map
-		   evil-visual-state-map
-		   evil-insert-state-map)))
+     ;; (use-package disable-mouse 
+     ;;   :diminish 'disable-mouse-global-mode
+     ;;   :after evil
+     ;;   :config
+     ;;   (global-disable-mouse-mode)
+     ;;   (mapc #'disable-mouse-in-keymap
+     ;; 	(list evil-motion-state-map
+     ;; 	      evil-normal-state-map
+     ;; 	      evil-visual-state-map
+     ;; 	      evil-insert-state-map)))
 
      ;; UTF-8 all the things.
      (prefer-coding-system 'utf-8-unix)
@@ -295,87 +295,88 @@ additional explanations are provided.
    #+END_SRC
 ** Auto-Completion / Language Services
    #+BEGIN_SRC emacs-lisp
-     (use-package yasnippet :diminish yas-minor-mode
-       :hook (after-init . yas-global-mode))
+      (use-package yasnippet :diminish yas-minor-mode
+        :hook (after-init . yas-global-mode))
 
-     (use-package company :diminish
-       :bind
-       (:map company-active-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous)
-             ("<tab>" . company-complete-common-or-cycle)
-             :map company-search-map
-             ("C-n" . company-select-next)
-             ("C-p" . company-select-previous))
-       :custom
-       (company-idle-delay 0)
-       (company-echo-delay 0)
-       (company-minimum-prefix-length 1)
-       :hook
-       ((rust-mode
-         go-mode
-         c++-mode
-         c-mode
-         objc-mode) . (lambda () (set (make-local-variable 'company-backends)
-                                 '((company-yasnippet
-                                    company-lsp
-                                    company-files
-                                    ;; company-dabbrev-code
-                                    )))))
-       (after-init . global-company-mode))
+      (use-package company :diminish
+        :bind
+        (:map company-active-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous)
+              ("<tab>" . company-complete-common-or-cycle)
+              :map company-search-map
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous))
+        :custom
+        (company-idle-delay 0)
+        (company-echo-delay 0)
+        (company-minimum-prefix-length 1)
+        :hook
+        ((rust-mode
+          python-mode
+          go-mode
+          c++-mode
+          c-mode
+          objc-mode) . (lambda () (set (make-local-variable 'company-backends)
+                                  '((company-yasnippet
+                                     company-lsp
+                                     company-files
+                                     ;; company-dabbrev-code
+                                     )))))
+        (after-init . global-company-mode))
 
-     (use-package lsp-mode
-       :custom
-       (lsp-print-io nil)
-       (lsp-trace nil)
-       (lsp-print-performance nil)
-       (lsp-auto-guess-root t)
-       (lsp-document-sync-method 'incremental)
-       (lsp-response-timeout 10)
-       (lsp-prefer-flymake t)  ;; Flycheck??
-       :config
-       (require 'lsp-clients)
-       :hook
-       ((rust-mode c++-mode) . lsp)
-       :bind
-       (:map lsp-mode-map
-             ("<f2>" . lsp-rename)
-             ("C-." .  lsp-execute-code-action)
-             ))
+      (use-package lsp-mode
+        :custom
+        (lsp-print-io nil)
+        (lsp-trace nil)
+        (lsp-print-performance nil)
+        (lsp-auto-guess-root t)
+        (lsp-document-sync-method 'incremental)
+        (lsp-response-timeout 10)
+        :config
+        (require 'lsp-clients)
+        :hook
+        ((rust-mode python-mode c++-mode) . lsp)
+        :bind
+        (:map lsp-mode-map
+              ("<f2>" . lsp-rename)
+              ;; ("C-<period>" .  lsp-execute-code-action)
+              ("C-c C-f" . lsp-format-buffer)
+              ))
 
-     (use-package lsp-ui
-       :commands lsp-ui-mode
-       :hook
-       (lsp-mode . lsp-ui-mode))
+      (use-package lsp-ui
+        :commands lsp-ui-mode
+        :hook
+        (lsp-mode . lsp-ui-mode))
 
-     (use-package company-lsp :after company
-       :custom
-       (company-lsp-cache-candidates t)
-       (company-lsp-async t)
-       (company-lsp-enable-snippet t)
-       (company-lsp-enable-recompletion t))
+      (use-package company-lsp :after company
+        :custom
+        (company-lsp-cache-candidates t)
+        (company-lsp-async t)
+        (company-lsp-enable-snippet t)
+        (company-lsp-enable-recompletion t))
 
+     (use-package lsp-treemacs)
 
-     ;; Keep? Should probably replace flymake
-     (use-package flycheck :diminish
-       :hook ((rust-mode python-mode). global-flycheck-mode))
+      (use-package flycheck :diminish
+        :hook ((rust-mode python-mode). flycheck-mode))
 
-     (use-package helm :diminish 'helm-mode
-       :after evil
-       :demand t
-       :config
-       (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-       (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
-       (diminish 'helm-mode)
-       (global-set-key (kbd "M-x") 'helm-M-x)
-       :hook (after-init . helm-mode))
+      (use-package helm :diminish 'helm-mode
+        :after evil
+        :demand t
+        :config
+        (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+        (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+        (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
+        (diminish 'helm-mode)
+        (global-set-key (kbd "M-x") 'helm-M-x)
+        :hook (after-init . helm-mode))
 
-     (use-package helm-ag :after helm
-       :config
-       (evil-leader/set-key "f" 'helm-ag))
+      (use-package helm-ag :after helm
+        :config
+        (evil-leader/set-key "f" 'helm-ag))
 
-     (use-package helm-projectile :ensure t :after helm)
+      (use-package helm-projectile :ensure t :after helm)
    #+END_SRC
 ** Languages
 *** Rust
@@ -399,6 +400,13 @@ additional explanations are provided.
    #+BEGIN_SRC emacs-lisp
      ;; (use-package python :mode ("\\.py\\'" . python-mode)
      ;;   :interpreter ("python" . python-mode))
+
+     (use-package pipenv
+       :hook (python-mode . pipenv-mode)
+       :init
+       (setq
+        pipenv-projectile-after-switch-function
+        #'pipenv-projectile-after-switch-extended))
    #+END_SRC
 
 *** Lua
