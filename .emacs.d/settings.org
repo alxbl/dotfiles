@@ -9,24 +9,30 @@ additional explanations are provided.
 * Base
 ** Core
    
-   Define a few global variables.
+   The settings configured here are applied globally and configure the
+   baseline functionality that I want.
    
    #+BEGIN_SRC emacs-lisp
      (setq evil-want-C-u-scroll t) ; Use vim's C-u
 
-     ;; Base location of the orgmode files. It's called WIKI
+     ;; Base location of my journal. It's called WIKI
      ;; because I used to use VimWiki and was too lazy to rename it.
      (setq alxbl-wiki (getenv "WIKI"))
 
      ;; No clutter.
      (setq create-lockfiles nil)
-     (setq custom-file (make-temp-file "emacs-custom"))
      (setq make-backup-files nil)
      (setq auto-save-default nil)
-     (setq-default indent-tabs-mode nil)
+     ;; This is important: It prevents emacs-custom from messing with my config.
+     (setq custom-file (make-temp-file "emacs-custom"))
+     
+     ;; Boost the font size
+     (set-frame-font "Noto Sans Mono 12" nil t)
    #+END_SRC
 
-   Setup =use-package= and MELPA sources.
+   Next, I want to use =use-package= to manage my configuration cleanly.
+   To do that I need a bit of bootstrap code that will configure
+   package repositories and install the module on the first run.
 
    #+BEGIN_SRC emacs-lisp
      (eval-and-compile
@@ -49,7 +55,7 @@ additional explanations are provided.
        (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"   ) t)
        (add-to-list 'package-archives '("org"   . "http://orgmode.org/elpa/"      ) t)
 
-       ;; Install use-package and core packages on clean run.
+       ;; Install use-package and core packages on first run.
        (unless (package-installed-p 'use-package)
          (package-refresh-contents)
          (package-install 'use-package)
@@ -64,6 +70,11 @@ additional explanations are provided.
      (use-package server
        :hook (after-init . server-mode))
    #+END_SRC
+   
+    The last part additionally starts =emacs-server= so that emacs keeps
+    running in the background. I use =emacsclient -c= to spawn a new frame.
+    This also makes it possible to use emacs from the command line in
+    degraded mode for quick edits.
 
 ** Editor
    #+BEGIN_SRC emacs-lisp
@@ -78,6 +89,7 @@ additional explanations are provided.
      (menu-bar-mode 0)
      (scroll-bar-mode 0)
 
+     ;; Disable mouse use in most cases.
      (use-package disable-mouse 
        :diminish 'disable-mouse-global-mode
        :after evil
@@ -89,6 +101,7 @@ additional explanations are provided.
 		   evil-visual-state-map
 		   evil-insert-state-map)))
 
+     ;; UTF-8 all the things.
      (prefer-coding-system 'utf-8-unix)
      (set-locale-environment "en_US.UTF-8")
      (set-default-coding-systems 'utf-8-unix)
@@ -100,9 +113,10 @@ additional explanations are provided.
      (setq buffer-file-coding-system 'utf-8)
      (setq save-buffer-coding-system 'utf-8-unix)
 
-     ;; Vertical Column
+     ;; Vertical Column. 70 is too narrow for modern monitors...
      (set-fill-column 120)
 
+     ;; Adjust font-size with hotkeys
      (global-set-key (kbd "C-+") 'text-scale-increase)
      (global-set-key (kbd "C--") 'text-scale-decrease)
 
@@ -116,7 +130,7 @@ additional explanations are provided.
        (push '("*Cargo Build*") popwin:special-display-config)
        :hook (after-init . popwin-mode))
 
-     ;; Display line numbers where convenient
+     ;; Display line numbers for code buffers.
      (use-package display-line-numbers
      :hook ((prog-mode rust-mode python-mode) . display-line-numbers-mode)
      :custom
@@ -126,6 +140,16 @@ additional explanations are provided.
      (display-line-numbers-widen t))
 
    #+END_SRC
+   
+   Eldoc has been causing some trouble when using Python by popping up
+   a pesky =*Python-Help*== buffer that destroys buffer layout and
+   steals focus. I'm not exactly sure why this is happening, but I
+   use LSP anyway so I don't need eldoc.
+
+   #+BEGIN_SRC emacs-lisp
+     (global-eldoc-mode -1)
+   #+END_SRC
+
 ** Evil Mode
 
    The best of vim's modal editing in Emacs.
@@ -277,27 +301,27 @@ additional explanations are provided.
      (use-package company :diminish
        :bind
        (:map company-active-map
-	     ("C-n" . company-select-next)
-	     ("C-p" . company-select-previous)
-	     ("<tab>" . company-complete-common-or-cycle)
-	     :map company-search-map
-	     ("C-n" . company-select-next)
-	     ("C-p" . company-select-previous))
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous)
+             ("<tab>" . company-complete-common-or-cycle)
+             :map company-search-map
+             ("C-n" . company-select-next)
+             ("C-p" . company-select-previous))
        :custom
        (company-idle-delay 0)
        (company-echo-delay 0)
        (company-minimum-prefix-length 1)
        :hook
        ((rust-mode
-	 go-mode
-	 c++-mode
-	 c-mode
-	 objc-mode) . (lambda () (set (make-local-variable 'company-backends)
-				 '((company-yasnippet
-				    company-lsp
-				    company-files
-				    ;; company-dabbrev-code
-				    )))))
+         go-mode
+         c++-mode
+         c-mode
+         objc-mode) . (lambda () (set (make-local-variable 'company-backends)
+                                 '((company-yasnippet
+                                    company-lsp
+                                    company-files
+                                    ;; company-dabbrev-code
+                                    )))))
        (after-init . global-company-mode))
 
      (use-package lsp-mode
@@ -308,16 +332,16 @@ additional explanations are provided.
        (lsp-auto-guess-root t)
        (lsp-document-sync-method 'incremental)
        (lsp-response-timeout 10)
-       (lsp-prefer-flymake t) 
+       (lsp-prefer-flymake t)  ;; Flycheck??
        :config
        (require 'lsp-clients)
        :hook
-       ((rust-mode python-mode c++-mode) . lsp)
+       ((rust-mode c++-mode) . lsp)
        :bind
        (:map lsp-mode-map
-	     ("<f2>" . lsp-rename)
-	     ("C-." .  lsp-execute-code-action)
-	     ))
+             ("<f2>" . lsp-rename)
+             ("C-." .  lsp-execute-code-action)
+             ))
 
      (use-package lsp-ui
        :commands lsp-ui-mode
@@ -332,6 +356,7 @@ additional explanations are provided.
        (company-lsp-enable-recompletion t))
 
 
+     ;; Keep? Should probably replace flymake
      (use-package flycheck :diminish
        :hook ((rust-mode python-mode). global-flycheck-mode))
 
@@ -372,8 +397,8 @@ additional explanations are provided.
 
 *** Python
    #+BEGIN_SRC emacs-lisp
-     (use-package python :mode ("\\.py\\'" . python-mode)
-       :interpreter ("python" . python-mode))
+     ;; (use-package python :mode ("\\.py\\'" . python-mode)
+     ;;   :interpreter ("python" . python-mode))
    #+END_SRC
 
 *** Lua
@@ -402,9 +427,9 @@ additional explanations are provided.
 	    (php-mode . rainbow-mode)
     )
     
-    (use-package javascript-mode :mode "\\.(js)\\'"
+    (use-package js :mode "\\.(js)\\'"
      :custom
-     (js-indent-level 2))
+     (js-indent-level 4))
     #+END_SRC
 
 *** C
@@ -556,4 +581,6 @@ additional explanations are provided.
 
     (use-package ledger-mode :mode "\\.ledger\\'")
     (use-package htmlize)
+    ;; Export slide-shows from Org-mode to Reveal.js presentations
+    (use-package ox-reveal)
    #+END_SRC
