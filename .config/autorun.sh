@@ -1,5 +1,5 @@
 #!/bin/sh
-compton -i 0.90 &
+picom -i 0.90 -b
 fcitx &
 flameshot &
 xautolock -time 5 -locker  "i3lock -c1f67b1 -u -i ~/.config/awesome/lock.png" &

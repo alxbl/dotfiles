@@ -13,7 +13,7 @@ exec_always --no-startup-id "~/.config/wallpaper.sh"
 gaps inner 10
 for_window [class=".*"] border pixel 1
 default_border pixel 1
-font pango:Noto Sans 11
+font pango:Noto Sans 12
 
 # Colors from Xresources
 set_from_resource $fg i3wm.foreground      #F8F8F2
