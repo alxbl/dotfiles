@@ -45,3 +45,13 @@ if [[ -d "$HOME/.bin/Ghidra" ]]; then
 fi
 
 
+dark() {
+    ln -sf $HOME/.config/termite/regular $HOME/.config/termite/config
+    killall -USR1 termite
+}
+
+light() {
+    ln -sf $HOME/.config/termite/projector $HOME/.config/termite/config
+    killall -USR1 termite
+}
+
