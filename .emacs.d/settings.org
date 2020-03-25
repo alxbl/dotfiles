@@ -161,6 +161,7 @@ additional explanations are provided.
         (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
         (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
         (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
+        (define-key evil-normal-state-map (kbd "z0") 'hs-hide-level)
 
         ; Motion mode shouldd behave like normal mode.
         (define-key evil-motion-state-map (kbd "M-h") 'evil-window-left)
@@ -331,6 +332,7 @@ additional explanations are provided.
         (lsp-trace nil)
         (lsp-print-performance nil)
         (lsp-auto-guess-root t)
+        (lsp-prefer-flymake nil)
         (lsp-document-sync-method 'incremental)
         (lsp-response-timeout 10)
         :config
@@ -356,10 +358,14 @@ additional explanations are provided.
         (company-lsp-enable-snippet t)
         (company-lsp-enable-recompletion t))
 
-     (use-package lsp-treemacs)
+      (use-package lsp-treemacs)
 
       (use-package flycheck :diminish
-        :hook ((rust-mode python-mode). flycheck-mode))
+        :init (global-flycheck-mode)
+        :hook ((rust-mode python-mode) . flycheck-mode)
+        :config
+        (define-key evil-normal-state-map (kbd "zn") 'flycheck-next-error)
+        (define-key evil-normal-state-map (kbd "zp") 'flycheck-previous-error))
 
       (use-package helm :diminish 'helm-mode
         :after evil
