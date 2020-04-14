@@ -228,27 +228,11 @@ additional explanations are provided.
        :hook
        (prog-mode . rainbow-delimiters-mode))
    #+END_SRC
-** Dired
 
-   Rebind some keys to make =dired= easier to use with evil.
+** Project Management
 
-   #+BEGIN_SRC emacs-lisp
-   (use-package dired :ensure nil
-     :after evil
-     :config
-    (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
-    (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
-    (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
-    (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
-    (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
-    (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
-    (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
-    (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
-    (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
-    (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
-    (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer))
-   #+END_SRC
-** Source Control
+   Setup source control and git integration with =magit=.
+
    #+BEGIN_SRC emacs-lisp
      (use-package magit
        :config
@@ -281,7 +265,10 @@ additional explanations are provided.
            "q"           'magit-mode-bury-buffer)
          ))
    #+END_SRC
-** Project Management
+   
+   Use =projectile= and =treemacs= to make it easier to track/navigate
+   individual projects and workspaces.
+
    #+BEGIN_SRC emacs-lisp
      (use-package projectile :diminish)
      (use-package treemacs
@@ -294,7 +281,28 @@ additional explanations are provided.
      (use-package treemacs-projectile :after treemacs projectile)
      (use-package treemacs-evil :after treemacs evil)
    #+END_SRC
-** Auto-Completion / Language Services
+   
+   Sometimes, I still use dired to navigate the file system, so give
+   it some =vim=-like bindings.
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package dired :ensure nil
+     :after evil
+     :config
+    (evil-define-key 'normal dired-mode-map "h" 'dired-up-directory)
+    (evil-define-key 'normal dired-mode-map "l" 'dired-find-file)
+    (evil-define-key 'normal dired-mode-map "o" 'dired-sort-toggle-or-edit)
+    (evil-define-key 'normal dired-mode-map "v" 'dired-toggle-marks)
+    (evil-define-key 'normal dired-mode-map "m" 'dired-mark)
+    (evil-define-key 'normal dired-mode-map "u" 'dired-unmark)
+    (evil-define-key 'normal dired-mode-map "U" 'dired-unmark-all-marks)
+    (evil-define-key 'normal dired-mode-map "c" 'dired-create-directory)
+    (evil-define-key 'normal dired-mode-map "n" 'evil-search-next)
+    (evil-define-key 'normal dired-mode-map "N" 'evil-search-previous)
+    (evil-define-key 'normal dired-mode-map "q" 'kill-this-buffer))
+   #+END_SRC
+
+** Auto-Completion & Language Services
    #+BEGIN_SRC emacs-lisp
       (use-package yasnippet :diminish yas-minor-mode
         :hook (after-init . yas-global-mode))
@@ -384,8 +392,15 @@ additional explanations are provided.
 
       (use-package helm-projectile :ensure t :after helm)
    #+END_SRC
-** Languages
+** Programming Language Support
+   This section configures various language-specific modules.
+
 *** Rust
+    Adds basic language support, Cargo Keybinds, TOML syntax highlighting
+    and flycheck support.
+    # FIXME: is flycheck-rust required with lsp-mode?
+    # FIXME: What about clippy?
+
     #+BEGIN_SRC emacs-lisp
       (use-package rust-mode :mode "\\.rs\\'"
 	:hook (rust-mode . hs-minor-mode)
@@ -403,6 +418,11 @@ additional explanations are provided.
     #+END_SRC
 
 *** Python
+    This is a very flakey work in progress for Python... It looks like
+    lsp-mode, flycheck, and eldoc are clashing wildly and causing me a
+    lot of pain. The package =pipenv= is very useful for making Emacs use
+    LSP and whatnot from the virtual environment.
+
    #+BEGIN_SRC emacs-lisp
      ;; (use-package python :mode ("\\.py\\'" . python-mode)
      ;;   :interpreter ("python" . python-mode))
@@ -415,35 +435,29 @@ additional explanations are provided.
         #'pipenv-projectile-after-switch-extended))
    #+END_SRC
 
-*** Lua
-   #+BEGIN_SRC emacs-lisp
-     (use-package lua-mode :mode "\\.lua\\'")
-   #+END_SRC
-
-*** YAML
-    #+BEGIN_SRC emacs-lisp
-    (use-package yaml-mode :mode "\\.(yaml|yml)\\'")
-    #+END_SRC
-
-*** Windows
+*** Powershell / C#
     #+BEGIN_SRC emacs-lisp
     (use-package powershell :mode "\\.(ps1|psm1|psd1)\\'")
     (use-package csharp-mode :mode "\\.(cs)\\'")
     #+END_SRC
 
 *** Web
-    #+BEGIN_SRC emacs-lisp
-    (use-package php-mode :mode "\\.(php)\\'")
+    Web development packages.
 
-    (use-package rainbow-mode 
-      :hook (css-mode . rainbow-mode)
-	    (html-mode . rainbow-mode)
-	    (php-mode . rainbow-mode)
-    )
-    
-    (use-package js :mode "\\.(js)\\'"
-     :custom
-     (js-indent-level 4))
+    #+BEGIN_SRC emacs-lisp
+      (use-package php-mode :mode "\\.(php)\\'")
+
+      ;; Display color swatches
+      (use-package rainbow-mode 
+        :hook ((html-mode css-mode) . rainbow-mode))
+
+      ;; Javascript
+      (use-package js :mode "\\.(js)\\'"
+       :custom
+       (js-indent-level 4))
+
+      ;; TypeScript
+      (use-package tide :mode "\\.(ts)\\'")
     #+END_SRC
 
 *** C
@@ -453,6 +467,23 @@ additional explanations are provided.
 				 (c-set-style "bsd")
 				 (setq tab-width 4)
 				 (setq c-base-offset 4))))
+    #+END_SRC
+
+*** Miscelleneous
+    This section contains packages for various languages that are not
+    commonly used but for which it is nice to have syntax highlight.
+    
+    Most of these languages are markup or general purpose.
+
+    #+BEGIN_SRC emacs-lisp
+    ;; YAML
+    (use-package yaml-mode :mode "\\.(yaml|yml)\\'")
+
+    ;; AsciiDoc
+    (use-package adoc-mode :mode "\\.(adoc)\\'")
+
+    ;; Lua
+     (use-package lua-mode :mode "\\.lua\\'")
     #+END_SRC
 * Org Mode 
   #+BEGIN_SRC emacs-lisp
@@ -466,16 +497,18 @@ additional explanations are provided.
 	  (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
 	  (config-file (concat user-emacs-directory "/settings.org"))
 	  (org-agenda-files "~/.emacs.d/agenda")
-	  (org-todo-keywords '((sequence "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "DONE(d!)" "DROPPED(x!)")))
+	  (org-todo-keywords '((sequence "IDEA(i)" "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "READY(r!)" "DONE(d!)" "DROPPED(x!)")))
 	  (org-return-follows-link t)
 	  (org-hide-leading-stars t)
 	  (org-pretty-entities t)
 	  (org-hide-emphasis-markers t)
 	  (org-todo-keyword-faces
-	   '(("TODO" . "orange")
+	   '(("IDEA" . "cyan")
+             ("TODO" . "orange")
 	     ("WIP" . "yellow")
 	     ("BLOCKED" . "red")
-	     ("DROPPED" . "gray")))
+	     ("DROPPED" . "gray")
+	     ("READY" . "green")))
 	  (org-capture-templates
 	   `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
 	       "* TODO %?\n   - Added on [%(alxbl/get-date)]\n %i\n" :kill-buffer t)
