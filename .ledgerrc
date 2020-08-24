@@ -1,2 +1,4 @@
 --file ~/Documents/Wiki/log/2020.ledger
 --price-db ~/Documents/Wiki/log/pricedb
+--cleared
+--sort date
