@@ -1,0 +1,21 @@
+/* vim:ft=css */
+configuration {
+    modi: "window,drun,run,ssh";
+    terminal: "alacritty";
+    matching: "fuzzy";
+
+    /* Theme */
+
+    /*
+    fullscreen: true;
+    hide-scrollbar: true;
+    separator-style: "solid";
+    show-icons: false;
+    padding: 400;
+    bw: 0;
+    lines: 5;
+    line-padding: 10;
+    */    
+}
+
+@theme "~/.config/rofi/theme.rasi"

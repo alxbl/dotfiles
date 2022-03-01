@@ -1,0 +1,53 @@
+/* https://github.com/davatorium/rofi/blob/next/doc/rofi-theme.5.markdown */
+* {
+    font: "NotoSans 20";
+
+    /* Colors */
+    fg: #87b6b7;
+    fg-fade: #a5bcbd;
+    background: #00000000;
+    background-color: transparent;
+    urgent-foreground: #bd93f9;
+    active-foreground: #8be9fd;
+
+
+    selected-normal-foreground: #b9fafc;
+    alternate-normal-foreground: @foreground;
+}
+
+/* ! State              'bg',      'fg',     'altbg',   'hlbg',    'hlfg'
+color-normal: "#00000000, #87b6b7, #00000000, #0affffff, #b9fafc";
+color-active: "#00000000, #8be9fd, #00000000, #0affffff, #b9fafc";
+color-urgent: "#00000000, #bd93f9, #00000000, #0affffff, #b9fafc";
+color-window: "#dd282a36, #00000000, #87b6b7";
+*/
+
+prompt {
+    margin-right: 10;
+    text-color: @fg-fade;
+    padding: 0 15 0 0;
+}
+
+window {
+    width: 100%;
+    height: 100%;
+    background-color: #282a36c2;
+}
+
+inputbar {
+    margin: 0 0 20 0;
+    border: 0 0 1 0;
+    border-color: @fg;
+}
+
+element selected {
+    background-color: #ffffff1a;
+}
+
+mainbox {
+    margin: 25%;
+}
+
+* {
+    text-color: @fg;
+}
