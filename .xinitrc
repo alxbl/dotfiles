@@ -8,7 +8,5 @@ stty -xion
 setxkbmap -option ctrl:nocaps
 
 [[ -x /lib/notify-osd/notify-osd ]] && /lib/notify-osd/notify-osd &
-# Start emacs server at login
-emacs --daemon
 
 exec i3

@@ -490,12 +490,6 @@ additional explanations are provided.
     (use-package org
 	:after evil
 	:custom
-	  (tasks-file (concat alxbl-wiki "/log/tasks.org"))
-	  (diary-file (concat alxbl-wiki "/log/personal.org"))
-	  (work-file (concat alxbl-wiki "/log/work.org"))
-	  (wiki-file (concat alxbl-wiki "/wiki.org"))
-	  (work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
-	  (config-file (concat user-emacs-directory "/settings.org"))
 	  (org-agenda-files "~/.emacs.d/agenda")
 	  (org-todo-keywords '((sequence "IDEA(i)" "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "READY(r!)" "DONE(d!)" "DROPPED(x!)")))
 	  (org-return-follows-link t)
@@ -522,6 +516,12 @@ additional explanations are provided.
 	       (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
 	     ))
 	:config
+	  (setq tasks-file (concat alxbl-wiki "/log/tasks.org"))
+	  (setq diary-file (concat alxbl-wiki "/log/personal.org"))
+	  (setq work-file (concat alxbl-wiki "/log/work.org"))
+	  (setq wiki-file (concat alxbl-wiki "/wiki.org"))
+	  (setq work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
+	  (setq config-file (concat user-emacs-directory "/settings.org"))
 	   ;; LaTeX export settings
 	   (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
 	   (add-to-list 'org-latex-packages-alist '("" "minted"))

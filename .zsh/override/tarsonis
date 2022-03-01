@@ -1,0 +1,2 @@
+#!/usr/bin/zsh
+export WIKI="$HOME/Documents/Wiki"
