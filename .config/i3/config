@@ -10,10 +10,10 @@ exec_always --no-startup-id "xset r rate 350 70"
 exec_always --no-startup-id "~/.config/wallpaper.sh"
 
 # THEME
-gaps inner 10
+gaps inner 15
 for_window [class=".*"] border pixel 1
-default_border pixel 1
-font pango:Noto Sans 12
+default_border pixel 0
+font pango:Noto Sans 13
 
 # Colors from Xresources
 set_from_resource $fg i3wm.foreground      #F8F8F2
@@ -98,7 +98,6 @@ bindsym $mod+Shift+Up    move up
 bindsym $mod+Shift+Right move right
 
 bindsym $mod+Shift+space floating toggle
-
 bindsym $mod+space focus mode_toggle
 
 bindsym $mod+a focus parent
