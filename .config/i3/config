@@ -1,13 +1,13 @@
 set $mod Mod4
-set $lock "i3lock -c1f67b1 -u -i ~/.config/awesome/lock.png"
+set $lock "~/.config/i3/lock.sh"
 floating_modifier $mod
 focus_follows_mouse no
 
 # AUTORUNS
-exec        --no-startup-id "~/.config/autorun.sh" 
+exec        --no-startup-id "~/.config/i3/autorun.sh" 
 exec_always --no-startup-id "setxkbmap -option ctrl:nocaps"
 exec_always --no-startup-id "xset r rate 350 70"
-exec_always --no-startup-id "~/.config/wallpaper.sh"
+exec_always --no-startup-id "~/.config/i3/wallpaper.sh"
 
 # THEME
 gaps inner 15
@@ -187,6 +187,16 @@ assign [class="firefox"] 2
 for_window [title="Picture-in-Picture"] sticky enable
 for_window [title="Picture-in-Picture"] resize set width 420 px height 240 px
 for_window [title="Picture-in-Picture"] move position 89 ppt 3 ppt
+
+for_window [title="Volume Control"] floating enable
+for_window [title="Volume Control"] sticky enable
+
+# Games (Fullscreen, no border, floating, workspace 4)
+# FFXIV 
+assign [class="^ffxiv"] 4
+for_window [class="^ffxiv"] floating enable
+for_window [class="^ffxiv"] border pixel 0
+for_window [class="^ffxiv"] fullscreen enable
 
 # No bar... polybar is taking care of it.
 # bar {
