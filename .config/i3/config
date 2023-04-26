@@ -183,8 +183,12 @@ assign [class="^st-"] 1
 assign [class="Emacs"] 1
 
 assign [class="firefox"] 2
+# Picture-in-Picture on all workspaces
+for_window [title="Picture-in-Picture"] sticky enable
+for_window [title="Picture-in-Picture"] resize set width 420 px height 240 px
+for_window [title="Picture-in-Picture"] move position 89 ppt 3 ppt
 
-
-bar {
-        status_command i3status
-}
+# No bar... polybar is taking care of it.
+# bar {
+#         status_command i3status
+# }
