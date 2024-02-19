@@ -1,13 +1,14 @@
 **** TODO Daily Review
-     - [ ] Clean physical workspace
-     - [ ] Declutter dump folders
-       #+BEGIN_SRC emacs-lisp
-       (dired "~/Downloads/")
-       #+END_SRC
-     - [ ] Clear e-mail backlog
-       - [ ] Work
-       - [ ] Personal
-       - [ ] Open Source
+     - [ ] Declutter
+       - [ ] Clean physical workspace
+       - [ ] Sort through dump folders
+         #+BEGIN_SRC emacs-lisp
+         (dired "~/Downloads/")
+         #+END_SRC
+       - [ ] Clear e-mail backlog
+         - [ ] Work
+         - [ ] Personal
+         - [ ] Open Source
      - [ ] Catch up on SNS
        - [ ] Feedly
        - [ ] Twitter
@@ -15,13 +16,4 @@
          - [ ] Montrehack
          - [ ] Work
          - [ ] Ringzer0
-
-     - [ ] Add tasks for loose ends
-     - [ ] Prioritize day and tasks
-       #+BEGIN_SRC emacs-lisp
-         (progn
-           (org-agenda nil "a")
-           (org-agenda-day-view))
-       #+END_SRC
-     - [ ] Commit and synchronize wiki
-     - [ ] Clock out
+     - [ ] Review ideas and convert to tasks

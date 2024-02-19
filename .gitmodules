@@ -49,3 +49,6 @@
 [submodule ".zsh/navi"]
 	path = .zsh/plugins/navi
 	url = https://github.com/alxbl/navi
+[submodule ".zsh/plugins/zsh-histdb"]
+	path = .zsh/plugins/zsh-histdb
+	url = https://github.com/larkery/zsh-histdb
