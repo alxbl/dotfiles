@@ -1,0 +1,14 @@
+live_config_reload = true
+
+[font]
+    size = 15
+
+[mouse]
+
+    bindings = [
+        { mouse = "Right", action = "Paste" },
+    ]
+
+[keyboard]
+    bindings = [
+    ]

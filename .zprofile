@@ -14,6 +14,7 @@ if [[ ! -v TMUX ]]; then
     export LUA_PATH="$HOME/.luarocks/share/lua/5.3/?.lua;;"
 
     export PATH="$PATH:$HOME/.cargo/bin:$HOME/.gem/ruby/2.5.0/bin:$GOPATH/bin"
+    export RIPGREP_CONFIG_PATH="$HOME/.config/ripgreprc"
 
     # Perl.
     PERLBASE="$CODEPATH/perl"
