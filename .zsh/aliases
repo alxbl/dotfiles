@@ -8,6 +8,8 @@ alias mux='tmuxinator'
 alias wiki='cd $WIKI'
 alias ed='emacsclient -t'
 alias e='emacsclient -n'
+alias kc='kubectl'
+alias kget='kubectl get --all-namespaces'
 # ---
 
 if _has exa; then
