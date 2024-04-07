@@ -8,8 +8,12 @@ alias mux='tmuxinator'
 alias wiki='cd $WIKI'
 alias ed='emacsclient -t'
 alias e='emacsclient -n'
+alias ish='ssh -o "StrictHostKeyChecking no"'
+
 alias kc='kubectl'
 alias kget='kubectl get --all-namespaces'
+alias ka='kubectl apply'
+alias kd='kubectl delete'
 # ---
 
 if _has exa; then

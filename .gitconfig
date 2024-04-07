@@ -13,6 +13,7 @@
     st = status
     co = checkout
     com = commit
+    us = restore --staged
 
 [log]
     date = local
