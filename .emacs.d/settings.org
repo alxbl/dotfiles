@@ -194,7 +194,9 @@ additional explanations are provided.
         (evil-commentary-mode t)
         (global-evil-surround-mode t)
 
-        (evil-leader/set-key "Q" 'alxbl/kill-all-buffers))
+        (evil-leader/set-key "Q" 'alxbl/kill-all-buffers)
+        (evil-leader/set-key "e" 'pp-eval-last-sexp)
+        (evil-leader/set-key "s" 'sh-show-shell))
   #+END_SRC
 * IDE
 ** Appearance
@@ -311,9 +313,26 @@ additional explanations are provided.
    #+END_SRC
 
 ** Auto-Completion & Language Services
-   #+BEGIN_SRC emacs-lisp
-     (use-package yasnippet :diminish yas-minor-mode
-       :hook (after-init . yas-global-mode))
+  #+BEGIN_SRC emacs-lisp
+    (use-package yasnippet :diminish yas-minor-mode
+      :hook (after-init . yas-global-mode))
+
+    ;; TODO: Navigation
+    (use-package helm :diminish 'helm-mode
+      :after evil
+      :demand t
+      :config
+      (define-key evil-normal-state-map (kbd ";") 'helm-mini)
+      (evil-define-key 'normal info-mode-map ";" 'helm-mini)
+      (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
+      (global-set-key (kbd "M-x") 'helm-M-x)
+      :hook (after-init . helm-mode))
+
+     (use-package helm-projectile :ensure t :after helm)
+
+     (use-package helm-rg :after helm
+      :config
+      (evil-leader/set-key "f" 'helm-projectile-rg))
 
      (use-package company :diminish
        :bind
@@ -336,70 +355,12 @@ additional explanations are provided.
          c-mode
          objc-mode) . (lambda () (set (make-local-variable 'company-backends)
                                  '((company-yasnippet
-                                    company-lsp
+                                    ;; company-lsp
                                     company-files
                                     ;; company-dabbrev-code
                                     )))))
        (after-init . global-company-mode))
-
-     (use-package lsp-mode
-       :custom
-       (lsp-print-io nil)
-       (lsp-trace nil)
-       (lsp-print-performance nil)
-       (lsp-auto-guess-root t)
-       (lsp-prefer-flymake nil)
-       (lsp-document-sync-method 'incremental)
-       (lsp-response-timeout 10)
-       :config
-       (require 'lsp-clients)
-       :hook
-       ((rust-mode python-mode c++-mode) . lsp)
-       :bind
-       (:map lsp-mode-map
-             ("<f2>" . lsp-rename)
-             ;; ("C-<period>" .  lsp-execute-code-action)
-             ("C-c C-f" . lsp-format-buffer)
-             ))
-
-     (use-package lsp-ui
-       :commands lsp-ui-mode
-       :hook
-       (lsp-mode . lsp-ui-mode))
-
-     (use-package company-lsp :after company
-       :custom
-       (company-lsp-cache-candidates t)
-       (company-lsp-async t)
-       (company-lsp-enable-snippet t)
-       (company-lsp-enable-recompletion t))
-
-     (use-package lsp-treemacs)
-
-     (use-package flycheck :diminish
-       :init (global-flycheck-mode)
-       :hook ((rust-mode python-mode) . flycheck-mode)
-       :config
-       (define-key evil-normal-state-map (kbd "zn") 'flycheck-next-error)
-       (define-key evil-normal-state-map (kbd "zp") 'flycheck-previous-error))
-
-     (use-package helm :diminish 'helm-mode
-       :after evil
-       :demand t
-       :config
-       (define-key evil-normal-state-map (kbd ";") 'helm-mini)
-       (evil-define-key 'normal info-mode-map ";" 'helm-mini)
-       (define-key evil-normal-state-map (kbd "C-p") 'helm-projectile-find-file)
-       (diminish 'helm-mode)
-       (global-set-key (kbd "M-x") 'helm-M-x)
-       :hook (after-init . helm-mode))
-
-     ;; (use-package helm-rg :after helm
-     ;;   :config
-     ;;   (evil-leader/set-key "f" 'helm-projectile-rg))
-
-     ;; (use-package helm-projectile :ensure t :after helm)
-   #+END_SRC
+  #+END_SRC
 ** Programming Language Support
    This section configures various language-specific modules.
 
@@ -494,7 +455,7 @@ additional explanations are provided.
       (use-package adoc-mode :mode "\\.(adoc)\\'")
 
       ;; Lua
-      (use-package lua-mode :mode "\\.lua\\'")
+       (use-package lua-mode :mode "\\.lua\\'")
 
       ;; Markdown (TOC Generation)
       (use-package markdown-toc :after markdown-mode)
@@ -502,149 +463,147 @@ additional explanations are provided.
       ;; CMake
       (use-package cmake-mode :mode "CMakeLists\\.txt\\'")
 
-      ;; Ledger files
-      (use-package ledger-mode :mode "\\.ledger\\'")
-
     #+END_SRC
 * Org Mode
   #+BEGIN_SRC emacs-lisp
     (use-package org
-        :after evil
-        :custom
-          (org-agenda-files "~/.emacs.d/agenda")
-          (org-todo-keywords '((sequence "IDEA(i)" "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "READY(r!)" "DONE(d!)" "DROPPED(x!)")))
-          (org-return-follows-link t)
-          (org-hide-leading-stars t)
-          (org-pretty-entities t)
-          (org-hide-emphasis-markers t)
-          (org-todo-keyword-faces
-           '(("IDEA" . "cyan")
+	:after evil
+	:custom
+	  (org-agenda-files "~/.emacs.d/agenda")
+	  (org-todo-keywords '((sequence "IDEA(i)" "TODO(t)" "WIP(w!)" "BLOCKED(b!)" "|" "READY(r!)" "DONE(d!)" "DROPPED(x!)")))
+	  (org-return-follows-link t)
+	  (org-hide-leading-stars t)
+	  (org-pretty-entities t)
+	  (org-hide-emphasis-markers t)
+	  (org-todo-keyword-faces
+	   '(("IDEA" . "cyan")
              ("TODO" . "orange")
-             ("WIP" . "yellow")
-             ("BLOCKED" . "red")
-             ("DROPPED" . "gray")
-             ("READY" . "green")))
-          (org-capture-templates
-           `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
-               "* TODO %?\n   - Added on [%(alxbl/get-date)]\n %i\n" :kill-buffer t)
-             ("p" "Add Personal note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
-             ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
-             ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
-               (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-             ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
-               (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
-             ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
-               (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
-             ))
-        :config
-          (setq tasks-file (concat alxbl-wiki "/log/tasks.org"))
-          (setq diary-file (concat alxbl-wiki "/log/personal.org"))
-          (setq work-file (concat alxbl-wiki "/log/work.org"))
-          (setq wiki-file (concat alxbl-wiki "/wiki.org"))
-          (setq work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
-          (setq config-file (concat user-emacs-directory "/settings.org"))
-           ;; LaTeX export settings
-           (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
-           (add-to-list 'org-latex-packages-alist '("" "minted"))
-           (setq org-latex-listings 'minted)
-           (setq org-latex-pdf-process
-                   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-                   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+	     ("WIP" . "yellow")
+	     ("BLOCKED" . "red")
+	     ("DROPPED" . "gray")
+	     ("READY" . "green")))
+	  (org-capture-templates
+	   `(("t" "Add todo item" entry (file+headline tasks-file "Inbox")
+	       "* TODO %?\n   - Added on [%(alxbl/get-date)]\n %i\n" :kill-buffer t)
+	     ("p" "Add Personal note" item (file+olp+datetree diary-file "Diary") " - %? " :tree-type week :kill-buffer t)
+	     ("i" "Remember an idea" item (file+headline diary-file "Ideas") " - %?" :tree-type week :kill-buffer t)
+	     ("r" "Perform Daily Review" entry (file+olp+datetree diary-file "Diary")
+	       (file "~/.emacs.d/templates/daily.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+	     ("R" "Perform Monthly Review" entry (file+olp+datetree diary-file "Diary")
+	       (file "~/.emacs.d/templates/monthly.org") :immediate-finish t :tree-type week :kill-buffer t :jump-to-captured t)
+	     ("w" "Start work day" entry (file+olp+datetree work-file  "Diary")
+	       (file ,work-tmpl) :tree-type week :kill-buffer t :jump-to-captured t :immediate-finish t)
+	     ))
+	:config
+	  (setq tasks-file (concat alxbl-wiki "/log/tasks.org"))
+	  (setq diary-file (concat alxbl-wiki "/log/personal.org"))
+	  (setq work-file (concat alxbl-wiki "/log/work.org"))
+	  (setq wiki-file (concat alxbl-wiki "/wiki.org"))
+	  (setq work-tmpl (concat alxbl-wiki "/meta/templates/workday.org"))
+	  (setq config-file (concat user-emacs-directory "/settings.org"))
+	   ;; LaTeX export settings
+	   (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
+	   (add-to-list 'org-latex-packages-alist '("" "minted"))
+	   (setq org-latex-listings 'minted)
+	   (setq org-latex-pdf-process
+		   '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+		   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+		   "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
-           (setq org-src-fontify-natively t)
+	   (setq org-src-fontify-natively t)
 
-           (org-babel-do-load-languages
-               'org-babel-load-languages
-               '((python . t)
-               (latex . t)))
-           ;; --
+	   (org-babel-do-load-languages
+	       'org-babel-load-languages
+	       '((python . t)
+	       (latex . t)))
+	   ;; --
 
-          (evil-define-key  'normal org-mode-map
-              ;; Navigation
-              "gl" 'org-demote-subtree
-              "gh" 'org-promote-subtree
-              "L" 'org-next-visible-heading
-              "H" 'org-previous-visible-heading
-              ;; <leader>t: Task Management
-              "T" 'org-todo
-              "ts" 'org-schedule
-              "tci" 'org-clock-in
-              "tco" 'org-clock-out
-              "tcg" 'org-clock-goto
-              "tcv" 'org-toggle-time-stamp-overlays
-              (kbd "RET") 'org-open-at-point)
+	  (evil-define-key  'normal org-mode-map
+	      ;; Navigation
+	      "gl" 'org-demote-subtree
+	      "gh" 'org-promote-subtree
+	      "L" 'org-next-visible-heading
+	      "H" 'org-previous-visible-heading
+	      ;; <leader>t: Task Management
+	      "T" 'org-todo
+	      "ts" 'org-schedule
+	      "tci" 'org-clock-in
+	      "tco" 'org-clock-out
+	      "tcg" 'org-clock-goto
+	      "tcv" 'org-toggle-time-stamp-overlays
+	      (kbd "RET") 'org-open-at-point)
 
-           ;; <leader>o: Organization
-           (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
-           (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
+	   ;; <leader>o: Organization
+	   (evil-leader/set-key "ow" (lambda () (interactive) (find-file wiki-file)))
+	   (evil-leader/set-key "oc" (lambda () (interactive) (find-file config-file)))
 
-           (evil-leader/set-key "oa" 'org-agenda)
-           (evil-leader/set-key "or" 'org-refile)
-           (evil-leader/set-key "oo" 'org-capture)
-           (evil-leader/set-key "oO" 'org-capture-goto-target)
-           (evil-leader/set-key "ol" 'org-store-link)
-           (evil-leader/set-key "ob" 'org-switchb)
-           (evil-leader/set-key "of" 'org-footnote-action)
-           (evil-leader/set-key "on" 'org-narrow-to-subtree)
-           (evil-leader/set-key "oN" 'widen)
+	   (evil-leader/set-key "oa" 'org-agenda)
+	   (evil-leader/set-key "or" 'org-refile)
+	   (evil-leader/set-key "oo" 'org-capture)
+	   (evil-leader/set-key "oO" 'org-capture-goto-target)
+	   (evil-leader/set-key "ol" 'org-store-link)
+	   (evil-leader/set-key "ob" 'org-switchb)
+	   (evil-leader/set-key "of" 'org-footnote-action)
+	   (evil-leader/set-key "on" 'org-narrow-to-subtree)
+	   (evil-leader/set-key "oN" 'widen)
 
-           (evil-leader/set-key "p" 'org-capture-screenshot)
+	   (evil-leader/set-key "p" 'org-capture-screenshot)
 
-           (evil-leader/set-key "SPC" 'evil-toggle-fold)
-           ;; This breaks delete/yank line motions.
-           ;; "dab" 'org-cut-subtree
-           ;; "yab" 'org-copy-subtree
-           ;; (evil-define-key 'visual org-mode-map
-           ;;   "d" 'delete-region)
-        :hook
-          (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
-          (org-mode . auto-fill-mode)
-        :preface
-           (defun alxbl/get-date ()
-             "Return the current time as a formatted string"
-             (format-time-string "%Y-%m-%d %H:%M" (current-time)))
+	   (evil-leader/set-key "SPC" 'evil-toggle-fold)
+	   ;; This breaks delete/yank line motions.
+	   ;; "dab" 'org-cut-subtree
+	   ;; "yab" 'org-copy-subtree
+	   ;; (evil-define-key 'visual org-mode-map
+	   ;;   "d" 'delete-region)
+	:hook
+	  (kill-emacs . ladicle/org-clock-out-and-save-when-exit)
+	  (org-mode . auto-fill-mode)
+	:preface
+	   (defun alxbl/get-date ()
+	     "Return the current time as a formatted string"
+	     (format-time-string "%Y-%m-%d %H:%M" (current-time)))
 
-           ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
-           (defun datetree-jump ()
-             "Jumps to the datetree heading that matches the current date."
-             (interactive)
-             (let ((point (point)))
-               (catch 'found
-                 (goto-char (point-min))
-                 (while (outline-next-heading)
-                   (let* ((hl (org-element-at-point))
-                          (title (org-element-property :raw-value hl)))
-                     (when (string= title (format-time-string "%F %A"))
-                       (org-show-context)
-                       (setq point (point))
-                       (throw 'found t)))))
-               (goto-char point)))
+	   ;; https://emacs.stackexchange.com/questions/50253/how-to-jump-to-a-heading-in-a-date-tree
+	   (defun datetree-jump ()
+	     "Jumps to the datetree heading that matches the current date."
+	     (interactive)
+	     (let ((point (point)))
+	       (catch 'found
+		 (goto-char (point-min))
+		 (while (outline-next-heading)
+		   (let* ((hl (org-element-at-point))
+			  (title (org-element-property :raw-value hl)))
+		     (when (string= title (format-time-string "%F %A"))
+		       (org-show-context)
+		       (setq point (point))
+		       (throw 'found t)))))
+	       (goto-char point)))
 
-          ;; https://ladicle.com/post/config/#org
-          (defun ladicle/org-clock-out-and-save-when-exit ()
-              "Save buffers and stop clocking when kill emacs."
-                (ignore-errors (org-clock-out) t)
-                (save-some-buffers t))
-          (defun org-capture-screenshot (&optional caption)
-            (interactive "P")
-            (let* ((image-dir
-                    (if (not (buffer-file-name))
-                        (let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
-                          (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
-                      "screens")))
-              (unless (file-exists-p image-dir)
-                (make-directory image-dir))
-              (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
-                     (exit-status (call-process "flameshot" nil nil nil "gui"))
-                     (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
-                     )
-                (if caption
-                    (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
-                (org-insert-link nil (concat "file:" image-file) "")
-                (org-display-inline-images))))
-        )
+	  ;; https://ladicle.com/post/config/#org
+	  (defun ladicle/org-clock-out-and-save-when-exit ()
+	      "Save buffers and stop clocking when kill emacs."
+		(ignore-errors (org-clock-out) t)
+		(save-some-buffers t))
+	  (defun org-capture-screenshot (&optional caption)
+	    (interactive "P")
+	    (let* ((image-dir
+		    (if (not (buffer-file-name))
+			(let ((buffer-name (replace-regexp-in-string "CAPTURE-[0-9-]*" "" (buffer-name))))
+			  (concat (file-name-directory (buffer-file-name (get-file-buffer buffer-name))) "screens"))
+		      "screens")))
+	      (unless (file-exists-p image-dir)
+		(make-directory image-dir))
+	      (let* ((image-file (concat image-dir "/" (format-time-string "%Y%m%d_%H%M%S") ".png"))
+		     (exit-status (call-process "flameshot" nil nil nil "gui"))
+		     (exit-status (call-process "xclip" nil `(:file ,image-file) nil "-selection" "clipboard" "-t" "image/png" "-o"))
+		     )
+		(if caption
+		    (insert (format "#+CAPTION: %s label:fig:%s\n" (read-input "Caption: ") (read-input "label: "))))
+		(org-insert-link nil (concat "file:" image-file) "")
+		(org-display-inline-images))))
+	)
 
+    (use-package ledger-mode :mode "\\.ledger\\'")
     (use-package htmlize)
     ;; Export slide-shows from Org-mode to Reveal.js presentations
     (use-package ox-reveal)
