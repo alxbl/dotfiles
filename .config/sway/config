@@ -10,8 +10,11 @@ set $menu wofi --show run | xargs swaymsg exec --
 # Firefox PIP sticky top right.
 for_window [title="^Picture-in-Picture$"] floating enable, sticky enable, resize set width 420 px height 240 px
 for_window [title="Picture-in-Picture"] move position 88 ppt 3 ppt
-# Firefox notifications.
+
+# top right: 3479, 37 (x,y) 351x129
+# bottom right: 3483, 2034 | 351x114
 for_window [title="^$" app_id="firefox"] floating enable
+for_window [title="^$" app_id="firefox"] move position 88 ppt 3 ppt
 
 floating_modifier $mod
 focus_follows_mouse no
