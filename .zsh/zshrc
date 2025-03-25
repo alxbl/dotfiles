@@ -2,6 +2,12 @@
 ZSHCFG="$HOME/.zsh"
 ZSH="$ZSHCFG/oh-my-zsh"
 ZSH_CUSTOM="$ZSHCFG"
+export ZSH_DOTENV_FILE=.env
+export ZSH_DOTENV_ALLOWED_LIST="$ZSHCFG/env-allow"
+export ZSH_DOTENV_DISALLOWED_LIST="$ZSHCFG/env-deny"
+
+export XKB_DEFAULT_OPTIONS=caps:escape
+
 
 
 # Process overrides for a specific host.
@@ -48,7 +54,7 @@ for e in $editors; do
 	export EDITOR=$e
 	break
     fi
-done 
+done
 
 # Pick a terminal.
 local terms=(st termite)
@@ -57,7 +63,7 @@ for t in $terms; do
 	export TERMINAL=$t
 	break
     fi
-done 
+done
 
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
