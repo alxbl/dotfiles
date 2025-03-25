@@ -1,4 +1,2 @@
 #!/usr/bin/zsh
 export WIKI="$HOME/Documents/Wiki"
-wlr-randr --output HDMI-A-1 --pos 1920,0
-wlr-randr --output DP-1 --pos 0,0
