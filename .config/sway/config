@@ -2,14 +2,21 @@
 set $mod Mod4
 set $term alacritty
 
+# Set screens
+exec_always wlr-randr --output DP-1 --pos 0,0 --output HDMI-A-1 --pos 1920,0
+
 # Launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu wofi --show run | xargs swaymsg exec --
+set $menu rofi -show run
+set $window rofi -show window
 
 # Firefox PIP sticky top right.
 for_window [title="^Picture-in-Picture$"] floating enable, sticky enable, resize set width 420 px height 240 px
 for_window [title="Picture-in-Picture"] move position 88 ppt 3 ppt
+
+# Flag Xwayland windows
+for_window [shell="xwayland"] title_format "[XWayland] %title"
 
 # top right: 3479, 37 (x,y) 351x129
 # bottom right: 3483, 2034 | 351x114
@@ -46,6 +53,8 @@ output * bg $HOME/Documents/Pictures/walls/984617.jpg fill
 
     # Start launcher
     bindsym $mod+r exec $menu
+    bindsym $mod+Tab exec $window
+    bindsym Alt+Tab exec $window
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -107,6 +116,10 @@ bindsym $mod+Shift+7 move container to workspace number 7
 bindsym $mod+Shift+8 move container to workspace number 8
 bindsym $mod+Shift+9 move container to workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10
+
+
+bindsym $mod+Control+Shift+h move workspace to output left
+bindsym $mod+Control+Shift+l move workspace to output right
 
 # Splits.
 bindsym $mod+b splith

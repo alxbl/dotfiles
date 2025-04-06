@@ -1,4 +1,4 @@
-source ~/Code/pwndbg/gdbinit.py
+source ~/Code/github.com/pwndbg/pwndbg/gdbinit.py
 set follow-fork-mode parent
 
 # python
@@ -9,3 +9,4 @@ set follow-fork-mode parent
 
 # import glm
 # end
+set debuginfod enabled on
