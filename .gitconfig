@@ -1,7 +1,7 @@
 [user]
     name = Alexandre Beaulieu
     email = alex@segfault.me
-    signingkey = E3FC7081
+    # signingkey = E3FC7081
 
 [color]
     status = always
@@ -19,7 +19,7 @@
     date = local
 
 [commit]
-    gpgsign = true
+	gpgsign = false
 
 [filter "lfs"]
 	clean = git-lfs clean -- %f
@@ -29,6 +29,7 @@
 
 [push]
     default = simple
+	autoSetupRemote = true
 
 [pull]
 	ff = only

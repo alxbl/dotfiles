@@ -61,3 +61,50 @@ light() {
     killall -USR1 termite
 }
 
+function co() {
+    if [ ! -d .git ]; then
+        echo "Not a git repository."
+        return 1
+    fi
+    local branch=$(git branch | fzf | sed -r 's#^(\s|\*)*##')
+    git checkout "$branch"
+}
+
+function www
+{
+    if [ ! -d .git ]; then
+        echo "Not a git repository."
+        return 1
+    fi
+    local url=$(git remote get-url origin)
+
+    if [[ $url =~ ^https://([^/]+)/? ]]; then
+        local host="${match[1]}"
+        case "$host" in
+            "aur.archlinux.org")
+                local url=$(echo $url | sed -e 's#.org/\(\w*\).git$#.org/packages/\1#')
+                browse $url
+                ;;
+            *)
+                browse $url
+                ;;
+        esac
+    elif [[ $url =~  ^git@([^:]+):(.+) ]]; then
+        local host=${match[1]}
+        local path=${match[2]}
+
+        case "$host" in
+            "ssh.dev.azure.com")
+                local parts=(${(@s:/:)path})
+                local project=${parts[-1]}
+                shift parts # v3
+                shift -p parts # project
+                browse "https://dev.azure.com/${(j:/:)parts}/_git/$project"
+                ;;
+        esac
+    fi
+}
+
+function browse {
+    firefox $1
+}

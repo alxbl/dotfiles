@@ -1,13 +1,13 @@
 GEOMETRY_PROMPT=(geometry_hostname geometry_path geometry_status)
-GEOMETRY_RPROMPT=(geometry_git geometry_virtualenv geometry_exec_time geometry_jobs geometry_exitcode)
+GEOMETRY_RPROMPT=(geometry_git geometry_kube geometry_rustup geometry_node geometry_virtualenv geometry_jobs geometry_exitcode)
 GEOMETRY_INFO=()
 
 GEOMETRY_STATUS_SYMBOL_COLOR_HASH=true
 
-GEOMETRY_STATUS_SYMBOL='$'             # default prompt symbol
-GEOMETRY_STATUS_SYMBOL_ERROR='!'       # default prompt symbol
-GEOMETRY_STATUS_SYMBOL_ROOT="#"        # when logged in user is root
-GEOMETRY_STATUS_SYMBOL_ROOT_ERROR="#"  # when logged in user is root
+GEOMETRY_STATUS_SYMBOL='◇'             # default prompt symbol
+GEOMETRY_STATUS_SYMBOL_ERROR='◆'       # default prompt symbol
+GEOMETRY_STATUS_SYMBOL_ROOT="⌗"        # when logged in user is root
+GEOMETRY_STATUS_SYMBOL_ROOT_ERROR="⌗"  # when logged in user is root
 
 # oh-my-zsh
 ZSH_THEME="geometry/geometry"

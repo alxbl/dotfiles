@@ -2,6 +2,9 @@
 *.jar
 .cache
 
+# Don't accidentally modify gitconfig
+.gitconfig
+
 # vim stuff
 .netrwhist
 .vim/bundle
