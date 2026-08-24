@@ -16,6 +16,7 @@ __pycache__
 
 # emacs stuff
 .emacs.d/elpa
+.emacs.d/eln-cache
 .emacs.d/settings.el
 .emacs.d/bak
 .emacs.d/recentf
@@ -28,6 +29,7 @@ __pycache__
 .emacs.d/bookmarks
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/request/
+*.~*~
 
 # Don't track random and sensitive files
 .config

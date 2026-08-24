@@ -13,21 +13,27 @@ additional explanations are provided.
    baseline functionality that I want.
 
    #+BEGIN_SRC emacs-lisp
-     (setq evil-want-C-u-scroll t) ; Use vim's C-u
+               (setq evil-want-C-u-scroll t) ; Use vim's C-u
 
-     ;; Base location of my journal. It's called WIKI
-     ;; because I used to use VimWiki and was too lazy to rename it.
-     (setq alxbl-wiki (getenv "WIKI"))
+               ;; Base location of my journal. It's called WIKI
+               ;; because I used to use VimWiki and was too lazy to rename it.
+               (setq alxbl-wiki (getenv "WIKI"))
 
-     ;; No clutter.
-     (setq create-lockfiles nil)
-     (setq make-backup-files nil)
-     (setq auto-save-default nil)
-     ;; This is important: It prevents emacs-custom from messing with my config.
-     (setq custom-file (make-temp-file "emacs-custom"))
+               ;; No clutter.
+               (setq create-lockfiles nil)
+               (setq
+                 make-backup-files t
+                 version-control t
+                 delete-old-versions t
+                 kept-new-versions 10
+                 kept-old-versions 0
+                 vc-make-backup-files t)
+               (setq auto-save-default nil)
+               ;; This is important: It prevents emacs-custom from messing with my config.
+               (setq custom-file (make-temp-file "emacs-custom"))
 
-     ;; Boost the font size
-     (set-frame-font "Noto Sans Mono 12" nil t)
+               ;; Boost the font size
+               (set-frame-font "Noto Sans Mono 12" nil t)
    #+END_SRC
 
    Next, I want to use =use-package= to manage my configuration cleanly.
