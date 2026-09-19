@@ -34,14 +34,13 @@ if [[ -f $ZSHCFG/zsh_nocomp ]]; then
     done < "$ZSHCFG/zsh_nocomp"
 fi
 
-
 DISABLE_AUTO_TITLE=true
 if [ $EUID -eq 0 ]; then
    ZSH_DISABLE_COMPFIX="true"
 fi
 source "$ZSHCFG/zsh_theme"
 
-# Pick an editor.
+# Editor priorities.
 local editors=(emacsclient nvim vim vi nano)
 for e in $editors; do
     if _has $e; then
@@ -50,7 +49,7 @@ for e in $editors; do
     fi
 done
 
-# Pick a terminal.
+# Terminal priorities
 local terms=(alacritty st termite)
 for t in $terms; do
     if _has $t; then
@@ -61,12 +60,11 @@ done
 
 stty -ixon # stop C-Q, C-S from freezing terminal.
 
+[[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors)
 # Source aliases last to make sure they don't get overwritten.
-[[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases # Aliases.
-[[ -f "$HOME/.xresources.d/dircolors" ]] && eval $(dircolors $HOME/.xresources.d/dircolors) # Colors.
+[[ -f $ZSHCFG/aliases ]] && source $ZSHCFG/aliases
 
-
-# Process overrides for a specific host.
+# Process overrides for a specific host if available.
 if [[ -f "$HOME/.zsh/override/$HOST" ]]; then
     source "$HOME/.zsh/override/$HOST"
 fi

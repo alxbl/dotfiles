@@ -1,5 +1,5 @@
 GEOMETRY_PROMPT=(geometry_hostname geometry_path geometry_status)
-GEOMETRY_RPROMPT=(geometry_git geometry_kube geometry_rustup geometry_node geometry_virtualenv geometry_jobs geometry_exitcode)
+GEOMETRY_RPROMPT=(geometry_git geometry_rustup geometry_node geometry_virtualenv geometry_jobs geometry_exitcode)
 GEOMETRY_INFO=()
 
 GEOMETRY_STATUS_SYMBOL_COLOR_HASH=true

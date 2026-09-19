@@ -1,0 +1,10 @@
+[General]
+FreeFloating=true
+
+[Plugins]
+krunner_appstreamEnabled=false
+krunner_sessionsEnabled=false
+krunner_webshortcutsEnabled=false
+
+[Plugins][Favorites]
+plugins=Bitwarden Rbw KRunner,windows,krunner_services,krunner_systemsettings,krunner_sessions,krunner_powerdevil
