@@ -30,6 +30,7 @@ __pycache__
 .emacs.d/projectile-bookmarks.eld
 .emacs.d/bookmarks.eld
 .emacs.d/request/
+.emacs.d/tramp
 *.~*~
 
 # Don't track random and sensitive files
