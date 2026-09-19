@@ -1,0 +1,12 @@
+[Unit]
+Description=Shadowsocks (segfault)
+After=network.target
+
+[Service]
+# Activate the virtual environment and start sslocal with the Shadowsocks config
+ExecStart=/usr/bin/sslocal -c /home/alex/.config/shadowsocks.json
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
