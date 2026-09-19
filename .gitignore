@@ -28,6 +28,7 @@ __pycache__
 .emacs.d/.org-id-locations
 .emacs.d/bookmarks
 .emacs.d/projectile-bookmarks.eld
+.emacs.d/bookmarks.eld
 .emacs.d/request/
 *.~*~
 
