@@ -8,12 +8,14 @@ alias wiki='cd $WIKI'
 alias ed='emacsclient -t'
 alias e='emacsclient -n'
 alias ish='ssh -o "StrictHostKeyChecking no"'
-alias dotnetup='paru -S dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin'
+alias dotnetup='paru -S dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin aspnet-targeting-pack-bin aspnet-runtime-bin'
 
 alias kc='kubectl'
 alias kget='kubectl get --all-namespaces'
 alias ka='kubectl apply'
 alias kd='kubectl delete'
+
+alias pods='watch "docker ps --format=\"table {{.ID}} - {{.Image}}\""'
 # ---
 
 if _has exa; then
@@ -61,8 +63,18 @@ light() {
     killall -USR1 termite
 }
 
+function is_git_repo() {
+    local dir="$PWD"
+    while true; do
+        # -e because .git is a file in worktrees
+        [ -e "$dir/.git" ] && return 0
+        [ "$dir" = "/" ] && return 1
+        dir="${dir:h}"
+    done
+}
+
 function co() {
-    if [ ! -d .git ]; then
+    if ! is_git_repo; then
         echo "Not a git repository."
         return 1
     fi
@@ -70,9 +82,34 @@ function co() {
     git checkout "$branch"
 }
 
+function gwl() {
+    case "$1" in
+        ""|prune|go) ;;
+        *)
+            echo "usage: gwl [go|prune]" >&2
+            return 1
+            ;;
+    esac
+
+    if ! is_git_repo; then
+        echo "Not a git repository."
+        return 1
+    fi
+
+    if [ "$1" = go ]; then
+        local dir
+        dir=$(git worktree list | fzf --prompt='worktree> ' | awk '{print $1}')
+        [ -n "$dir" ] && cd "$dir"
+    elif [ "$1" = prune ]; then
+        git worktree prune
+    else
+        git worktree list
+    fi
+}
+
 function www
 {
-    if [ ! -d .git ]; then
+    if ! is_git_repo; then
         echo "Not a git repository."
         return 1
     fi
