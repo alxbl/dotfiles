@@ -1,0 +1,35 @@
+# User-wide Agent Rules
+
+Applies to all agents and projects. Project-level CLAUDE.md files supplement this file.
+
+## Maintaining Rules Files
+- Keep this file high signal; every agent reads it.
+- No implementation or architectural details; they go stale. Read the code instead.
+- Project CLAUDE.md files hold conventions, procedures, traps, and invariants that must be respected.
+- `~/.config/agents/rules` is canonical. `~/.claude/CLAUDE.md` and other `[AGENT].md` files are symlinks to it.
+- **NEVER** edit any CLAUDE.md or `.rules` without the user's explicit consent or directive.
+
+## Code Hygiene
+- Make the simplest change that solves the task.
+- Write clean, idiomatic code. Omit anything not absolutely needed.
+- Doc strings are purpose statements:
+  - **DO** say what the class, method, or interface does.
+  - **DO** document preconditions, assumptions, and side-effects.
+  - **DON'T** explain why or how it works.
+  - **DON'T** leak implementation details or discuss another module's internals.
+- Comments are rare, specific, and high-signal:
+  - Explain workarounds, non-obvious choices, or genuinely complex logic.
+  - Link evidence where useful (RFC, documented invariant).
+- Changes must be unit tested.
+
+## Continuous Improvement
+- Spot recurring patterns and repetitive tasks.
+  - Propose a script or tool to automate them.
+  - Propose CLAUDE.md updates (project or user-wide) that capture them.
+
+## Agentic Work: tmux
+- If not in tmux: do not use tmux and do not re-offer unless asked.
+- If in tmux, note the session and your own pane ID (`$TMUX_PANE`), and:
+  - **NEVER** send keys or text to your own pane, or otherwise prompt yourself.
+  - When spawning an agent, create a tmux window for it with a short meaningful name.
+  - When running shell commands, create a pane next to your own for them.

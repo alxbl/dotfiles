@@ -7,6 +7,7 @@ alias src="cd ~/Code"
 alias wiki='cd $WIKI'
 alias ed='emacsclient -t'
 alias e='emacsclient -n'
+alias z='zeditor'
 alias ish='ssh -o "StrictHostKeyChecking no"'
 alias dotnetup='paru -S dotnet-host-bin dotnet-runtime-bin dotnet-sdk-bin aspnet-targeting-pack-bin aspnet-runtime-bin'
 
