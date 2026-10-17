@@ -39,6 +39,9 @@ for FILE in $(ls -A); do
     ln -f -s "$DST/$FILE" "$HOME/$FILE"
 done
 
+echo ">> Linking agent rules"
+ln -f -s "$HOME/.config/agents/rules" "$HOME/.claude/CLAUDE.md"
+
 #echo ">> Done copying files. Post-install routine"
 #if [ -d ".ssh" ]; then
 #    echo "  +chmod: .ssh (700)"

@@ -43,3 +43,4 @@ __pycache__
 !.gnupg/gpg.conf
 !.gnupg/gpg-agent.conf
 .gnupg/
+.claude
