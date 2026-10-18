@@ -22,6 +22,9 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
   - Link evidence where useful (RFC, documented invariant).
 - Changes must be unit tested.
 
+## Git
+- **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
+
 ## Continuous Improvement
 - Spot recurring patterns and repetitive tasks.
   - Propose a script or tool to automate them.
