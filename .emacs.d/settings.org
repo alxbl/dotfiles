@@ -33,8 +33,10 @@ additional explanations are provided.
      ;; This is important: It prevents emacs-custom from messing with my config.
      (setq custom-file (make-temp-file "emacs-custom"))
 
-     ;; Boost the font size
-     (set-frame-font "Noto Sans Mono 12" nil t)
+     ;; Set frame defaults because daemon has no initial frame.
+     (add-to-list 'default-frame-alist '(font . "Noto Sans Mono-12"))
+     (add-to-list 'default-frame-alist '(width . 160))
+     (add-to-list 'default-frame-alist '(height . 55))
    #+END_SRC
 
    Next, I want to use =use-package= to manage my configuration cleanly.
