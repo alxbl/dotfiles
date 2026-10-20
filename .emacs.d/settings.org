@@ -614,3 +614,104 @@ additional explanations are provided.
     ;; Export slide-shows from Org-mode to Reveal.js presentations
     (use-package ox-reveal)
    #+END_SRC
+
+* Work Log
+  Helpers that read and append to the work log in =work-file=. Each day
+  is a datetree entry headed =YYYY-MM-DD Weekday= with a =Work Log=
+  child heading.
+
+  #+BEGIN_SRC emacs-lisp
+    ;; The org macros must be known when this block is byte-compiled.
+    (eval-when-compile
+      (require 'org)
+      (require 'subr-x))
+
+    (defvar work-file)
+
+    (defun alxbl/work-log--find (date)
+      "Move point to the Work Log heading of DATE and return non-nil.
+DATE is a \"YYYY-MM-DD\" string. The current buffer must be `work-file',
+widened. Return nil when DATE has no entry or its entry has no Work Log
+heading (point is then unspecified)."
+      (goto-char (point-min))
+      (when (re-search-forward
+             (format "^\\*+ %s\\(?: \\|$\\)" (regexp-quote date)) nil t)
+        (org-back-to-heading t)
+        (let ((end (save-excursion (org-end-of-subtree t t) (point))))
+          (when (re-search-forward "^\\*+ Work Log\\b" end t)
+            (org-back-to-heading t)
+            t))))
+
+    (defun alxbl/work-log--dates (start end)
+      "Return the list of \"YYYY-MM-DD\" strings from START to END inclusive.
+START and END are \"YYYY-MM-DD\" strings. Signal a `user-error' if either
+is malformed. Return nil when START is after END."
+      (let ((to-time
+             (lambda (date)
+               (unless (string-match-p "\\`[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\'" date)
+                 (user-error "Invalid date %S, expected YYYY-MM-DD" date))
+               (let ((p (parse-time-string date)))
+                 ;; Noon keeps the +24h step on the right day across DST changes.
+                 (encode-time (list 0 0 12 (nth 3 p) (nth 4 p) (nth 5 p)))))))
+        (let ((cur (funcall to-time start))
+              (last (funcall to-time end))
+              dates)
+          (while (not (time-less-p last cur))
+            (push (format-time-string "%F" cur) dates)
+            (setq cur (time-add cur 86400)))
+          (nreverse dates))))
+
+    (defun alxbl/work-log (start end)
+      "Return the work log for each day from START to END inclusive.
+START and END are \"YYYY-MM-DD\" strings. The result has one block per
+day, formatted as \"* DATE\\nWORK-LOG-CONTENT\\n\", in date order. Days
+with no entry, no Work Log heading or an empty Work Log are omitted, so
+the result is the empty string when nothing matches.
+
+Reads `work-file' (visiting it in a background buffer if needed). The
+buffer's point, narrowing and modification state are left unchanged."
+      (with-current-buffer (find-file-noselect work-file)
+        (org-with-wide-buffer
+         (save-excursion
+           (mapconcat
+            #'identity
+            (delq nil
+                  (mapcar
+                   (lambda (date)
+                     (when (alxbl/work-log--find date)
+                       (let ((body (string-trim
+                                    (buffer-substring-no-properties
+                                     (save-excursion (forward-line 1) (point))
+                                     (save-excursion (org-end-of-subtree t t) (point))))))
+                         (unless (string-empty-p body)
+                           (format "* %s\n%s\n" date body)))))
+                   (alxbl/work-log--dates start end)))
+            "")))))
+
+    (defun alxbl/work-log-add (text)
+      "Append TEXT as a new \"- [ ] TEXT\" item to today's Work Log.
+TEXT should be a single line. Return the inserted item.
+
+Signal a `user-error' if `work-file' has no entry for today or the entry
+has no Work Log heading, in which case nothing is modified.
+
+Side effect: edits the `work-file' buffer. It is saved afterwards only if
+it had no unsaved changes before the insertion, so unrelated pending
+edits are never written to disk by this function."
+      (interactive "sWork log entry: ")
+      (let ((today (format-time-string "%F"))
+            (item (concat "- [ ] " (string-trim text))))
+        (with-current-buffer (find-file-noselect work-file)
+          (org-with-wide-buffer
+           (save-excursion
+             (unless (alxbl/work-log--find today)
+               (user-error "No Work Log section for %s in %s" today work-file))
+             (let ((was-modified (buffer-modified-p)))
+               ;; Insert after the last non-blank line so trailing blank
+               ;; lines stay between the list and the next heading.
+               (goto-char (save-excursion (org-end-of-subtree t t) (point)))
+               (skip-chars-backward " \t\n")
+               (insert "\n" item)
+               (unless was-modified (save-buffer))))))
+        item))
+  #+END_SRC
