@@ -27,7 +27,8 @@ DST=$(pwd)
 FILES=$(ls -A)
 
 for FILE in $(ls -A); do
-    if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" || $FILE == ".gitignore" ]]; then # Don't copy the installer or .git folder.
+    # Don't link the installer or .git folder. ~/.config is a real directory holding app state, see below.
+    if [[ $BASE == $FILE || $FILE == ".git"  || $FILE == ".gitmodules" || $FILE == ".gitignore" || $FILE == ".config" ]]; then
 	continue
     fi
 
@@ -37,6 +38,16 @@ for FILE in $(ls -A); do
         echo "  +Install: $FILE"
     fi
     ln -f -s "$DST/$FILE" "$HOME/$FILE"
+done
+
+echo ">> Linking ~/.config"
+# Link each tracked file individually so app state never lands in the repo,
+# and so that running this from a worktree repoints only the files it tracks.
+# mv -T over a temporary link swaps each file atomically.
+mkdir -p "$HOME/.config"
+for FILE in ${(0)"$(git ls-files -z .config)"}; do
+    mkdir -p "$HOME/${FILE:h}"
+    ln -sf "$DST/$FILE" "$HOME/$FILE.install" && mv -T "$HOME/$FILE.install" "$HOME/$FILE" || echo "  !Failed:  $FILE"
 done
 
 echo ">> Linking agent rules"

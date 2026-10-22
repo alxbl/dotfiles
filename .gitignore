@@ -34,7 +34,6 @@ __pycache__
 *.~*~
 
 # Don't track random and sensitive files
-.config
 .tmux/plugins
 
 # Allow only actual dotfiles from .config

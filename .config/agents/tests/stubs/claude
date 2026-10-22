@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Fake headless claude for the loop tests. Plays each role by moving labels the way
+# the real skill would. Behaviour per role can be overridden with $FAKE_GH/role-<name>
+# (an executable run with the issue number; its stdout becomes the final message).
+set -euo pipefail
+echo "claude $*" >>"$FAKE_GH/calls.log"
+prompt=$2 role=${2%% *}; role=${role#/loop-}; n=${prompt##* }
+labels=$FAKE_GH/issues/$n/labels
+has() { grep -qxF "$1" "$labels"; }
+move() { gh issue edit "$n" --remove-label "$1" --add-label "$2"; }
+
+if [[ -x $FAKE_GH/role-$role ]]; then
+  msg=$("$FAKE_GH/role-$role" "$n")
+else
+  case $role in
+    explore) has agent:explore && move agent:explore agent:explored ;;
+    contribute)
+      mkdir -p "$FAKE_GH/prs/$((n + 100))"
+      [[ -e $FAKE_GH/prs/$((n + 100))/body ]] || {
+        printf '<!-- loop:pr issue=%s -->\nCloses #%s\n' "$n" "$n" >"$FAKE_GH/prs/$((n + 100))/body"
+        : >"$FAKE_GH/prs/$((n + 100))/comments"
+      }
+      if has agent:explored; then move agent:explored agent:review; else move agent:changes agent:review; fi ;;
+    review)
+      verdict=$(head -n1 "$FAKE_GH/verdicts"); sed -i 1d "$FAKE_GH/verdicts"
+      gh pr comment "$((n + 100))" --body "<!-- loop:review round=1 verdict=$verdict -->"
+      if [[ $verdict == pass ]]; then move agent:review agent:human-review; else move agent:review agent:changes; fi ;;
+  esac
+  msg=$(printf 'did %s\n<loop-friction>\n- missing-doc: %s note\n</loop-friction>\n' "$role" "$role")
+  [[ $role == retro ]] && msg=$(printf 'retro\n<loop-improvements>\nPROTOCOL.md\tprotocol\tclarify X\n</loop-improvements>\n')
+fi
+jq -n --arg r "$msg" '{result: $r, is_error: false, num_turns: 3, total_cost_usd: 0.01}'
