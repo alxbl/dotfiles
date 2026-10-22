@@ -22,6 +22,16 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
   - Link evidence where useful (RFC, documented invariant).
 - Changes must be unit tested.
 
+## Repository Layout
+- All code repositories live at `~/Code/[source]/[grouping]/[repo]/[worktree-name|main]`:
+  - `source`: hostname of the git server (e.g. `github.com`, `azure.com`).
+  - `grouping`: logical owner on that platform (user/org on GitHub, project on Azure DevOps). Omit if the platform has no such concept.
+  - `repo`: repository name.
+- `[repo]/main` is the cloned worktree. It is always named `main`, even if the repo's default branch has another name (e.g. `master`), and **MUST** stay pristine on the default branch. Never work in it.
+- Every other subfolder of `[repo]` is a worktree for work in progress.
+- Worktree names are concise and meaningful. A change spanning multiple repositories uses the same worktree name in each.
+- When asked to clone a repo, clone it into this layout.
+
 ## Git
 - **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
 
