@@ -132,6 +132,7 @@ test_loop_run_happy_path() {
   check "explore cannot edit code" grep -q -- '/loop-explore 1.*--disallowedTools Edit(/.*/.worktrees/\*\*) Write(/.*/.worktrees/\*\*) NotebookEdit' "$FAKE_GH/calls.log"
   check "explore may edit its context" grep -q -- '/loop-explore 1.*--allowedTools Edit(/.*/.agents/work/\*\*) Write(/.*/.agents/work/\*\*)' "$FAKE_GH/calls.log"
   check "contribute can edit" test -z "$(grep -- '/loop-contribute 1.*--disallowedTools' "$FAKE_GH/calls.log")"
+  check "one-command rule passed to every role" eq "$(grep -c -- '--append-system-prompt Run exactly one command per Bash call' "$FAKE_GH/calls.log")" 5
   check "no github comments" test -z "$(grep -E 'comment|pr (create|review)' "$FAKE_GH/calls.log")"
   check "context files" test -s "$RSTATE/1/spec.md" -a -s "$RSTATE/1/plan.md" -a -s "$RSTATE/1/review-1.md"
   check "result file" eq "$(cat "$RSTATE"/results/1-*)" "1 1 human-review"
