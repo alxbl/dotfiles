@@ -29,7 +29,7 @@ This is a compliance check, not a deep code review. The human does the final rev
    - [ ] User rules: tests added, docstrings state purpose only, comments rare and high-signal, simplest change.
    - [ ] Nothing exceeds the environment access in `.agents/loop.md`. No secrets or generated credentials committed.
    - [ ] Commits and PR follow the convention, the PR says `Closes #<N>`, and nothing contains a session ID or session URL.
-   - [ ] `validate` commands pass; CI is green if the repo has CI. The PR's checkout is `.worktrees/<branch>` (branch: `gh pr view <P> --json headRefName`). Run each command against it by path (for example `python3 -m unittest discover -s .worktrees/<branch>/tests -t .worktrees/<branch>`); you cannot `cd`. If it cannot be run that way, say so and rely on the PR body.
+   - [ ] `validate` commands pass; CI is green if the repo has CI. The PR's checkout is `.worktrees/<branch>` (branch: `gh pr view <P> --json headRefName`). Run each command against it by path (for example `python3 -m unittest discover -s .worktrees/<branch>/tests`; adapt paths to the repo's `validate` commands); you cannot `cd`. If it cannot be run that way, say so and rely on the PR body.
    - [ ] Every finding from the previous round is fixed or answered convincingly.
 4. Round number `r` = number of earlier `D/review-*.md` files + 1.
    If a finding would repeat unchanged from the previous round after a reasoned reply, do not post it again: block and summarize both positions.
