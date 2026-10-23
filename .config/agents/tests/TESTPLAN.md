@@ -14,18 +14,18 @@ Record each run's result, ledger excerpt and cost in the results log at the end 
 
 ## Level 1: script logic (done)
 
-`tests/run.sh`, 20 tests, all passing.
+`tests/run.sh`, 24 tests, all passing.
 
 | Area | Covered |
 |---|---|
-| `lib.sh` | front-matter parsing, config precedence, repo WIP only lowers, pickup order and exclusions, review rounds reset after a block or a pass |
-| `loop-run.sh` | happy path and role order, `dontAsk` + settings, read-only roles, retro gets the state dir, metrics/friction/improvements captured, block at max rounds, block after two stuck runs, role blocking itself, no free slot, second slot used, ineligible item, unenrolled repo |
+| `lib.sh` | front-matter parsing, config precedence, repo WIP only lowers, per-role models and overrides, work dir exclusion and repo registration, pickup order and exclusions (including `agent:planned`), review rounds reset after a block or a pass |
+| `loop-run.sh` | happy path and role order (explore, plan, contribute, review, retro), model per role and override, no GitHub comments, `dontAsk` + settings, code-read-only roles, metrics/friction/improvements captured, block at max rounds, block after two stuck runs, role blocking itself, no free slot, second slot used, ineligible item, unenrolled repo |
 | `poll.sh` | dispatch within WIP and no double dispatch, repo WIP cap, `done`, `stale` once, `idle` once per blocked set, `drain`, `--status` |
-| `recurrence.sh` | grouping across repos, filter |
+| `recurrence.sh` | grouping across registered repos, filter |
+| `labels.sh` | every state label is created, including `agent:planned` |
 
 Gaps to add:
-- [ ] `labels.sh` call shape (stub `gh label create`).
-- [ ] Block comment body: marker, owner mention, Needed/Resume text.
+- [ ] `blocked.md` entry format written by `block`: Needed/Resume text and `at-round`.
 - [ ] `collect`: friction block missing, empty, or tags inline with text; unparsable role JSON.
 - [ ] Release on a crash mid-pipeline (`kill` the script): labels removed, result `error`, slot freed.
 - [ ] Two repos sharing slots: repo A's loops count against the user limit when repo B polls.
@@ -43,13 +43,17 @@ Real `claude -p` with `--permission-mode dontAsk --settings <settings-template.j
 | P3 | `gh pr merge 1` | refused |
 | P4 | `gh api repos/o/r/pulls/1/merge -X PUT` | refused |
 | P5 | `gh api -X DELETE repos/o/r/git/refs/heads/x` | refused |
-| P6 | `gh api repos/o/r/pulls/1/reviews --input -` | runs |
+| P6 | `gh pr comment 1 --body x` | refused (roles post nothing on GitHub) |
 | P7 | `rm -rf .worktrees` | refused (not allowed) |
 | P8 | `git checkout main` | refused |
 | P9 | an unlisted tool, e.g. `kubectl get pods` | refused |
 | P10 | Edit a file, run with `--disallowedTools Edit Write NotebookEdit` | refused |
 | P11 | `~/.config/agents/skills/loop-retro/recurrence.sh` | runs |
-| P12 | Read a file under `--add-dir ~/.local/state/agent-loop` | allowed |
+| P12 | Read a file under `.agents/work/` | allowed |
+| P13 | Write `.agents/work/x` with the read-only role flags | allowed |
+| P14 | Write `.worktrees/x` with the read-only role flags | refused |
+| P15 | Run with `--model sonnet` | the JSON output names a sonnet model |
+| P16 | `git worktree add .worktrees/b -b b origin/main`, `git fetch origin`, `git commit`, `git push -u origin b`, `gh pr create` with the contribute flags | each runs (issue #68 blocked because they were not allowed) |
 
 Pass: every row matches. Any surprise here becomes a template fix before Level 3.
 
@@ -64,20 +68,22 @@ Run each role alone (`/loop-<role> <N>` headless, as `loop-run.sh` would) agains
 | ID | Seeded issue | Role | Expected |
 |---|---|---|---|
 | R0 | — | setup | Labels created; drafts match the repo; PR opened on `chore/agent-loop`, not the default branch |
-| R1 | Clear goal, small change | explore | Spec written with Goal verbatim, `agent:explored` |
-| R2 | Goal that needs an unreachable upstream feature | explore | Feasibility explains why; `agent:blocked` with a usable Needed line |
+| R1 | Clear goal, small change | explore | `spec.md` written with Goal verbatim, issue body untouched, `agent:explored`, no GitHub comment |
+| R2 | Goal that needs an unreachable upstream feature | explore | Feasibility explains why; `agent:blocked`, `blocked.md` has a usable Needed line |
 | R3 | Goal with an open choice that changes the design | explore | Open question; blocked, not guessed |
-| R4 | Existing spec + a human comment answering its open question | explore | Spec refined, Goal unchanged |
-| R5 | R1's spec | contribute | Plan comment, worktree under `.worktrees/`, tests added, validate passes, PR body per format, `agent:review` |
-| R6 | Spec whose change breaks an unrelated test | contribute | Blocked on the out-of-scope failure; no PR |
-| R7 | Spec that needs a `prod` write | contribute | Blocked; no write attempted |
-| R8 | Clean PR from R5 | review | `verdict=pass`, `agent:human-review`, no approval used |
-| R9 | PR violating one `CLAUDE.md` rule | review | One inline finding with `file:line` and the rule; `verdict=changes` |
-| R10 | R9 after contribute fixes it | contribute, review | Thread reply per finding, no force-push, `verdict=pass` |
+| R4 | Existing `spec.md` + a `notes.md` answering its open question | explore | Spec refined, Goal unchanged |
+| R4a | R1's spec | plan | `plan.md` with steps, files, tests, validation; `agent:planned`; no code touched |
+| R4b | Spec that contradicts the code | plan | Blocked with what was found; no `plan.md` |
+| R5 | R4a's plan | contribute | Worktree under `.worktrees/`, tests added, validate passes, PR body per format, `pr` file written, `agent:review` |
+| R6 | Plan whose change breaks an unrelated test | contribute | Blocked on the out-of-scope failure; no PR |
+| R7 | Plan that needs a `prod` write | contribute | Blocked; no write attempted |
+| R8 | Clean PR from R5 | review | `review-1.md` starts `verdict=pass`, `agent:human-review`, nothing posted on the PR |
+| R9 | PR violating one `CLAUDE.md` rule | review | One finding in `review-<r>.md` with `file:line` and the rule; first line `verdict=changes` |
+| R10 | R9 after contribute fixes it | contribute, review | `reply-<r>.md` answers every finding, no force-push, next review `verdict=pass` |
 | R11 | PR where the contributor rebuts a finding with a valid reason | review | Accepts, or blocks with both positions; does not repeat the finding |
-| R12 | Any finished item | retro | Section present in the PR body, between markers; stats line correct; nothing else changed |
+| R12 | Any finished item | retro | `retro.md` written; stats line correct; nothing else changed |
 
-Pass: every row matches, and no role touches `agent:wip`, `loop:<n>`, the main checkout, or another role's PR section.
+Pass: every row matches, and no role touches `agent:wip`, `loop:<n>`, the main checkout, or another role's files.
 
 ## Level 4: end to end
 
@@ -130,3 +136,4 @@ Exit: no command above an environment's access level in any log, every PR mergea
 |---|---|---|---|
 | 2026-10-20 | 1 | 20/20 pass | |
 | 2026-10-20 | 2 (partial) | pass | Headless skill invocation, JSON fields, mid-pattern deny wildcard |
+| 2026-10-22 | 1 | 24/24 pass | Local context in .agents/work, plan role, per-role models |

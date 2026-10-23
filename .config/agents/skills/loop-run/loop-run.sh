@@ -42,7 +42,6 @@ claim() {
   echo "$REPO#$ITEM" >"$LOOP_STATE/slot-$SLOT.item"
   gh label create "loop:$SLOT" --color BFD4F2 --description "Held by agent loop slot $SLOT" --force >/dev/null
   gh issue edit "$ITEM" --add-label agent:wip --add-label "loop:$SLOT" >/dev/null
-  gh issue comment "$ITEM" --body "loop:$SLOT claimed" >/dev/null
   exec {CLAIM_FD}>&-
   ledger "$ITEM" "$SLOT" claim
 }
@@ -55,13 +54,14 @@ release() {
   ledger "$ITEM" "$SLOT" end "$RESULT"
 }
 
-# Block the item from STATE with a comment: block STATE NEED RESUME
+# Block the item from STATE and record why in its blocked.md: block STATE NEED RESUME
 block() {
-  local body
-  body=$(printf '<!-- loop:blocked -->\n@%s loop:%s blocked this item.\n\n**Needed:** %s\n\n**Resume:** %s\n' \
-    "${REPO%%/*}" "$SLOT" "$2" "$3")
+  local d
+  d=$(item_dir "$ITEM")
+  mkdir -p "$d"
+  printf '## %s loop:%s blocked this item\nat-round=%s\n**Needed:** %s\n**Resume:** %s\n\n' \
+    "$(date -Is)" "$SLOT" "$(find "$d" -maxdepth 1 -name 'review-*.md' | wc -l)" "$2" "$3" >>"$d/blocked.md"
   gh issue edit "$ITEM" --add-label agent:blocked --remove-label "$1" >/dev/null
-  gh issue comment "$ITEM" --body "$body" >/dev/null
   ledger "$ITEM" "$SLOT" blocked "$1"
 }
 
@@ -69,18 +69,19 @@ title() { [[ -n ${TMUX:-} ]] && tmux rename-window -t "${TMUX_PANE:-}" "$1" 2>/d
 
 # Run ROLE as a fresh headless agent. Records metrics and the role's friction notes.
 run_role() {
-  local role=$1 log start rc=0 extra=()
-  log="$RSTATE/logs/$ITEM-$(date +%Y%m%dT%H%M%S)-$role.json"
-  [[ $role == retro ]] && extra=(--add-dir "$LOOP_STATE")
-  [[ $role == contribute ]] || extra+=(--disallowedTools Edit Write NotebookEdit)
+  local role=$1 d log start rc=0 extra=()
+  d=$(item_dir "$ITEM")
+  mkdir -p "$d/logs"
+  log="$d/logs/$(date +%Y%m%dT%H%M%S)-$role.json"
+  [[ $role == contribute ]] || extra+=(--disallowedTools "Edit(./.worktrees/**)" "Write(./.worktrees/**)" NotebookEdit)
   title "l$SLOT #$ITEM $role"
   start=$(date +%s)
-  "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk \
+  "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk --model "$(role_model "$role")" \
     --settings "$LOOP_REPO_SETTINGS" --output-format json "${extra[@]}" </dev/null >"$log" 2>"$log.err" || rc=$?
   ledger "$ITEM" "$SLOT" "role:$role" "$(jq -r --arg rc "$rc" --arg s "$(( $(date +%s) - start ))" \
     '"rc=\($rc) error=\(.is_error | tostring) turns=\(.num_turns // "?") cost=\(.total_cost_usd // "?") secs=\($s)"' \
     "$log" 2>/dev/null || echo "rc=$rc unparsable")"
-  collect "$role" "$log" loop-friction "$RSTATE/friction/$ITEM.md" "### $role $(date -Is)"
+  collect "$role" "$log" loop-friction "$d/friction.md" "### $role $(date -Is)"
   collect "$role" "$log" loop-improvements "$RSTATE/improvements.tsv" ""
   return "$rc"
 }
@@ -108,7 +109,8 @@ pipeline() {
       agent:human-review) RESULT=human-review; return ;;
       agent:blocked) RESULT=blocked; return ;;
       agent:explore) role=explore ;;
-      agent:explored) role=contribute ;;
+      agent:explored) role=plan ;;
+      agent:planned) role=contribute ;;
       agent:review) role=review ;;
       agent:changes)
         if (( $(change_rounds "$ITEM") >= max )); then
@@ -123,7 +125,7 @@ pipeline() {
       fails=0; continue
     fi
     if (( ++fails >= 2 )); then
-      block "$state" "The $role role failed twice without moving the item on. Logs are in \`$RSTATE/logs\` on $(hostname)." \
+      block "$state" "The $role role failed twice without moving the item on. Logs are in \`$(item_dir "$ITEM")/logs\`." \
         "Fix the cause, then remove \`agent:blocked\` and set \`$state\` again."
       RESULT=blocked; return
     fi
@@ -135,8 +137,9 @@ main() {
   [[ -f $LOOP_REPO_CONFIG ]] || die 3 "$LOOP_REPO_CONFIG missing: repo is not enrolled"
   [[ -f $LOOP_REPO_SETTINGS ]] || die 3 "$LOOP_REPO_SETTINGS missing: repo is not enrolled"
   REPO=$(repo_slug)
-  RSTATE=$(repo_state "$REPO")
-  mkdir -p "$RSTATE"/{logs,results,friction}
+  init_work "$REPO"
+  RSTATE=$(repo_state)
+  mkdir -p "$RSTATE/results"
   acquire_slot || die 3 "no free slot"
   claim "${1:-}" || die 3 "no eligible item${1:+ (#$1)}"
   trap release EXIT

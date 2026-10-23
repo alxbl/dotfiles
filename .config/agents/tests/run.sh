@@ -13,20 +13,20 @@ setup() {
   export FAKE_GH=$T/gh FAKE_REPO=me/repo LOOP_STATE=$T/state LOOP_USER_CONFIG=$T/loop.md
   export PATH=$TESTS/stubs:$PATH CLAUDE_BIN=$TESTS/stubs/claude PENDING_TTL=300
   unset TMUX
-  mkdir -p "$FAKE_GH/issues" "$FAKE_GH/prs" "$T/repo/.agents"
+  mkdir -p "$FAKE_GH/issues" "$T/repo/.agents"
   : >"$FAKE_GH/verdicts"
   printf -- '---\nwip: 1\npoll_interval: 1\n---\n' >"$LOOP_USER_CONFIG"
   printf -- '---\nbase: main\n---\nnotes\n' >"$T/repo/.agents/loop.md"
   echo '{}' >"$T/repo/.agents/settings.json"
   git -C "$T/repo" init -q
-  RSTATE=$LOOP_STATE/me-repo
+  RSTATE=$T/repo/.agents/work
   cd "$T/repo" || exit 1
 }
 
 teardown() { cd / && rm -rf "$T"; }
 
 issue() { # issue N CREATED LABEL...
-  local d=$FAKE_GH/issues/$1; mkdir -p "$d"; echo "$2" >"$d/created"; : >"$d/comments"
+  local d=$FAKE_GH/issues/$1; mkdir -p "$d"; echo "$2" >"$d/created"
   shift 2; printf '%s\n' "$@" >"$d/labels"
 }
 
@@ -71,21 +71,47 @@ test_eligible_order_and_exclusions() {
   issue 6 2026-01-06 bug
   issue 7 2026-01-07 agent:review
   issue 8 2025-12-31 agent:explore
-  check "order" eq "$(gh issue list | lib eligible_filter | paste -sd' ' -)" "2 7 3 8 1"
+  issue 9 2026-01-08 agent:planned
+  check "order" eq "$(gh issue list | lib eligible_filter | paste -sd' ' -)" "2 7 9 3 8 1"
 }
 
 test_change_rounds_reset_after_block() {
-  issue 1 2026-01-01 agent:changes
-  mkdir -p "$FAKE_GH/prs/9"; echo '<!-- loop:pr issue=1 -->' >"$FAKE_GH/prs/9/body"; : >"$FAKE_GH/prs/9/comments"
-  gh pr comment 9 --body '<!-- loop:review round=1 verdict=changes -->'
-  gh pr comment 9 --body '<!-- loop:review round=2 verdict=changes -->'
+  local d=$RSTATE/1; mkdir -p "$d"
+  review() { echo "verdict=$2" >"$d/review-$1.md"; }
+  check "no pr" eq "$(lib change_rounds 1)" 0
+  echo 9 >"$d/pr"
+  review 1 changes; review 2 changes
   check "two rounds" eq "$(lib change_rounds 1)" 2
-  gh issue comment 1 --body '<!-- loop:blocked --> stuck'
+  printf '## t loop:1 blocked this item\nat-round=2\n' >"$d/blocked.md"
   check "reset by block" eq "$(lib change_rounds 1)" 0
-  gh pr comment 9 --body '<!-- loop:review round=3 verdict=changes -->'
+  review 3 changes
   check "counts after block" eq "$(lib change_rounds 1)" 1
-  gh pr comment 9 --body '<!-- loop:review round=4 verdict=pass -->'
+  review 4 pass
   check "reset by pass" eq "$(lib change_rounds 1)" 0
+  review 5 changes
+  check "counts after pass" eq "$(lib change_rounds 1)" 1
+}
+
+test_role_model_defaults_and_overrides() {
+  check "explore" eq "$(lib role_model explore)" opus
+  check "plan" eq "$(lib role_model plan)" opus
+  check "contribute" eq "$(lib role_model contribute)" sonnet
+  check "review" eq "$(lib role_model review)" sonnet
+  check "retro" eq "$(lib role_model retro)" opus
+  printf -- '---\nmodel_review: haiku\nmodel_plan: sonnet\n---\n' >"$LOOP_USER_CONFIG"
+  check "user" eq "$(lib role_model review)" haiku
+  printf -- '---\nmodel_review: opus\n---\n' >.agents/loop.md
+  check "repo wins" eq "$(lib role_model review)" opus
+  check "user other" eq "$(lib role_model plan)" sonnet
+}
+
+test_init_work_excludes_and_registers() {
+  lib init_work me/repo
+  lib init_work me/repo
+  check "work dir" test -d "$RSTATE"
+  check "excluded once" eq "$(grep -cxF '.agents/work/' .git/info/exclude)" 1
+  check "worktrees excluded" grep -qxF .worktrees/ .git/info/exclude
+  check "registered once" eq "$(cat "$LOOP_STATE/repos")" "me/repo"$'\t'"$(realpath "$T/repo")"
 }
 
 # --- loop-run ----------------------------------------------------------------
@@ -97,17 +123,28 @@ test_loop_run_happy_path() {
   check "exit 0" eq "$rc" 0
   check "labels" eq "$(labels 1)" agent:human-review
   check "roles in order" eq "$(grep -o '/loop-[a-z]* 1' "$FAKE_GH/calls.log" | paste -sd' ' -)" \
-    "/loop-explore 1 /loop-contribute 1 /loop-review 1 /loop-retro 1"
-  check "dontAsk" grep -q -- '--permission-mode dontAsk --settings .agents/settings.json' "$FAKE_GH/calls.log"
-  check "retro sees state" grep -q -- "/loop-retro 1.*--add-dir $LOOP_STATE" "$FAKE_GH/calls.log"
-  check "explore read-only" grep -q -- "/loop-explore 1.*--disallowedTools Edit Write" "$FAKE_GH/calls.log"
+    "/loop-explore 1 /loop-plan 1 /loop-contribute 1 /loop-review 1 /loop-retro 1"
+  check "models" eq "$(grep -o '/loop-[a-z]* 1.*--model [a-z]*' "$FAKE_GH/calls.log" | sed 's|/loop-\([a-z]*\) .*--model |\1=|' | paste -sd' ' -)" \
+    "explore=opus plan=opus contribute=sonnet review=sonnet retro=opus"
+  check "dontAsk" grep -q -- '--permission-mode dontAsk --model [a-z]* --settings .agents/settings.json' "$FAKE_GH/calls.log"
+  check "explore cannot edit code" grep -q -- '/loop-explore 1.*--disallowedTools Edit(./.worktrees/\*\*) Write(./.worktrees/\*\*) NotebookEdit' "$FAKE_GH/calls.log"
   check "contribute can edit" test -z "$(grep -- '/loop-contribute 1.*--disallowedTools' "$FAKE_GH/calls.log")"
-  check "claim comment" grep -q 'loop:1 claimed' "$FAKE_GH/issues/1/comments"
+  check "no github comments" test -z "$(grep -E 'comment|pr (create|review)' "$FAKE_GH/calls.log")"
+  check "context files" test -s "$RSTATE/1/spec.md" -a -s "$RSTATE/1/plan.md" -a -s "$RSTATE/1/review-1.md"
   check "result file" eq "$(cat "$RSTATE"/results/1-*)" "1 1 human-review"
   check "slot item cleared" test ! -e "$LOOP_STATE/slot-1.item"
   check "metrics" grep -q $'role:review\trc=0 error=false turns=3 cost=0.01' "$RSTATE/ledger.tsv"
-  check "friction" grep -q 'missing-doc: contribute note' "$RSTATE/friction/1.md"
+  check "friction" grep -q 'missing-doc: contribute note' "$RSTATE/1/friction.md"
   check "improvements" grep -q $'\t1\tPROTOCOL.md\tprotocol\tclarify X$' "$RSTATE/improvements.tsv"
+}
+
+test_loop_run_uses_configured_model() {
+  printf -- '---\nmodel_review: opus\n---\n' >.agents/loop.md
+  issue 1 2026-01-01 agent:review
+  mkdir -p "$RSTATE/1"; echo 1 >"$RSTATE/1/pr"
+  echo pass >"$FAKE_GH/verdicts"
+  "$LOOP_RUN" >/dev/null 2>&1
+  check "review on opus" grep -q -- '/loop-review 1.*--model opus' "$FAKE_GH/calls.log"
 }
 
 test_loop_run_blocks_after_max_rounds() {
@@ -117,7 +154,8 @@ test_loop_run_blocks_after_max_rounds() {
   check "exit 2" eq "$rc" 2
   check "labels" eq "$(labels 1)" agent:blocked
   check "contribute runs" eq "$(grep -c '/loop-contribute 1' "$FAKE_GH/calls.log")" 3
-  check "block comment" grep -q 'loop:blocked.*max_review_rounds' <(tr -d '\n' <"$FAKE_GH/issues/1/comments")
+  check "block notice" grep -q 'max_review_rounds' "$RSTATE/1/blocked.md"
+  check "block round" grep -qx 'at-round=3' "$RSTATE/1/blocked.md"
   check "retro still runs" grep -q '/loop-retro 1' "$FAKE_GH/calls.log"
 }
 
@@ -159,7 +197,7 @@ test_loop_run_uses_second_slot() {
   "$LOOP_RUN" >/dev/null 2>&1; local rc=$?
   kill "$holder"
   check "exit 0" eq "$rc" 0
-  check "slot 2" grep -q 'loop:2 claimed' "$FAKE_GH/issues/1/comments"
+  check "slot 2" grep -q $'\t1\t2\tclaim' "$RSTATE/ledger.tsv"
 }
 
 test_loop_run_rejects_ineligible_item() {
@@ -233,11 +271,18 @@ test_poll_status() {
 test_recurrence_groups_across_repos() {
   local r=$SKILLS/loop-retro/recurrence.sh
   check "empty" eq "$("$r")" "no earlier proposals"
-  mkdir -p "$LOOP_STATE/a-x" "$LOOP_STATE/b-y"
-  printf 't\t1\tCLAUDE.md\tmissing-rule\tdoc A\nt\t2\tCLAUDE.md\tmissing-rule\tdoc B\n' >"$LOOP_STATE/a-x/improvements.tsv"
-  printf 't\t5\tCLAUDE.md\tmissing-rule\tdoc C\nt\t6\tPROTOCOL.md\tprotocol\tfix P\n' >"$LOOP_STATE/b-y/improvements.tsv"
-  check "top group" eq "$("$r" | head -n1 | cut -f1-4)" $'3\tCLAUDE.md\tmissing-rule\ta-x,b-y'
+  mkdir -p "$LOOP_STATE" "$T/a/.agents/work" "$T/b/.agents/work" "$T/c"
+  printf 't\t1\tCLAUDE.md\tmissing-rule\tdoc A\nt\t2\tCLAUDE.md\tmissing-rule\tdoc B\n' >"$T/a/.agents/work/improvements.tsv"
+  printf 't\t5\tCLAUDE.md\tmissing-rule\tdoc C\nt\t6\tPROTOCOL.md\tprotocol\tfix P\n' >"$T/b/.agents/work/improvements.tsv"
+  printf 'o/a\t%s\no/b\t%s\no/c\t%s\n' "$T/a" "$T/b" "$T/c" >"$LOOP_STATE/repos"
+  check "top group" eq "$("$r" | head -n1 | cut -f1-4)" $'3\tCLAUDE.md\tmissing-rule\to/a,o/b'
   check "filter" eq "$("$r" PROTOCOL | cut -f1,2)" $'1\tPROTOCOL.md'
+}
+
+test_labels_creates_every_state() {
+  "$SKILLS/loop-setup/labels.sh" >/dev/null
+  check "all labels" eq "$(grep -c '^gh label create agent:' "$FAKE_GH/calls.log")" 8
+  check "planned" grep -q '^gh label create agent:planned ' "$FAKE_GH/calls.log"
 }
 
 # -----------------------------------------------------------------------------

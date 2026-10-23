@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Fake headless claude for the loop tests. Plays each role by moving labels the way
-# the real skill would. Behaviour per role can be overridden with $FAKE_GH/role-<name>
+# Fake headless claude for the loop tests. Plays each role by moving labels and writing
+# its files under .agents/work/<n>/ the way the real skill would. Override a role with $FAKE_GH/role-<name>
 # (an executable run with the issue number; its stdout becomes the final message).
 set -euo pipefail
 echo "claude $*" >>"$FAKE_GH/calls.log"
@@ -8,22 +8,25 @@ prompt=$2 role=${2%% *}; role=${role#/loop-}; n=${prompt##* }
 labels=$FAKE_GH/issues/$n/labels
 has() { grep -qxF "$1" "$labels"; }
 move() { gh issue edit "$n" --remove-label "$1" --add-label "$2"; }
+dir=$PWD/.agents/work/$n
+mkdir -p "$dir"
 
 if [[ -x $FAKE_GH/role-$role ]]; then
   msg=$("$FAKE_GH/role-$role" "$n")
 else
   case $role in
-    explore) has agent:explore && move agent:explore agent:explored ;;
+    explore) has agent:explore && { echo spec >"$dir/spec.md"; move agent:explore agent:explored; } ;;
+    plan) has agent:explored && { echo plan >"$dir/plan.md"; move agent:explored agent:planned; } ;;
     contribute)
-      mkdir -p "$FAKE_GH/prs/$((n + 100))"
-      [[ -e $FAKE_GH/prs/$((n + 100))/body ]] || {
-        printf '<!-- loop:pr issue=%s -->\nCloses #%s\n' "$n" "$n" >"$FAKE_GH/prs/$((n + 100))/body"
-        : >"$FAKE_GH/prs/$((n + 100))/comments"
-      }
-      if has agent:explored; then move agent:explored agent:review; else move agent:changes agent:review; fi ;;
+      echo $((n + 100)) >"$dir/pr"
+      if has agent:planned; then move agent:planned agent:review
+      else
+        echo reply >"$dir/reply-$(find "$dir" -name 'review-*.md' | wc -l).md"
+        move agent:changes agent:review
+      fi ;;
     review)
       verdict=$(head -n1 "$FAKE_GH/verdicts"); sed -i 1d "$FAKE_GH/verdicts"
-      gh pr comment "$((n + 100))" --body "<!-- loop:review round=1 verdict=$verdict -->"
+      printf 'verdict=%s\n' "$verdict" >"$dir/review-$(( $(find "$dir" -name 'review-*.md' | wc -l) + 1 )).md"
       if [[ $verdict == pass ]]; then move agent:review agent:human-review; else move agent:review agent:changes; fi ;;
   esac
   msg=$(printf 'did %s\n<loop-friction>\n- missing-doc: %s note\n</loop-friction>\n' "$role" "$role")

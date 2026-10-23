@@ -5,7 +5,8 @@ LOOP_STATE="${LOOP_STATE:-$HOME/.local/state/agent-loop}"
 LOOP_USER_CONFIG="${LOOP_USER_CONFIG:-$HOME/.config/agents/loop.md}"
 LOOP_REPO_CONFIG=".agents/loop.md"
 LOOP_REPO_SETTINGS=".agents/settings.json"
-LOOP_STATES=(agent:explore agent:explored agent:review agent:changes agent:human-review agent:blocked)
+LOOP_STATES=(agent:explore agent:explored agent:planned agent:review agent:changes agent:human-review agent:blocked)
+LOOP_WORK=".agents/work"
 
 die() { local code=$1; shift; echo "$*" >&2; exit "$code"; }
 
@@ -32,6 +33,13 @@ cfg() {
   echo "${v:-$2}"
 }
 
+# Print the model for ROLE: repo config, then user config, then the role default.
+role_model() {
+  local d=sonnet
+  case $1 in explore | plan | retro) d=opus ;; esac
+  cfg "model_$1" "$d"
+}
+
 # Print the user-wide WIP limit (number of slots).
 user_wip() { local v; v=$(fm_get "$LOOP_USER_CONFIG" wip); echo "${v:-1}"; }
 
@@ -44,8 +52,26 @@ repo_wip() {
 
 repo_slug() { gh repo view --json nameWithOwner | jq -r .nameWithOwner; }
 
-# Print the state directory for REPO (owner/name).
-repo_state() { echo "$LOOP_STATE/${1/\//-}"; }
+# Print the root of the main checkout of the current repo.
+repo_root() { dirname "$(realpath "$(git rev-parse --git-common-dir)")"; }
+
+# Print the loop's working directory for the current repo. All loop context lives here.
+repo_state() { echo "$(repo_root)/$LOOP_WORK"; }
+
+# Print the directory holding the context of issue N.
+item_dir() { echo "$(repo_state)/$1"; }
+
+# Keep the working directory and the code worktrees out of git, and record the
+# repo (SLUG) so cross-repo tools can find its context.
+init_work() {
+  local slug=$1 ex tmp p
+  ex="$(realpath "$(git rev-parse --git-common-dir)")/info/exclude"
+  mkdir -p "$(dirname "$ex")" "$(repo_state)" "$LOOP_STATE"
+  for p in "$LOOP_WORK/" .worktrees/; do grep -qxF "$p" "$ex" 2>/dev/null || echo "$p" >>"$ex"; done
+  tmp=$(mktemp)
+  { grep -v "^$slug"$'\t' "$LOOP_STATE/repos" 2>/dev/null || true; printf '%s\t%s\n' "$slug" "$(repo_root)"; } >"$tmp"
+  mv "$tmp" "$LOOP_STATE/repos"
+}
 
 # Append one ledger line: ITEM SLOT EVENT DETAIL. Needs RSTATE.
 ledger() { printf '%s\t%s\t%s\t%s\t%s\n' "$(date -Is)" "$1" "$2" "$3" "${4:-}" >>"$RSTATE/ledger.tsv"; }
@@ -80,8 +106,9 @@ eligible_filter() {
     def rank:
       if has("agent:changes") then 1
       elif has("agent:review") then 2
-      elif has("agent:explored") then 3
-      elif has("agent:explore") then 4
+      elif has("agent:planned") then 3
+      elif has("agent:explored") then 4
+      elif has("agent:explore") then 5
       else 0 end;
     map(select((has("agent:wip") or has("agent:blocked")) | not) | .rank = rank | select(.rank > 0))
     | sort_by(.rank, .createdAt) | .[].number'
@@ -91,28 +118,29 @@ eligible_filter() {
 item_state() {
   local labels s
   labels=$(gh issue view "$1" --json labels | jq -r '.labels[].name')
-  for s in agent:blocked agent:human-review agent:changes agent:review agent:explored agent:explore; do
+  for s in agent:blocked agent:human-review agent:changes agent:review agent:planned agent:explored agent:explore; do
     grep -qxF "$s" <<<"$labels" && { echo "$s"; return; }
   done
 }
 
-# Print the number of the open PR that implements issue N, or nothing.
-find_pr() {
-  gh pr list --state open --limit 200 --json number,body |
-    jq -r --arg m "<!-- loop:pr issue=$1 -->" 'map(select(.body | contains($m))) | .[0].number // empty'
-}
+# Print the number of the PR that implements issue N, or nothing.
+find_pr() { cat "$(item_dir "$1")/pr" 2>/dev/null || true; }
 
-# Print how many review rounds on issue N's PR asked for changes since the last
-# block or pass. Zero when there is no PR.
+# Print how many review rounds of issue N asked for changes since the last pass
+# or block. Zero when there is no PR. Round r is review-<r>.md, whose first line is
+# verdict=pass|changes; a block records at-round=<rounds so far> in blocked.md.
 change_rounds() {
-  local pr since
-  pr=$(find_pr "$1")
-  [[ -n $pr ]] || { echo 0; return; }
-  since=$(gh issue view "$1" --json comments |
-    jq -r '[.comments[] | select(.body | contains("<!-- loop:blocked -->")) | .createdAt] | max // ""')
-  gh pr view "$pr" --json comments | jq -r --arg since "$since" '
-    [.comments[] | select(.body | test("<!-- loop:review round=[0-9]+ verdict=")) ] as $r
-    | ([$r[] | select(.body | contains("verdict=pass")) | .createdAt] | max // "") as $pass
-    | ([$since, $pass] | max) as $after
-    | [$r[] | select(.body | contains("verdict=changes")) | select(.createdAt > $after)] | length'
+  local d total base=0 r n=0
+  d=$(item_dir "$1")
+  [[ -n $(find_pr "$1") ]] || { echo 0; return; }
+  [[ -f $d/blocked.md ]] && base=$(sed -n 's/^at-round=//p' "$d/blocked.md" | tail -n1)
+  base=${base:-0}
+  total=$(find "$d" -maxdepth 1 -name 'review-*.md' 2>/dev/null | wc -l)
+  for ((r = 1; r <= total; r++)); do
+    [[ $(sed -n '1s/^verdict=//p' "$d/review-$r.md" 2>/dev/null) == pass ]] && (( r > base )) && base=$r
+  done
+  for ((r = base + 1; r <= total; r++)); do
+    [[ $(sed -n '1s/^verdict=//p' "$d/review-$r.md" 2>/dev/null) == changes ]] && n=$((n + 1))
+  done
+  echo "$n"
 }

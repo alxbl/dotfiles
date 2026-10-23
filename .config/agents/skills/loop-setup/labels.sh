@@ -7,6 +7,7 @@ while IFS='|' read -r name color desc; do
 done <<'EOF'
 agent:explore|C5DEF5|Approved for the agent loop; needs a spec
 agent:explored|0E8A16|Spec ready; needs implementation
+agent:planned|1D76DB|Plan ready; needs implementation
 agent:review|FBCA04|PR open; awaiting agent review
 agent:changes|D93F0B|Agent review asked for changes
 agent:human-review|5319E7|Agent review passed; waiting for a human

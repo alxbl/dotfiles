@@ -99,8 +99,9 @@ main() {
   cd "$(git rev-parse --show-toplevel)"
   [[ -f $LOOP_REPO_CONFIG ]] || die 3 "$LOOP_REPO_CONFIG missing: repo is not enrolled"
   REPO=$(repo_slug)
-  RSTATE=$(repo_state "$REPO")
-  mkdir -p "$LOOP_STATE" "$RSTATE"/{results,pending}
+  init_work "$REPO"
+  RSTATE=$(repo_state)
+  mkdir -p "$RSTATE"/{results,pending}
   touch "$RSTATE/ledger.tsv"
   [[ ${1:-} == --status ]] && { status; exit 0; }
   local interval
