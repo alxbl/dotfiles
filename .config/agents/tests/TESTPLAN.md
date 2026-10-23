@@ -146,4 +146,4 @@ Exit: no command above an environment's access level in any log, every PR mergea
 | 2026-10-22 | 3 R6, R8 (#4) | pass | Contribute reached PR #7; the review role (run by hand, sonnet, 20 turns, $0.15, no denials) validated the worktree itself and passed it |
 
 Not run yet: R0 (headless `/loop-setup`), R4, R9–R11 (seeded violating PR, fix round, rebuttal), Level 4 (orchestrator E1–E10), S1–S6.
-
+| 2026-10-22 | 3 R9 (#8, PR #9 with a `print` in library code) | pass | One finding with the right `file:line` and rule, `verdict=changes`, `agent:changes`; sonnet, 21 turns, $0.15. The reviewer could not validate the worktree because a plain `unittest` run imports the main checkout's package, and it said so instead of guessing |
