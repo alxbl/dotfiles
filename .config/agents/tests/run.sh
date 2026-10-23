@@ -13,6 +13,8 @@ setup() {
   export FAKE_GH=$T/gh FAKE_REPO=me/repo LOOP_STATE=$T/state LOOP_USER_CONFIG=$T/loop.md
   export PATH=$TESTS/stubs:$PATH CLAUDE_BIN=$TESTS/stubs/claude PENDING_TTL=300
   unset TMUX
+  export LOOP_SKILLS_DIR=$T/skills
+  for r in explore plan contribute review retro; do mkdir -p "$T/skills/loop-$r"; touch "$T/skills/loop-$r/SKILL.md"; done
   mkdir -p "$FAKE_GH/issues" "$T/repo/.agents"
   : >"$FAKE_GH/verdicts"
   printf -- '---\nwip: 1\npoll_interval: 1\n---\n' >"$LOOP_USER_CONFIG"
@@ -267,6 +269,14 @@ test_loop_run_rejects_ineligible_item() {
   "$LOOP_RUN" 1 >/dev/null 2>&1; local rc=$?
   check "exit 3" eq "$rc" 3
   check "no claude" test ! -s <(grep '^claude' "$FAKE_GH/calls.log")
+}
+
+test_loop_run_requires_installed_skills() {
+  issue 1 2026-01-01 agent:explore
+  rm "$T/skills/loop-plan/SKILL.md"
+  "$LOOP_RUN" >/dev/null 2>&1; local rc=$?
+  check "exit 3" eq "$rc" 3
+  check "not claimed" eq "$(labels 1)" agent:explore
 }
 
 test_loop_run_requires_enrollment() {

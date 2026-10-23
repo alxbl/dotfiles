@@ -50,6 +50,12 @@ for FILE in ${(0)"$(git ls-files -z .config)"}; do
     ln -sf "$DST/$FILE" "$HOME/$FILE.install" && mv -T "$HOME/$FILE.install" "$HOME/$FILE" || echo "  !Failed:  $FILE"
 done
 
+echo ">> Linking agent skills"
+mkdir -p "$HOME/.claude/skills"
+for SKILL in "$HOME"/.config/agents/skills/loop-*(/N); do
+    ln -sfn "$SKILL" "$HOME/.claude/skills/${SKILL:t}"
+done
+
 echo ">> Linking agent rules"
 ln -f -s "$HOME/.config/agents/rules" "$HOME/.claude/CLAUDE.md"
 

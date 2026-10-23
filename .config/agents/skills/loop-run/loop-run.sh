@@ -140,6 +140,9 @@ main() {
   cd "$(git rev-parse --show-toplevel)"
   [[ -f $LOOP_REPO_CONFIG ]] || die 3 "$LOOP_REPO_CONFIG missing: repo is not enrolled"
   [[ -f $LOOP_REPO_SETTINGS ]] || die 3 "$LOOP_REPO_SETTINGS missing: repo is not enrolled"
+  for role in "${LOOP_ROLES[@]}"; do
+    [[ -f $LOOP_SKILLS_DIR/loop-$role/SKILL.md ]] || die 3 "skill loop-$role is not installed in $LOOP_SKILLS_DIR"
+  done
   REPO=$(repo_slug)
   init_work "$REPO"
   RSTATE=$(repo_state)

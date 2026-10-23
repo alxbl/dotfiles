@@ -3,6 +3,8 @@
 
 LOOP_STATE="${LOOP_STATE:-$HOME/.local/state/agent-loop}"
 LOOP_USER_CONFIG="${LOOP_USER_CONFIG:-$HOME/.config/agents/loop.md}"
+LOOP_SKILLS_DIR="${LOOP_SKILLS_DIR:-$HOME/.claude/skills}"
+LOOP_ROLES=(explore plan contribute review retro)
 LOOP_REPO_CONFIG=".agents/loop.md"
 LOOP_REPO_SETTINGS=".agents/settings.json"
 LOOP_STATES=(agent:explore agent:explored agent:planned agent:review agent:changes agent:human-review agent:blocked)

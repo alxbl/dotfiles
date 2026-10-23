@@ -11,6 +11,7 @@
       "Write(./.worktrees/**)",
       "WebFetch",
       "WebSearch",
+      "Bash(ls:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
