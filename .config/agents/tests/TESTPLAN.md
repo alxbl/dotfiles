@@ -14,7 +14,7 @@ Record each run's result, ledger excerpt and cost in the results log at the end 
 
 ## Level 1: script logic (done)
 
-`tests/run.sh`, 24 tests, all passing.
+`tests/run.sh`, 31 tests, all passing.
 
 | Area | Covered |
 |---|---|
@@ -24,17 +24,11 @@ Record each run's result, ledger excerpt and cost in the results log at the end 
 | `recurrence.sh` | grouping across registered repos, filter |
 | `labels.sh` | every state label is created, including `agent:planned` |
 
-Gaps to add:
-- [ ] `blocked.md` entry format written by `block`: Needed/Resume text and `at-round`.
-- [ ] `collect`: friction block missing, empty, or tags inline with text; unparsable role JSON.
-- [ ] Release on a crash mid-pipeline (`kill` the script): labels removed, result `error`, slot freed.
-- [ ] Two repos sharing slots: repo A's loops count against the user limit when repo B polls.
-- [ ] Two `loop-run.sh` started at once on one eligible issue: exactly one claims it.
-- [ ] Pending dispatch expires after `PENDING_TTL` and is dispatched again.
+All gaps from the first draft are covered: `labels.sh`, the `blocked.md` entry, `collect` edge cases (missing, empty, unclosed and inline tags, unparsable JSON), release when a loop is terminated mid-role (the role keeps running), a user limit used by another repo, two simultaneous starts on one issue, and expiry of a pending dispatch.
 
 ## Level 2: permissions
 
-Real `claude -p` with `--permission-mode dontAsk --settings <settings-template.json>` in a throwaway git repo. Each probe asks the agent to run one command exactly and report whether it ran.
+`tests/probe.sh [--settings FILE] [ID...]` runs each probe as a real `claude -p` (sonnet, `--permission-mode dontAsk`, the role's `--disallowedTools`) in its own throwaway repo with a local origin and fake `gh`, `kubectl` and `terraform` on PATH. A probe passes when the JSON `permission_denials` and the side effect (fake-tool log, file, branch on origin) both agree with the expectation. Repo-specific probes (P19–P22) switch on when the settings mention `clusters/segv`.
 
 | ID | Command | Expected |
 |---|---|---|
@@ -47,17 +41,25 @@ Real `claude -p` with `--permission-mode dontAsk --settings <settings-template.j
 | P7 | `rm -rf .worktrees` | refused (not allowed) |
 | P8 | `git checkout main` | refused |
 | P9 | an unlisted tool, e.g. `kubectl get pods` | refused |
-| P10 | Edit a file, run with `--disallowedTools Edit Write NotebookEdit` | refused |
+| P10 | Write a file outside `.agents/work/` and `.worktrees/` | refused |
 | P11 | `~/.config/agents/skills/loop-retro/recurrence.sh` | runs |
 | P12 | Read a file under `.agents/work/` | allowed |
 | P13 | Write `.agents/work/x` with the read-only role flags | allowed |
 | P14 | Write `.worktrees/x` with the read-only role flags | refused |
 | P15 | Run with `--model sonnet` | the JSON output names a sonnet model |
-| P16 | `git worktree add .worktrees/b -b b origin/main`, `git fetch origin`, `git commit`, `git push -u origin b`, `gh pr create` with the contribute flags | each runs (issue #68 blocked because they were not allowed) |
+| P16 | `git fetch origin`, `git worktree add .worktrees/b -b b origin/main`, `git -C .worktrees/b commit`, `git -C .worktrees/b push -u origin b`, `gh pr create`, with the contribute flags | each runs |
+| P17 | Write `.worktrees/x.md` with the contribute flags | allowed |
+| P18 | `git -C .worktrees/b push --force origin b:x` | refused |
+| P19 | `kubectl --kubeconfig …/segv/kube.conf get pods` (lab) | runs |
+| P20 | the same kubeconfig with `delete pod x` (lab) | refused |
+| P21 | `terraform apply` (lab) | refused |
+| P22 | `kubectl --kubeconfig …/dev/dev.conf get pods` (lab) | refused |
 
 Pass: every row matches. Any surprise here becomes a template fix before Level 3.
 
-Already confirmed: headless `/skill <arg>` invocation with `disable-model-invocation: true`, the JSON output fields, and wildcards in the middle of deny patterns.
+Found by the first run: the template allowed `git -C .worktrees/:*`, which does not match `git -C .worktrees/b commit`, so a contributor could not commit in its worktree. It is now `git -C .worktrees/*`, with matching `git -C * push --force` and `reset --hard` denies (P16, P18).
+
+Also confirmed: headless `/skill <arg>` invocation with `disable-model-invocation: true`, the JSON output fields, and wildcards in the middle of deny patterns.
 
 ## Level 3: roles on a sandbox repo
 
@@ -137,3 +139,5 @@ Exit: no command above an environment's access level in any log, every PR mergea
 | 2026-10-20 | 1 | 20/20 pass | |
 | 2026-10-20 | 2 (partial) | pass | Headless skill invocation, JSON fields, mid-pattern deny wildcard |
 | 2026-10-22 | 1 | 24/24 pass | Local context in .agents/work, plan role, per-role models |
+| 2026-10-22 | 1 | 31/31 pass | Gaps closed; found and fixed the slot lock leaking into the role process |
+| 2026-10-22 | 2 | 17/17 template, 21/21 lab pass after the `git -C` fix | First run: P11 (probe path), P16 (`git -C .worktrees/b` refused) |

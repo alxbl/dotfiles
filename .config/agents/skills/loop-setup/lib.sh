@@ -40,6 +40,11 @@ role_model() {
   cfg "model_$1" "$d"
 }
 
+# Print the tool patterns ROLE may not use, one per line. Only contribute writes code.
+role_disallowed() {
+  [[ $1 == contribute ]] || printf '%s\n' "Edit(./.worktrees/**)" "Write(./.worktrees/**)" NotebookEdit
+}
+
 # Print the user-wide WIP limit (number of slots).
 user_wip() { local v; v=$(fm_get "$LOOP_USER_CONFIG" wip); echo "${v:-1}"; }
 

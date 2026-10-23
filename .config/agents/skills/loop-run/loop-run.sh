@@ -69,11 +69,12 @@ title() { [[ -n ${TMUX:-} ]] && tmux rename-window -t "${TMUX_PANE:-}" "$1" 2>/d
 
 # Run ROLE as a fresh headless agent. Records metrics and the role's friction notes.
 run_role() {
-  local role=$1 d log start rc=0 extra=()
+  local role=$1 d log start rc=0 extra=() deny
   d=$(item_dir "$ITEM")
   mkdir -p "$d/logs"
   log="$d/logs/$(date +%Y%m%dT%H%M%S)-$role.json"
-  [[ $role == contribute ]] || extra+=(--disallowedTools "Edit(./.worktrees/**)" "Write(./.worktrees/**)" NotebookEdit)
+  mapfile -t deny < <(role_disallowed "$role")
+  (( ${#deny[@]} )) && extra+=(--disallowedTools "${deny[@]}")
   title "l$SLOT #$ITEM $role"
   start=$(date +%s)
   "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk --model "$(role_model "$role")" \
