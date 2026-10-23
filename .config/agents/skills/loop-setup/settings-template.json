@@ -12,6 +12,7 @@
       "WebFetch",
       "WebSearch",
       "Bash(ls:*)",
+      "Bash(grep:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",

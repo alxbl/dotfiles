@@ -11,7 +11,7 @@ If a skill and this file disagree, this file wins.
 - **Round**: one review of a PR, ending with verdict `pass` or `changes`.
 - **Owner**: the repo owner.
 - **Work dir**: `.agents/work/` at the root of the repo's main checkout, git-ignored. All loop context lives here; GitHub carries only labels and the PR. Loops are single-machine.
-- **Item dir** `D`: `.agents/work/<N>/`.
+- **Item dir** `D`: `.agents/work/<N>/` under the main checkout. A role that will `cd` into a worktree first runs `git rev-parse --show-toplevel` in the main checkout and uses the absolute `D` afterwards: relative paths and rules follow the shell's working directory.
 
 ## Components
 | Component | Kind | Job |
@@ -64,7 +64,7 @@ Roles run as `claude -p "/loop-<role> <N>" --permission-mode dontAsk --settings 
 Only tools allowed by the merged settings run; anything else is refused, never prompted.
 Every role may write under `.agents/work/`. Only `contribute` may write under `.worktrees/`; the others run with those paths and `NotebookEdit` disallowed.
 `.agents/settings.json` holds the loop's allow and deny rules and must match `environments`. It applies to loops only, not to interactive sessions.
-Run one command per Bash call: compound commands (`;`, `&&`, `||`, pipes, redirects) match no allow rule and are refused. Use Read to read files and Grep to search.
+Run one command per Bash call: compound commands (`;`, `&&`, `||`, pipes, redirects) match no allow rule and are refused. Use Read to read files. Glob and Grep do not exist in headless sessions: list with `ls` and search with `grep`, one command per call.
 If the task needs a refused tool, block the item and name the tool. Do not work around a refusal.
 
 ## Labels

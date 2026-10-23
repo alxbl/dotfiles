@@ -71,6 +71,15 @@ probe P16 runs contribute "Run these Bash commands one at a time, in this order,
   'git ls-remote --exit-code origin b >/dev/null && grep -q "gh pr create" "$PROBE_LOG"'
 probe P18 refused contribute "Run these Bash commands one at a time, in this order, and say DONE: (1) git worktree add .worktrees/b -b b origin/main (2) git -C .worktrees/b push --force origin b:x" \
   'git ls-remote --exit-code origin x >/dev/null'
+probe P23 runs ro 'Use the Write tool to create the file whose absolute path is the repo root followed by /.agents/work/y.md (find the repo root with the working directory you were started in) with content hello, then say DONE.' '[ -e .agents/work/y.md ]'
+probe P24 refused ro 'Use the Write tool to create the file whose absolute path is the repo root followed by /.worktrees/y.md with content hello, then say DONE.' '[ -e .worktrees/y.md ]'
+probe P25 runs contribute "$(cmd "gh pr create --base main --title 'feat: t' --body 'Closes #1
+
+## Summary
+Adds \`char_count\` (uses str.isspace).
+- [x] done: \`test_x\`'")" 'grep -q "gh pr create" "$PROBE_LOG"'
+probe P26 runs contribute "$(cmd 'gh pr create --base main --title t --body-file .agents/work/a.txt')" 'grep -q "gh pr create" "$PROBE_LOG"'
+probe P27 runs contribute 'Do these in order, one tool call each, and say DONE: (1) Bash: git worktree add .worktrees/b -b b origin/main (2) Bash: cd .worktrees/b (3) Write tool: create the file whose absolute path is the original repo root (the directory you were started in, not the worktree) followed by /.agents/work/z.md with content hello.' '[ -e .agents/work/z.md ]'
 probe P17 runs contribute 'Use the Write tool to create the file .worktrees/x.md with the content hello, then say DONE.' '[ -e .worktrees/x.md ]'
 
 # Repo-specific probes, enabled when the settings name the environment.
@@ -83,17 +92,18 @@ fi
 
 # Run one probe in a private copy of the template repo; write "ID verdict detail" to results/.
 run_probe() {
-  local id expect role prompt effect d flags=() json denied took verdict
+  local id expect role prompt effect d root flags=() deny allow denied took verdict
   IFS=$'\x1f' read -r id expect role prompt effect <<<"$1"
   d=$WORK/run-$id
   cp -a "$BASE" "$d"
   git -C "$d/repo" remote set-url origin "$d/origin.git"
   export PROBE_LOG=$d/calls.log PROBE_JSON=$d/out.json PROBE_RESULT=$d/result.txt PROBE_MODEL=$MODEL
   : >"$PROBE_LOG"
-  [[ $role == contribute ]] || flags=(--disallowedTools "Edit(./.worktrees/**)" "Write(./.worktrees/**)" NotebookEdit)
-  mapfile -t want < <(role_disallowed "$role")
-  [[ $role == contribute && ${#want[@]} -eq 0 || $role != contribute && ${#want[@]} -eq 3 ]] ||
-    { echo "$id FAIL role_disallowed disagrees with the probe flags" >"$WORK/results/$id"; return; }
+  root=$(cd "$d/repo" && repo_root)
+  mapfile -t deny < <(role_disallowed "$role" "$root")
+  mapfile -t allow < <(role_allowed "$role" "$root")
+  (( ${#deny[@]} )) && flags+=(--disallowedTools "${deny[@]}")
+  flags+=(--allowedTools "${allow[@]}")
   (cd "$d/repo" && PATH=$BIN:$PATH claude -p "$prompt" --permission-mode dontAsk --settings .agents/settings.json \
     --model "$MODEL" --output-format json "${flags[@]}" </dev/null >"$PROBE_JSON" 2>"$d/err.log")
   jq -r '.result // ""' "$PROBE_JSON" >"$PROBE_RESULT" 2>/dev/null

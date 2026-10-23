@@ -129,7 +129,8 @@ test_loop_run_happy_path() {
   check "models" eq "$(grep -o '/loop-[a-z]* 1.*--model [a-z]*' "$FAKE_GH/calls.log" | sed 's|/loop-\([a-z]*\) .*--model |\1=|' | paste -sd' ' -)" \
     "explore=opus plan=opus contribute=sonnet review=sonnet retro=opus"
   check "dontAsk" grep -q -- '--permission-mode dontAsk --model [a-z]* --settings .agents/settings.json' "$FAKE_GH/calls.log"
-  check "explore cannot edit code" grep -q -- '/loop-explore 1.*--disallowedTools Edit(./.worktrees/\*\*) Write(./.worktrees/\*\*) NotebookEdit' "$FAKE_GH/calls.log"
+  check "explore cannot edit code" grep -q -- '/loop-explore 1.*--disallowedTools Edit(/.*/.worktrees/\*\*) Write(/.*/.worktrees/\*\*) NotebookEdit' "$FAKE_GH/calls.log"
+  check "explore may edit its context" grep -q -- '/loop-explore 1.*--allowedTools Edit(/.*/.agents/work/\*\*) Write(/.*/.agents/work/\*\*)' "$FAKE_GH/calls.log"
   check "contribute can edit" test -z "$(grep -- '/loop-contribute 1.*--disallowedTools' "$FAKE_GH/calls.log")"
   check "no github comments" test -z "$(grep -E 'comment|pr (create|review)' "$FAKE_GH/calls.log")"
   check "context files" test -s "$RSTATE/1/spec.md" -a -s "$RSTATE/1/plan.md" -a -s "$RSTATE/1/review-1.md"

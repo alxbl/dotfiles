@@ -42,9 +42,20 @@ role_model() {
   cfg "model_$1" "$d"
 }
 
-# Print the tool patterns ROLE may not use, one per line. Only contribute writes code.
+# Print the tool patterns ROLE may not use, one per line, for the repo at ROOT. Only
+# contribute writes code. Paths are absolute because relative rules follow the Bash
+# tool's working directory, which moves when a role runs `cd` into a worktree.
 role_disallowed() {
-  [[ $1 == contribute ]] || printf '%s\n' "Edit(./.worktrees/**)" "Write(./.worktrees/**)" NotebookEdit
+  [[ $1 == contribute ]] || printf '%s\n' "Edit(/$2/.worktrees/**)" "Write(/$2/.worktrees/**)" NotebookEdit
+}
+
+# Print the file-edit patterns ROLE is allowed, one per line, for the repo at ROOT.
+role_allowed() {
+  local t
+  for t in Edit Write; do
+    printf '%s\n' "$t(/$2/$LOOP_WORK/**)"
+    [[ $1 != contribute ]] || printf '%s\n' "$t(/$2/.worktrees/**)"
+  done
 }
 
 # Print the user-wide WIP limit (number of slots).

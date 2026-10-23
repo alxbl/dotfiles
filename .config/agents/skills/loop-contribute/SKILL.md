@@ -19,7 +19,7 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
 - Add unit tests for the change. If the repo has none for this area, run the closest check in `validate` and say so in the PR.
 - Environments: only the access `.agents/loop.md` grants. Never run a command listed under `ask`.
 - If the spec is wrong or infeasible, block with what you found. Small, justified deviations are fine; list them in the PR.
-- Write code only in the worktree. Context files in `D` are for reading, except the ones named below.
+- Write code only in the worktree. Context files in `D` are for reading, except the ones named below. Before the first `cd`, run `git rev-parse --show-toplevel` and use the absolute `D` for every later read and write.
 
 ## Implement
 1. Read `D/spec.md`, `D/plan.md` and `D/notes.md` if present.
@@ -27,9 +27,9 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
    Name the branch from `.agents/loop.md` `branch`. Make sure `.worktrees/` is in `.git/info/exclude`.
 3. Follow the plan. Deviate only for a reason you can state, and list each deviation in the PR.
 4. Implement and test inside the worktree.
-5. Run every `validate` command and the relevant tests. All must pass. A failure caused outside the item's scope → block.
+5. Run every `validate` command and the relevant tests from inside the worktree (`cd` into it; the commands assume the repo root). All must pass. A failure caused outside the item's scope → block.
 6. Commit using the repo's convention, then `git push -u origin <branch>`.
-7. Open the PR: `gh pr create --base <base> --head <branch> --title "<conventional title>" --body-file -`, using the protocol's PR body format.
+7. Write the PR body to `D/pr-body.md` in the protocol's PR body format, then open the PR: `gh pr create --base <base> --head <branch> --title "<conventional title>" --body-file D/pr-body.md`. Never pass the body inline.
 8. Write the PR number to `D/pr`.
 9. Move `agent:planned` → `agent:review`.
 
@@ -40,7 +40,7 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
 4. Address each finding. Answer every one in `D/reply-<r>.md` with what changed.
    If you disagree, give your reasoning and leave the code alone; the reviewer decides or escalates.
 5. Validate as in Implement step 5. Commit and push (never force).
-6. Update the PR body's acceptance criteria, validation and deviations if they changed.
+6. If the acceptance criteria, validation or deviations changed, update `D/pr-body.md` and run `gh pr edit <P> --body-file D/pr-body.md`.
 7. Move `agent:changes` → `agent:review`.
 
 End with a two-line summary and the `<loop-friction>` block.

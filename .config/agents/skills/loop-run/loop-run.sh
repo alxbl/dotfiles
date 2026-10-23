@@ -69,12 +69,14 @@ title() { [[ -n ${TMUX:-} ]] && tmux rename-window -t "${TMUX_PANE:-}" "$1" 2>/d
 
 # Run ROLE as a fresh headless agent. Records metrics and the role's friction notes.
 run_role() {
-  local role=$1 d log start rc=0 extra=() deny
+  local role=$1 d log start rc=0 extra=() deny allow
   d=$(item_dir "$ITEM")
   mkdir -p "$d/logs"
   log="$d/logs/$(date +%Y%m%dT%H%M%S)-$role.json"
-  mapfile -t deny < <(role_disallowed "$role")
+  mapfile -t deny < <(role_disallowed "$role" "$ROOT")
   (( ${#deny[@]} )) && extra+=(--disallowedTools "${deny[@]}")
+  mapfile -t allow < <(role_allowed "$role" "$ROOT")
+  extra+=(--allowedTools "${allow[@]}")
   title "l$SLOT #$ITEM $role"
   start=$(date +%s)
   "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk --model "$(role_model "$role")" \
@@ -144,6 +146,7 @@ main() {
     [[ -f $LOOP_SKILLS_DIR/loop-$role/SKILL.md ]] || die 3 "skill loop-$role is not installed in $LOOP_SKILLS_DIR"
   done
   REPO=$(repo_slug)
+  ROOT=$(repo_root)
   init_work "$REPO"
   RSTATE=$(repo_state)
   mkdir -p "$RSTATE/results"
