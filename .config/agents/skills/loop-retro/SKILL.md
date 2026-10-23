@@ -21,7 +21,7 @@ Read `~/.config/agents/skills/loop-setup/PROTOCOL.md` first, especially "Self-im
 - `W/ledger.tsv`, lines for this item: role runs, retries, turns, cost, duration, blocks.
 - `D/spec.md`, `D/plan.md`, `D/blocked.md`, and `D/notes.md` (an answer to an open question means the spec had a gap).
 - `D/review-*.md` and `D/reply-*.md`; the PR body and deviations if there is a PR.
-- `~/.config/agents/skills/loop-retro/recurrence.sh`: earlier proposals across all repos, grouped. Run it instead of reading every `improvements.tsv`.
+- `~/.config/agents/skills/loop-retro/recurrence.sh`: earlier proposals across all repos, grouped. Run it exactly as written, with the leading `~/` and no `bash` prefix (the allow rule matches only that form), instead of reading every `improvements.tsv`.
 - The current text of anything you propose to change.
 
 ## Steps

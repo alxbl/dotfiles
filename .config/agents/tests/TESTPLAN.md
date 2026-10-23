@@ -162,6 +162,7 @@ Not run yet: R0 (headless `/loop-setup`), R4, R9–R11 (seeded violating PR, fix
 | 2026-10-23 | 4 E8 (`touch drain` while #23, then #26, ran; #24/#27 eligible) | pass after 1 fix | First run: `poll.sh` exited 1 in drain mode while a loop ran (`[[ -z $held ]] && ...` under `set -e`), so the orchestrator stopped before reporting the running loop. Fixed with an `if`, unit test added. Second run: the running loop finished, `done` was reported, the orchestrator stopped, and the eligible issue was never claimed |
 | 2026-10-23 | 4 E9 (3 blocked items, nothing eligible) | pass | One `idle` push, not repeated across polls (`idle` file holds `2,5,8`) |
 | 2026-10-23 | 4 E10 (orchestrator transcripts of the E6-E9 sessions) | pass | Tool calls only `poll.sh`, `poll.sh --status`, `requeue.sh`, `tmux new-window`, `ls .agents/loop.md ...`, `ToolSearch` and `PushNotification`; no issue, PR, spec or code text in any message or tool result (the only matches are the project `CLAUDE.md` Claude Code injects at session start) |
+| 2026-10-23 | S1 (sandbox #29: `validate` lists `python3 -m compileall -q textstats`, absent from `settings.json`) | pass | The contributor implemented the change, was refused the command and blocked with "Allow `Bash(python3 -m compileall -q textstats)`". The retro found the planted cause, targeted `.agents/settings.json` with the exact diff (`+ "Bash(python3 -m compileall:*)"`), and added a true second proposal (preflight check that every `validate` command matches an allow rule). Item cost $1.12 in the ledger (explore .32, plan .29, contribute .17, retro .34); the 5h usage meter went from 31% to 38% |
 
-Still not run: S1-S6 and the pilot on `alxbl/lab`.
+Still not run: S2-S6 and the pilot on `alxbl/lab`.
 
