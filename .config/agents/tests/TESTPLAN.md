@@ -141,3 +141,9 @@ Exit: no command above an environment's access level in any log, every PR mergea
 | 2026-10-22 | 1 | 24/24 pass | Local context in .agents/work, plan role, per-role models |
 | 2026-10-22 | 1 | 31/31 pass | Gaps closed; found and fixed the slot lock leaking into the role process |
 | 2026-10-22 | 2 | 17/17 template, 21/21 lab pass after the `git -C` fix | First run: P11 (probe path), P16 (`git -C .worktrees/b` refused) |
+| 2026-10-22 | 3 (sandbox `alxbl/agent-loop-sandbox`) #1 full pipeline | pass after fixes | Explore/plan/contribute/review/retro ran headless; PR #6, `verdict=pass`, `agent:human-review`; about $4 in total across 4 attempts. Found and fixed: new skill not linked into `~/.config`, relative file rules followed the shell after `cd` into the worktree, grep/ls/Glob/Grep not available headless, PR body and `pr` file writes refused |
+| 2026-10-22 | 3 R2/R3/R7 (#2, #3, #5) | pass | Explore blocked each with a usable Needed line and a spec holding the open questions; #5 did not touch prod |
+| 2026-10-22 | 3 R6 (#4) | partial | Pipeline reached `agent:review` with PR #7; stopped before review to save budget |
+
+Not run yet: R0 (headless `/loop-setup`), R4, R9–R11 (seeded violating PR, fix round, rebuttal), Level 4 (orchestrator E1–E10), S1–S6.
+
