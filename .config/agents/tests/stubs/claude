@@ -11,6 +11,10 @@ move() { gh issue edit "$n" --remove-label "$1" --add-label "$2"; }
 dir=$PWD/.agents/work/$n
 mkdir -p "$dir"
 
+if [[ -e $FAKE_GH/raw-$role ]]; then
+  cat "$FAKE_GH/raw-$role"; exit 0
+fi
+
 if [[ -x $FAKE_GH/role-$role ]]; then
   msg=$("$FAKE_GH/role-$role" "$n")
 else

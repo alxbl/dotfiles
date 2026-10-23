@@ -77,7 +77,7 @@ run_role() {
   title "l$SLOT #$ITEM $role"
   start=$(date +%s)
   "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk --model "$(role_model "$role")" \
-    --settings "$LOOP_REPO_SETTINGS" --output-format json "${extra[@]}" </dev/null >"$log" 2>"$log.err" || rc=$?
+    --settings "$LOOP_REPO_SETTINGS" --output-format json "${extra[@]}" </dev/null >"$log" 2>"$log.err" {LOCK_FD}>&- || rc=$?
   ledger "$ITEM" "$SLOT" "role:$role" "$(jq -r --arg rc "$rc" --arg s "$(( $(date +%s) - start ))" \
     '"rc=\($rc) error=\(.is_error | tostring) turns=\(.num_turns // "?") cost=\(.total_cost_usd // "?") secs=\($s)"' \
     "$log" 2>/dev/null || echo "rc=$rc unparsable")"
@@ -88,15 +88,18 @@ run_role() {
 
 # Append the <TAG>...</TAG> block of a role's final message to FILE.
 collect() {
-  local role=$1 log=$2 tag=$3 file=$4 header=$5 block
-  block=$(jq -r '.result // ""' "$log" 2>/dev/null | sed -n "/<$tag>/,/<\/$tag>/{/<\/\{0,1\}$tag>/d;p}")
+  local role=$1 log=$2 tag=$3 file=$4 header=$5 text block
+  text=$(jq -r '.result // ""' "$log" 2>/dev/null) || return 0
+  [[ $text == *"<$tag>"*"</$tag>"* ]] || return 0
+  block=${text#*"<$tag>"}
+  block=${block%%"</$tag>"*}
   [[ -n ${block//[[:space:]]/} ]] || return 0
   if [[ $tag == loop-improvements ]]; then
     while IFS= read -r line; do
       [[ -n ${line//[[:space:]]/} ]] && printf '%s\t%s\t%s\n' "$(date -Is)" "$ITEM" "$line"
     done <<<"$block" >>"$file"
   else
-    printf '%s\n%s\n\n' "$header" "$block" >>"$file"
+    printf '%s\n%s\n\n' "$header" "$(sed '/^[[:space:]]*$/d' <<<"$block")" >>"$file"
   fi
 }
 

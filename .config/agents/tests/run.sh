@@ -166,6 +166,9 @@ test_loop_run_blocks_after_two_stuck_runs() {
   check "exit 2" eq "$rc" 2
   check "two attempts" eq "$(grep -c '/loop-explore 1' "$FAKE_GH/calls.log")" 2
   check "labels" eq "$(labels 1)" agent:blocked
+  check "block entry" grep -q '^\*\*Needed:\*\* The explore role failed twice' "$RSTATE/1/blocked.md"
+  check "resume line" grep -q '^\*\*Resume:\*\* .*agent:explore' "$RSTATE/1/blocked.md"
+  check "round recorded" grep -qx 'at-round=0' "$RSTATE/1/blocked.md"
 }
 
 test_loop_run_role_blocks_itself() {
@@ -176,6 +179,65 @@ test_loop_run_role_blocks_itself() {
   check "exit 2" eq "$rc" 2
   check "one attempt" eq "$(grep -c '/loop-explore 1' "$FAKE_GH/calls.log")" 1
   check "result" eq "$(cat "$RSTATE"/results/1-*)" "1 1 blocked"
+}
+
+# Run the explore role with FINAL as its raw final message; print the friction file.
+friction_from() {
+  issue 1 2026-01-01 agent:explore
+  printf '#!/bin/sh\ngh issue edit "$1" --remove-label agent:explore --add-label agent:blocked\nprintf "%%s" "$FINAL"\n' >"$FAKE_GH/role-explore"
+  chmod +x "$FAKE_GH/role-explore"
+  FINAL=$1 "$LOOP_RUN" >/dev/null 2>&1
+  cat "$RSTATE/1/friction.md" 2>/dev/null
+}
+
+test_collect_friction_edge_cases() {
+  check "block with tags on own lines" grep -q -- '- spec-gap: a' <(friction_from $'done\n<loop-friction>\n- spec-gap: a\n</loop-friction>')
+}
+
+test_collect_ignores_missing_empty_and_unparsable() {
+  check "no block" eq "$(friction_from 'done')" ""
+  teardown; setup
+  check "empty block" eq "$(friction_from $'done\n<loop-friction>\n\n</loop-friction>')" ""
+  teardown; setup
+  check "unclosed tag" eq "$(friction_from $'<loop-friction>\n- other: a')" ""
+  teardown; setup
+  issue 1 2026-01-01 agent:explore
+  echo 'not json' >"$FAKE_GH/raw-explore"
+  "$LOOP_RUN" >/dev/null 2>&1; local rc=$?
+  check "survives unparsable output" eq "$rc" 2
+  check "ledger notes it" grep -q 'rc=0 unparsable' "$RSTATE/ledger.tsv"
+}
+
+test_collect_inline_tags() {
+  check "inline block" grep -q -- '- other: x (y)' <(friction_from 'done <loop-friction>- other: x (y)</loop-friction>')
+}
+
+test_loop_run_releases_on_termination() {
+  issue 1 2026-01-01 agent:explore
+  printf '#!/bin/sh\nsleep 30 &\necho $! >"$FAKE_GH/sleeper"\nwait\n' >"$FAKE_GH/role-explore"; chmod +x "$FAKE_GH/role-explore"
+  "$LOOP_RUN" >/dev/null 2>&1 & local pid=$!
+  for _ in $(seq 50); do [[ $(labels 1) == *agent:wip* ]] && break; sleep 0.1; done
+  check "claimed" eq "$(labels 1)" "agent:explore agent:wip loop:1"
+  kill -TERM "$pid"
+  wait "$pid" 2>/dev/null
+  check "claim released" eq "$(labels 1)" agent:explore
+  check "slot freed" test ! -e "$LOOP_STATE/slot-1.item"
+  check "result recorded" eq "$(cat "$RSTATE"/results/1-*)" "1 1 error"
+  check "slot lock free although the role is still running" flock -n "$LOOP_STATE/slot-1.lock" true
+  kill "$(cat "$FAKE_GH/sleeper")" 2>/dev/null || true
+}
+
+test_loop_run_concurrent_starts_claim_once() {
+  printf -- '---\nwip: 2\n---\n' >"$LOOP_USER_CONFIG"
+  issue 1 2026-01-01 agent:explore
+  printf '#!/bin/sh\nsleep 1\ngh issue edit "$1" --remove-label agent:explore --add-label agent:blocked\n' >"$FAKE_GH/role-explore"
+  chmod +x "$FAKE_GH/role-explore"
+  "$LOOP_RUN" 1 >/dev/null 2>&1 & local a=$!
+  "$LOOP_RUN" 1 >/dev/null 2>&1 & local b=$!
+  wait "$a"; local ra=$?; wait "$b"; local rb=$?
+  check "one runs, one is refused" eq "$(printf '%s\n' "$ra" "$rb" | sort | paste -sd' ' -)" "2 3"
+  check "claimed once" eq "$(grep -c $'\tclaim\t*$' "$RSTATE/ledger.tsv")" 1
+  check "role ran once" eq "$(grep -c '/loop-explore 1' "$FAKE_GH/calls.log")" 1
 }
 
 test_loop_run_no_free_slot() {
@@ -231,6 +293,25 @@ test_poll_respects_repo_wip() {
   issue 1 2026-01-01 agent:explore
   issue 2 2026-01-02 agent:explore
   check "one dispatch" eq "$("$POLL" --once)" "dispatch 1"
+}
+
+test_poll_redispatches_expired_pending() {
+  issue 1 2026-01-01 agent:explore
+  check "dispatch" eq "$("$POLL" --once)" "dispatch 1"
+  touch -d '10 minutes ago' "$RSTATE/pending/1"
+  check "expired pending dispatched again" eq "$("$POLL" --once)" "dispatch 1"
+}
+
+test_poll_counts_slots_held_by_other_repos() {
+  issue 1 2026-01-01 agent:explore
+  mkdir -p "$LOOP_STATE"; echo "me/other#5" >"$LOOP_STATE/slot-1.item"
+  flock "$LOOP_STATE/slot-1.lock" sleep 30 & local holder=$!
+  sleep 0.2
+  check "no dispatch while the user limit is used" eq "$("$POLL" --once)" ""
+  check "loop-run refuses" eq "$("$LOOP_RUN" >/dev/null 2>&1; echo $?)" 3
+  pkill -P "$holder"; kill "$holder"; wait "$holder" 2>/dev/null
+  rm -f "$LOOP_STATE/slot-1.item"
+  check "dispatch once free" eq "$("$POLL" --once)" "dispatch 1"
 }
 
 test_poll_reports_done() {
