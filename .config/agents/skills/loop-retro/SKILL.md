@@ -35,7 +35,9 @@ Read `~/.config/agents/skills/loop-setup/PROTOCOL.md` first, especially "Self-im
    | Plan gap the planner should have caught | `loop-plan` skill |
    | Unclear or wrong loop instruction | protocol, `loop-*` skill or script |
    | Missing or slow repo tooling | `.agents/loop.md` `validate`, repo docs |
+   | Doc contradicts the code or itself | the doc, marked stale (take the code as ground truth) |
    | Needed a human anyway | no proposal; say so |
+   "Needed a human anyway" is only for blocks no rule, doc or tooling change could have avoided. If a decision is the human's to make (for example which of two contradicting sources is right), still propose the change you recommend and name the alternative; the human accepts or rejects it.
 3. Keep only proposals that would have prevented or shortened this loop, or that recur (`recurrence.sh`). Prefer the narrowest target that fixes it.
    If an earlier identical proposal exists, reference it and raise its count instead of rewording it.
 4. Rule proposals follow the user's rules-file policy: high signal, no implementation details.
