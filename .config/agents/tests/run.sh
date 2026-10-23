@@ -373,6 +373,20 @@ test_poll_drain() {
   check "drain" eq "$("$POLL" --once)" "drain"
 }
 
+test_poll_drain_waits_for_running_loop() {
+  issue 1 2026-01-01 agent:explore agent:wip loop:1
+  issue 2 2026-01-02 agent:explore
+  mkdir -p "$LOOP_STATE"; touch "$LOOP_STATE/drain"; echo "me/repo#1" >"$LOOP_STATE/slot-1.item"
+  flock "$LOOP_STATE/slot-1.lock" sleep 30 & local holder=$!
+  sleep 0.2
+  local out rc; out=$("$POLL" --once); rc=$?
+  check "no event while the loop runs" eq "$out" ""
+  check "still running is not an error" eq "$rc" 0
+  check "nothing dispatched" test ! -e "$RSTATE/pending/2"
+  pkill -P "$holder"; kill "$holder"; wait "$holder" 2>/dev/null
+  check "drain once it ends" eq "$("$POLL" --once)" "drain"
+}
+
 test_poll_status() {
   issue 1 2026-01-01 agent:explore
   issue 2 2026-01-01 agent:blocked

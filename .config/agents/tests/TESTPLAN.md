@@ -157,5 +157,11 @@ Not run yet: R0 (headless `/loop-setup`), R4, R9–R11 (seeded violating PR, fix
 | 2026-10-23 | 4 E4 (#8, real contributor, scripted reviewer returning `changes`) | pass | First attempt: the contributor blocked at round 2 because the scripted finding repeated unchanged (protocol rule, correct). Second attempt with a distinct finding per round: after the human relabel the count restarted from the recorded `at-round`, two contributor runs, then `block` at `max_review_rounds` with `at-round=7`; `change_rounds` is 0 after the block |
 | 2026-10-23 | 4 E5 (#21, loop-run killed with SIGKILL mid-explore) | pass after 3 fixes | Orchestrator reported `stale`, cleared `agent:wip` and `loop:1`, the item was dispatched again and a new loop took it to `agent:human-review`. Found and fixed: the requeue ledger line was written with a shell redirect that is refused (now `requeue.sh`, requeue once then block, unit tested); the new script was not linked into `~/.config` (tracked files only); a stale `slot-N.item` left by the killed loop made the next loop on that slot see the item as held ("no eligible item") |
 
-Still not run: E6-E10 and S1-S6.
+| 2026-10-23 | 4 E6 (#24, loop killed twice mid-explore) | pass | First stale: requeued, dispatched again; second stale: `requeue.sh` blocked it, `blocked.md` says "The claim on this item went stale twice", label `agent:blocked`, one notification |
+| 2026-10-23 | 4 E7 (#23 running, manual `loop-run.sh 24` and `loop-run.sh 23`) | pass | Both refused with "no free slot" (exit 3); no second claim in the ledger |
+| 2026-10-23 | 4 E8 (`touch drain` while #23, then #26, ran; #24/#27 eligible) | pass after 1 fix | First run: `poll.sh` exited 1 in drain mode while a loop ran (`[[ -z $held ]] && ...` under `set -e`), so the orchestrator stopped before reporting the running loop. Fixed with an `if`, unit test added. Second run: the running loop finished, `done` was reported, the orchestrator stopped, and the eligible issue was never claimed |
+| 2026-10-23 | 4 E9 (3 blocked items, nothing eligible) | pass | One `idle` push, not repeated across polls (`idle` file holds `2,5,8`) |
+| 2026-10-23 | 4 E10 (orchestrator transcripts of the E6-E9 sessions) | pass | Tool calls only `poll.sh`, `poll.sh --status`, `requeue.sh`, `tmux new-window`, `ls .agents/loop.md ...`, `ToolSearch` and `PushNotification`; no issue, PR, spec or code text in any message or tool result (the only matches are the project `CLAUDE.md` Claude Code injects at session start) |
+
+Still not run: S1-S6 and the pilot on `alxbl/lab`.
 

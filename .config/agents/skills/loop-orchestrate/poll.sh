@@ -52,7 +52,7 @@ poll_once() {
   busy=$( { echo "$held"; pending; } | sed '/^$/d' | sort -u)
 
   if [[ -e $LOOP_STATE/drain ]]; then
-    [[ -z $held ]] && EVENTS+=(drain)
+    if [[ -z $held ]]; then EVENTS+=(drain); fi
     return
   fi
 
