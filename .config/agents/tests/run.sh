@@ -266,6 +266,15 @@ test_loop_run_uses_second_slot() {
   check "slot 2" grep -q $'\t1\t2\tclaim' "$RSTATE/ledger.tsv"
 }
 
+test_loop_run_ignores_item_file_left_by_a_killed_loop() {
+  issue 1 2026-01-01 agent:explore
+  mkdir -p "$LOOP_STATE"; echo "me/repo#1" >"$LOOP_STATE/slot-1.item"
+  echo pass >"$FAKE_GH/verdicts"
+  "$LOOP_RUN" >/dev/null 2>&1; local rc=$?
+  check "exit 0" eq "$rc" 0
+  check "labels" eq "$(labels 1)" agent:human-review
+}
+
 test_loop_run_rejects_ineligible_item() {
   issue 1 2026-01-01 agent:blocked
   "$LOOP_RUN" 1 >/dev/null 2>&1; local rc=$?
@@ -324,6 +333,18 @@ test_poll_counts_slots_held_by_other_repos() {
   pkill -P "$holder"; kill "$holder"; wait "$holder" 2>/dev/null
   rm -f "$LOOP_STATE/slot-1.item"
   check "dispatch once free" eq "$("$POLL" --once)" "dispatch 1"
+}
+
+test_requeue_once_then_block() {
+  local rq=$SKILLS/loop-orchestrate/requeue.sh
+  issue 3 2026-01-01 agent:review agent:wip loop:1
+  check "first stale requeues" eq "$("$rq" 3 1)" requeued
+  check "claim released" eq "$(labels 3)" agent:review
+  check "ledger line" grep -q $'\t3\t-\trequeue\t' "$RSTATE/ledger.tsv"
+  gh issue edit 3 --add-label agent:wip --add-label loop:1
+  check "second stale blocks" eq "$("$rq" 3 1)" blocked
+  check "labels" eq "$(labels 3)" agent:blocked
+  check "block entry" grep -q 'went stale twice' "$RSTATE/3/blocked.md"
 }
 
 test_poll_reports_done() {

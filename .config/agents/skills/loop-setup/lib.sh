@@ -132,6 +132,18 @@ eligible_filter() {
     | sort_by(.rank, .createdAt) | .[].number'
 }
 
+# Block issue N from STATE and record why in its blocked.md: block_item N SLOT STATE NEED RESUME.
+# Needs RSTATE.
+block_item() {
+  local d
+  d=$(item_dir "$1")
+  mkdir -p "$d"
+  printf '## %s loop:%s blocked this item\nat-round=%s\n**Needed:** %s\n**Resume:** %s\n\n' \
+    "$(date -Is)" "$2" "$(find "$d" -maxdepth 1 -name 'review-*.md' | wc -l)" "$4" "$5" >>"$d/blocked.md"
+  gh issue edit "$1" --add-label agent:blocked --remove-label "$3" >/dev/null
+  ledger "$1" "$2" blocked "$3"
+}
+
 # Print the state label of issue N (see LOOP_STATES), or nothing.
 item_state() {
   local labels s

@@ -73,6 +73,7 @@ Status at a glance: `~/.config/agents/skills/loop-orchestrate/poll.sh --status` 
 ### Limits and safety
 
 - **WIP**: `wip` in `loop.md` caps concurrent loops across all repos, and so the number of agents working at once. A repo may lower it, never raise it.
+- **Orchestrator permissions**: it starts loops and requeues stale claims with single commands. Run it with allow rules for `poll.sh`, `requeue.sh`, `loop-run.sh`, `tmux new-window` and `setsid`, or approve them when asked; compound commands are refused in `dontAsk` mode.
 - **No merges**: no role merges, closes, deletes or force-pushes. All roles act as your GitHub account, so reviews are comments, not approvals.
 - **Permissions**: roles run with `--permission-mode dontAsk`. Anything not allowed by `.agents/settings.json` is refused, and a refusal the task needs blocks the item. Every role may write `.agents/work/`; only contribute may write `.worktrees/`.
 - **Environments**: production should be `read-only` or `none`. Pattern-based permission rules are a soft guard; for real enforcement, give the loop read-only credentials (e.g. a read-only kubeconfig) and name them in the environment's `how`.

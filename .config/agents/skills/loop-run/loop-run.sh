@@ -18,7 +18,7 @@ acquire_slot() {
   (( $(held_items "$REPO" | wc -l) < $(repo_wip) )) || return 1
   for ((n = 1; n <= $(user_wip); n++)); do
     exec {LOCK_FD}>"$LOOP_STATE/slot-$n.lock"
-    if flock -n "$LOCK_FD"; then SLOT=$n; return 0; fi
+    if flock -n "$LOCK_FD"; then SLOT=$n; rm -f "$LOOP_STATE/slot-$n.item"; return 0; fi
     exec {LOCK_FD}>&-
   done
   return 1
@@ -54,16 +54,8 @@ release() {
   ledger "$ITEM" "$SLOT" end "$RESULT"
 }
 
-# Block the item from STATE and record why in its blocked.md: block STATE NEED RESUME
-block() {
-  local d
-  d=$(item_dir "$ITEM")
-  mkdir -p "$d"
-  printf '## %s loop:%s blocked this item\nat-round=%s\n**Needed:** %s\n**Resume:** %s\n\n' \
-    "$(date -Is)" "$SLOT" "$(find "$d" -maxdepth 1 -name 'review-*.md' | wc -l)" "$2" "$3" >>"$d/blocked.md"
-  gh issue edit "$ITEM" --add-label agent:blocked --remove-label "$1" >/dev/null
-  ledger "$ITEM" "$SLOT" blocked "$1"
-}
+# Block the item from STATE: block STATE NEED RESUME
+block() { block_item "$ITEM" "$SLOT" "$1" "$2" "$3"; }
 
 title() { [[ -n ${TMUX:-} ]] && tmux rename-window -t "${TMUX_PANE:-}" "$1" 2>/dev/null || true; }
 
