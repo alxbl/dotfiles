@@ -24,7 +24,7 @@ Read `~/.config/agents/skills/loop-setup/PROTOCOL.md` first. It defines labels, 
    - **Steps**: ordered, each small enough to commit on its own.
    - **Files**: expected to change or be added, with the reason.
    - **Tests**: what is added or changed, and where.
-   - **Validation**: the `validate` commands and any extra check the acceptance criteria need.
+   - **Validation**: the `validate` commands and any extra check the acceptance criteria need. List only commands `.agents/settings.json` allows, one command each, and leave out `validate` entries whose scope the change does not touch.
    - **Risks**: what could go wrong and how the contributor will notice.
 5. Move `agent:explored` → `agent:planned`.
 6. End with a two-line summary and the `<loop-friction>` block.
