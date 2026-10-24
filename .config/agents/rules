@@ -34,6 +34,10 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 
 ## Git
 - **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
+- **NEVER** run `git checkout`, `switch` or `reset` in a repo's `main` worktree. Branch in a new worktree.
+
+## Credentials
+- **NEVER** put a credential in a command line or build one into a command string. A failed command is echoed in full (zsh does), which leaks it into logs and chat. Read it inside a script from its store and pass it by stdin or a file.
 
 ## Continuous Improvement
 - Spot recurring patterns and repetitive tasks.
