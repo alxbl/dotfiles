@@ -297,6 +297,23 @@ test_loop_run_requires_enrollment() {
   check "exit 3" eq "$rc" 3
 }
 
+test_validate_unmatched_checks_allow_rules() {
+  printf -- '---\nvalidate:\n  - python3 -m unittest discover -s tests\n  - helm lint <changed chart>\n  - scripts/test/<name>.sh when scripts change\n  - for t in a; do "$t"; done\n  - make check\nreview:\n  extra:\n    - x\n---\n' >.agents/loop.md
+  echo '{"permissions":{"allow":["Read","Bash(python3 -m unittest:*)","Bash(helm lint:*)","Bash(scripts/test/:*)"]}}' >.agents/settings.json
+  check "unmatched" eq "$(lib validate_unmatched)" $'scripts/test/<name>.sh when scripts change\nfor t in a; do "$t"; done\nmake check'
+  echo '{"permissions":{"allow":["Bash(python3 -m unittest:*)","Bash(helm lint:*)","Bash(scripts/test/*.sh)","Bash(make check)"]}}' >.agents/settings.json
+  check "glob and exact" eq "$(lib validate_unmatched)" 'for t in a; do "$t"; done'
+}
+
+test_loop_run_refuses_unmatched_validate() {
+  printf -- '---\nbase: main\nvalidate:\n  - make check\n---\n' >.agents/loop.md
+  issue 1 2026-01-01 agent:explore
+  "$LOOP_RUN" >/dev/null 2>"$T/err"; local rc=$?
+  check "exit 3" eq "$rc" 3
+  check "names the command" grep -q 'make check' "$T/err"
+  check "not claimed" eq "$(labels 1)" agent:explore
+}
+
 # --- poll --------------------------------------------------------------------
 
 test_poll_dispatches_within_wip_once() {

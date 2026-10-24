@@ -138,6 +138,8 @@ main() {
   for role in "${LOOP_ROLES[@]}"; do
     [[ -f $LOOP_SKILLS_DIR/loop-$role/SKILL.md ]] || die 3 "skill loop-$role is not installed in $LOOP_SKILLS_DIR"
   done
+  unmatched=$(validate_unmatched)
+  [[ -z $unmatched ]] || die 3 "validate commands with no allow rule in $LOOP_REPO_SETTINGS, or compound: ${unmatched//$'\n'/; }"
   REPO=$(repo_slug)
   ROOT=$(repo_root)
   init_work "$REPO"

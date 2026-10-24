@@ -27,6 +27,37 @@ fm_get() {
     }' "$file"
 }
 
+# Print the `validate` entries of the repo config, one per line.
+validate_commands() {
+  [[ -f $LOOP_REPO_CONFIG ]] || return 0
+  awk '
+    NR == 1 { if ($0 != "---") exit; next }
+    $0 == "---" { exit }
+    /^validate:/ { on = 1; next }
+    on && /^[ \t]+- / { v = $0; sub(/^[ \t]+- /, "", v); gsub(/^["\x27]|["\x27]$/, "", v); print v; next }
+    on && !/^[ \t]/ { on = 0 }' "$LOOP_REPO_CONFIG"
+}
+
+# Print each `validate` entry that no Bash allow rule in the repo settings covers, or that is a
+# compound command (which no rule matches). `<placeholders>` stand for any word; text after
+# " when " or ", " is prose.
+validate_unmatched() {
+  local entry cmd rule rules ok
+  mapfile -t rules < <(jq -r '.permissions.allow[]? | select(startswith("Bash(")) | .[5:-1]' "$LOOP_REPO_SETTINGS" 2>/dev/null)
+  while IFS= read -r entry; do
+    [[ -n $entry ]] || continue
+    cmd=$(sed -E 's/<[^>]*>/x/g; s/( when |, ).*$//' <<<"$entry")
+    ok=
+    if [[ $cmd != *[\;\|\>\&]* ]]; then
+      for rule in "${rules[@]}"; do
+        if [[ $rule == *:\* ]]; then [[ $cmd == "${rule%:\*}" || $cmd == "${rule%:\*} "* ]] && ok=1
+        else [[ $cmd == $rule ]] && ok=1; fi
+      done
+    fi
+    [[ -n $ok ]] || printf '%s\n' "$entry"
+  done < <(validate_commands)
+}
+
 # Print setting KEY: repo config, then user config, then DEFAULT.
 cfg() {
   local v

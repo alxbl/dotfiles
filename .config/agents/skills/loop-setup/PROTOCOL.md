@@ -64,7 +64,7 @@ Roles run as `claude -p "/loop-<role> <N>" --permission-mode dontAsk --settings 
 Only tools allowed by the merged settings run; anything else is refused, never prompted.
 Every role may write under `.agents/work/`. Only `contribute` may write under `.worktrees/`; the others run with those paths and `NotebookEdit` disallowed.
 `.agents/settings.json` holds the loop's allow and deny rules and must match `environments`. It applies to loops only, not to interactive sessions.
-Run one command per Bash call: compound commands (`;`, `&&`, `||`, pipes, redirects) match no allow rule and are refused. Use Read to read files. Glob and Grep do not exist in headless sessions: list with `ls` and search with `grep`, one command per call.
+Run one command per Bash call: compound commands (`;`, `&&`, `||`, pipes, redirects) match no allow rule and are refused. Run git as plain `git <cmd>` in the main checkout and as `git -C .worktrees/<branch> <cmd>` in a worktree; absolute `-C` paths match no rule. Every `validate` entry must be one command that an allow rule covers; `loop-run.sh` refuses to start otherwise. Use Read to read files. Glob and Grep do not exist in headless sessions: list with `ls` and search with `grep`, one command per call.
 If the task needs a refused tool, block the item and name the tool. Do not work around a refusal.
 
 ## Labels
