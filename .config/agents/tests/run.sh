@@ -314,6 +314,16 @@ test_loop_run_refuses_unmatched_validate() {
   check "not claimed" eq "$(labels 1)" agent:explore
 }
 
+test_loop_run_marks_resumed_blocks() {
+  issue 1 2026-01-01 agent:planned
+  echo pass >>"$FAKE_GH/verdicts"
+  mkdir -p .agents/work/1
+  printf '## t contribute blocked this item\nat-round=2\n**Needed:** x\n' >.agents/work/1/blocked.md
+  "$LOOP_RUN" 1 >/dev/null 2>&1
+  check "marker appended" grep -q '^## .* resumed at agent:planned' .agents/work/1/blocked.md
+  check "round base kept" eq "$(grep -c '^at-round=' .agents/work/1/blocked.md)" 1
+}
+
 # --- poll --------------------------------------------------------------------
 
 test_poll_dispatches_within_wip_once() {

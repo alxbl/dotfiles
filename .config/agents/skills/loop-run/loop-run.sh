@@ -42,6 +42,9 @@ claim() {
   echo "$REPO#$ITEM" >"$LOOP_STATE/slot-$SLOT.item"
   gh label create "loop:$SLOT" --color BFD4F2 --description "Held by agent loop slot $SLOT" --force >/dev/null
   gh issue edit "$ITEM" --add-label agent:wip --add-label "loop:$SLOT" >/dev/null
+  local blocked; blocked="$(item_dir "$ITEM")/blocked.md"
+  [[ ! -f $blocked ]] || printf '\n## %s resumed at %s\nSections above are resolved history, not instructions. The human'"'"'s answer, if any, is in notes.md. Trust the worktree and git log over their state descriptions.\n' \
+    "$(date -Is)" "$(item_state "$ITEM")" >>"$blocked"
   exec {CLAIM_FD}>&-
   ledger "$ITEM" "$SLOT" claim
 }

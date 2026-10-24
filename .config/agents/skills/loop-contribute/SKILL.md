@@ -28,7 +28,7 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
    Name the branch from `.agents/loop.md` `branch`. Make sure `.worktrees/` is in `.git/info/exclude`.
 3. Follow the plan. Deviate only for a reason you can state, and list each deviation in the PR.
 4. Implement and test inside the worktree.
-5. Run every `validate` command and the relevant tests from inside the worktree (`cd` into it; the commands assume the repo root). All must pass. A failure caused outside the item's scope → block, after confirming the worktree is on the current `origin/<base>`.
+5. Run every `validate` command and the relevant tests against the worktree by path, from the repo root (`validate` entries name `.worktrees/<branch>/...`; you cannot `cd`). All must pass. A failure caused outside the item's scope → block, after confirming the worktree is on the current `origin/<base>`.
 6. Commit using the repo's convention, then `git push -u origin <branch>`.
 7. Write the PR body to `D/pr-body.md` in the protocol's PR body format, then open the PR: `gh pr create --base <base> --head <branch> --title "<conventional title>" --body-file D/pr-body.md`. Never pass the body inline.
 8. Write the PR number to `D/pr`.

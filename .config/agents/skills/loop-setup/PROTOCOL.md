@@ -121,6 +121,7 @@ at-round=<number of D/review-*.md files>
 **Resume:** which label to set once resolved.
 ```
 The orchestrator notifies the owner with the path. Nothing is posted on GitHub. The human answers in `D/notes.md` (read by every role), then resumes the item.
+On resume, `loop-run.sh` appends a `resumed` marker to `blocked.md`; the sections above it are history, not instructions.
 Block instead of guessing when:
 - a question changes the solution
 - a step needs more access than the environment grants, or a refused tool
