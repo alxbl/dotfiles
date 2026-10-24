@@ -9,12 +9,10 @@ dir=$(j '.workspace.current_dir')
 [ -z "$dir" ] && dir=$(j '.cwd')
 short=${dir/#$HOME/\~}
 
-out=$(printf '%s | ctx %.0f%%' "$model" "${used:-0}")
-out="$out | $short"
+# Model + Context Window
+out=$(printf '%s | CTX %.0f%% |' "$model" "${used:-0}")
 
-branch=$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null || git -C "$dir" rev-parse --short HEAD 2>/dev/null)
-[ -n "$branch" ] && out="$out |  $branch"
-
+# Burn Rates
 # Rate limits (only present for subscription plans, after the first response)
 fmt_reset() {
   local ts=$1 now diff
@@ -28,8 +26,15 @@ for w in five_hour:5h seven_day:7d; do
   pct=$(j ".rate_limits.$key.used_percentage")
   [ -z "$pct" ] && continue
   rs=$(j ".rate_limits.$key.resets_at")
-  seg=$(printf '%s %.0f%%' "$label" "$pct")
-  [ -n "$rs" ] && seg="$seg (resets in $(fmt_reset "$rs"))"
-  out="$out | $seg"
+  seg=$(printf '%.0f%%' "$pct")
+  [ -n "$rs" ] && seg="$(fmt_reset "$rs")/$seg "
+  out="$out $seg"
 done
+
+# CWD
+out="$out | $short"
+
+# Branch
+branch=$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null || git -C "$dir" rev-parse --short HEAD 2>/dev/null)
+[ -n "$branch" ] && out="$out [$branch]"
 printf '%s' "$out"
