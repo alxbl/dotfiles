@@ -7,21 +7,21 @@ disable-model-invocation: true
 
 # Retro role
 
-Item: issue #$ARGUMENTS in the current repo.
+Item: issue #$ARGUMENTS in the current repo. Its context directory is `D` = `.agents/work/<N>/`.
 
 Read `~/.config/agents/skills/loop-setup/PROTOCOL.md` first, especially "Self-improvement".
 
 ## Limits
 - Change nothing: no files, labels, commits, rules, skills, config or permissions.
-- The only thing you write is the `<!-- loop:retro -->` section (PR body, or an issue comment when there is no PR).
+- The only thing you write is `D/retro.md`.
 
 ## Inputs
-`S` = `~/.local/state/agent-loop/<owner>-<repo>/`.
-- `S/friction/<N>.md`: notes each role left on this item.
-- `S/ledger.tsv`, lines for this item: role runs, retries, turns, cost, duration, blocks.
-- The issue: spec, plan, `<!-- loop:blocked -->` comments, and human comments (an answer to an open question means the spec had a gap).
-- The PR, if any: review rounds, findings, contributor replies, deviations.
-- `~/.config/agents/skills/loop-retro/recurrence.sh`: earlier proposals across all repos, grouped. Run it instead of reading every `improvements.tsv`.
+`W` = `.agents/work/`.
+- `D/friction.md`: notes each role left on this item.
+- `W/ledger.tsv`, lines for this item: role runs, retries, turns, cost, duration, blocks.
+- `D/spec.md`, `D/plan.md`, `D/blocked.md`, and `D/notes.md` (an answer to an open question means the spec had a gap).
+- `D/review-*.md` and `D/reply-*.md`; the PR body and deviations if there is a PR.
+- `~/.config/agents/skills/loop-retro/recurrence.sh`: earlier proposals across all repos, grouped. Run it exactly as written, with the leading `~/` and no `bash` prefix (the allow rule matches only that form), instead of reading every `improvements.tsv`.
 - The current text of anything you propose to change.
 
 ## Steps
@@ -32,29 +32,28 @@ Read `~/.config/agents/skills/loop-setup/PROTOCOL.md` first, especially "Self-im
    | Missing or ambiguous rule | repo `CLAUDE.md`, or `~/.config/agents/rules` if it applies to every repo |
    | Missing permission or access | `.agents/settings.json`, `.agents/loop.md` `environments` |
    | Spec gap the explorer should have caught | `loop-explore` skill |
+   | Plan gap the planner should have caught | `loop-plan` skill |
    | Unclear or wrong loop instruction | protocol, `loop-*` skill or script |
    | Missing or slow repo tooling | `.agents/loop.md` `validate`, repo docs |
+   | Doc contradicts the code or itself | the doc, marked stale (take the code as ground truth) |
    | Needed a human anyway | no proposal; say so |
+   "Needed a human anyway" is only for blocks no rule, doc or tooling change could have avoided. If a decision is the human's to make (for example which of two contradicting sources is right), still propose the change you recommend and name the alternative; the human accepts or rejects it.
 3. Keep only proposals that would have prevented or shortened this loop, or that recur (`recurrence.sh`). Prefer the narrowest target that fixes it.
    If an earlier identical proposal exists, reference it and raise its count instead of rewording it.
 4. Rule proposals follow the user's rules-file policy: high signal, no implementation details.
-5. Write the section, replacing any earlier one between the markers:
+5. Write `D/retro.md`, replacing any earlier one:
    ```
-   <!-- loop:retro -->
    ## Possible Workflow Improvements
    _<roles run> · <review rounds> · <blocks> · <total turns / cost>_
 
    ### <n>. <short title>
    - **Target:** `<file>`
-   - **Problem:** <what happened, with links to the comment, finding or log>
+   - **Problem:** <what happened, with the file or log it shows in>
    - **Proposal:** <the change, as a diff or exact text>
    - **Effect:** <what it would have saved>
    - **Seen:** <count> (this item + earlier loops)
-   <!-- /loop:retro -->
    ```
-   With nothing to propose, the section holds the stats line and "None: no friction recorded."
-   - PR exists: `gh pr view <P> --json body`, replace or append the section, `gh pr edit <P> --body-file -`.
-   - No PR: post it as an issue comment, or edit the previous retro comment if there is one.
+   With nothing to propose, the file holds the stats line and "None: no friction recorded."
 6. End with a two-line summary and one line per proposal:
    ```
    <loop-improvements>

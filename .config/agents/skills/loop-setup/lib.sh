@@ -3,9 +3,12 @@
 
 LOOP_STATE="${LOOP_STATE:-$HOME/.local/state/agent-loop}"
 LOOP_USER_CONFIG="${LOOP_USER_CONFIG:-$HOME/.config/agents/loop.md}"
+LOOP_SKILLS_DIR="${LOOP_SKILLS_DIR:-$HOME/.claude/skills}"
+LOOP_ROLES=(explore plan contribute review retro)
 LOOP_REPO_CONFIG=".agents/loop.md"
 LOOP_REPO_SETTINGS=".agents/settings.json"
-LOOP_STATES=(agent:explore agent:explored agent:review agent:changes agent:human-review agent:blocked)
+LOOP_STATES=(agent:explore agent:explored agent:planned agent:review agent:changes agent:human-review agent:blocked)
+LOOP_WORK=".agents/work"
 
 die() { local code=$1; shift; echo "$*" >&2; exit "$code"; }
 
@@ -24,12 +27,66 @@ fm_get() {
     }' "$file"
 }
 
+# Print the `validate` entries of the repo config, one per line.
+validate_commands() {
+  [[ -f $LOOP_REPO_CONFIG ]] || return 0
+  awk '
+    NR == 1 { if ($0 != "---") exit; next }
+    $0 == "---" { exit }
+    /^validate:/ { on = 1; next }
+    on && /^[ \t]+- / { v = $0; sub(/^[ \t]+- /, "", v); gsub(/^["\x27]|["\x27]$/, "", v); print v; next }
+    on && !/^[ \t]/ { on = 0 }' "$LOOP_REPO_CONFIG"
+}
+
+# Print each `validate` entry that no Bash allow rule in the repo settings covers, or that is a
+# compound command (which no rule matches). `<placeholders>` stand for any word; text after
+# " when " or ", " is prose.
+validate_unmatched() {
+  local entry cmd rule rules ok
+  mapfile -t rules < <(jq -r '.permissions.allow[]? | select(startswith("Bash(")) | .[5:-1]' "$LOOP_REPO_SETTINGS" 2>/dev/null)
+  while IFS= read -r entry; do
+    [[ -n $entry ]] || continue
+    cmd=$(sed -E 's/<[^>]*>/x/g; s/( when |, ).*$//' <<<"$entry")
+    ok=
+    if [[ $cmd != *[\;\|\>\&]* ]]; then
+      for rule in "${rules[@]}"; do
+        if [[ $rule == *:\* ]]; then [[ $cmd == "${rule%:\*}" || $cmd == "${rule%:\*} "* ]] && ok=1
+        else [[ $cmd == $rule ]] && ok=1; fi
+      done
+    fi
+    [[ -n $ok ]] || printf '%s\n' "$entry"
+  done < <(validate_commands)
+}
+
 # Print setting KEY: repo config, then user config, then DEFAULT.
 cfg() {
   local v
   v=$(fm_get "$LOOP_REPO_CONFIG" "$1")
   [[ -n $v ]] || v=$(fm_get "$LOOP_USER_CONFIG" "$1")
   echo "${v:-$2}"
+}
+
+# Print the model for ROLE: repo config, then user config, then the role default.
+role_model() {
+  local d=sonnet
+  case $1 in explore | plan | retro) d=opus ;; esac
+  cfg "model_$1" "$d"
+}
+
+# Print the tool patterns ROLE may not use, one per line, for the repo at ROOT. Only
+# contribute writes code. Paths are absolute because relative rules follow the Bash
+# tool's working directory, which moves when a role runs `cd` into a worktree.
+role_disallowed() {
+  [[ $1 == contribute ]] || printf '%s\n' "Edit(/$2/.worktrees/**)" "Write(/$2/.worktrees/**)" NotebookEdit
+}
+
+# Print the file-edit patterns ROLE is allowed, one per line, for the repo at ROOT.
+role_allowed() {
+  local t
+  for t in Edit Write; do
+    printf '%s\n' "$t(/$2/$LOOP_WORK/**)"
+    [[ $1 != contribute ]] || printf '%s\n' "$t(/$2/.worktrees/**)"
+  done
 }
 
 # Print the user-wide WIP limit (number of slots).
@@ -44,8 +101,26 @@ repo_wip() {
 
 repo_slug() { gh repo view --json nameWithOwner | jq -r .nameWithOwner; }
 
-# Print the state directory for REPO (owner/name).
-repo_state() { echo "$LOOP_STATE/${1/\//-}"; }
+# Print the root of the main checkout of the current repo.
+repo_root() { dirname "$(realpath "$(git rev-parse --git-common-dir)")"; }
+
+# Print the loop's working directory for the current repo. All loop context lives here.
+repo_state() { echo "$(repo_root)/$LOOP_WORK"; }
+
+# Print the directory holding the context of issue N.
+item_dir() { echo "$(repo_state)/$1"; }
+
+# Keep the working directory and the code worktrees out of git, and record the
+# repo (SLUG) so cross-repo tools can find its context.
+init_work() {
+  local slug=$1 ex tmp p
+  ex="$(realpath "$(git rev-parse --git-common-dir)")/info/exclude"
+  mkdir -p "$(dirname "$ex")" "$(repo_state)" "$LOOP_STATE"
+  for p in "$LOOP_WORK/" .worktrees/; do grep -qxF "$p" "$ex" 2>/dev/null || echo "$p" >>"$ex"; done
+  tmp=$(mktemp)
+  { grep -v "^$slug"$'\t' "$LOOP_STATE/repos" 2>/dev/null || true; printf '%s\t%s\n' "$slug" "$(repo_root)"; } >"$tmp"
+  mv "$tmp" "$LOOP_STATE/repos"
+}
 
 # Append one ledger line: ITEM SLOT EVENT DETAIL. Needs RSTATE.
 ledger() { printf '%s\t%s\t%s\t%s\t%s\n' "$(date -Is)" "$1" "$2" "$3" "${4:-}" >>"$RSTATE/ledger.tsv"; }
@@ -80,39 +155,53 @@ eligible_filter() {
     def rank:
       if has("agent:changes") then 1
       elif has("agent:review") then 2
-      elif has("agent:explored") then 3
-      elif has("agent:explore") then 4
+      elif has("agent:planned") then 3
+      elif has("agent:explored") then 4
+      elif has("agent:explore") then 5
       else 0 end;
     map(select((has("agent:wip") or has("agent:blocked")) | not) | .rank = rank | select(.rank > 0))
     | sort_by(.rank, .createdAt) | .[].number'
+}
+
+# Block issue N from STATE and record why in its blocked.md: block_item N SLOT STATE NEED RESUME.
+# Needs RSTATE.
+block_item() {
+  local d
+  d=$(item_dir "$1")
+  mkdir -p "$d"
+  printf '## %s loop:%s blocked this item\nat-round=%s\n**Needed:** %s\n**Resume:** %s\n\n' \
+    "$(date -Is)" "$2" "$(find "$d" -maxdepth 1 -name 'review-*.md' | wc -l)" "$4" "$5" >>"$d/blocked.md"
+  gh issue edit "$1" --add-label agent:blocked --remove-label "$3" >/dev/null
+  ledger "$1" "$2" blocked "$3"
 }
 
 # Print the state label of issue N (see LOOP_STATES), or nothing.
 item_state() {
   local labels s
   labels=$(gh issue view "$1" --json labels | jq -r '.labels[].name')
-  for s in agent:blocked agent:human-review agent:changes agent:review agent:explored agent:explore; do
+  for s in agent:blocked agent:human-review agent:changes agent:review agent:planned agent:explored agent:explore; do
     grep -qxF "$s" <<<"$labels" && { echo "$s"; return; }
   done
 }
 
-# Print the number of the open PR that implements issue N, or nothing.
-find_pr() {
-  gh pr list --state open --limit 200 --json number,body |
-    jq -r --arg m "<!-- loop:pr issue=$1 -->" 'map(select(.body | contains($m))) | .[0].number // empty'
-}
+# Print the number of the PR that implements issue N, or nothing.
+find_pr() { cat "$(item_dir "$1")/pr" 2>/dev/null || true; }
 
-# Print how many review rounds on issue N's PR asked for changes since the last
-# block or pass. Zero when there is no PR.
+# Print how many review rounds of issue N asked for changes since the last pass
+# or block. Zero when there is no PR. Round r is review-<r>.md, whose first line is
+# verdict=pass|changes; a block records at-round=<rounds so far> in blocked.md.
 change_rounds() {
-  local pr since
-  pr=$(find_pr "$1")
-  [[ -n $pr ]] || { echo 0; return; }
-  since=$(gh issue view "$1" --json comments |
-    jq -r '[.comments[] | select(.body | contains("<!-- loop:blocked -->")) | .createdAt] | max // ""')
-  gh pr view "$pr" --json comments | jq -r --arg since "$since" '
-    [.comments[] | select(.body | test("<!-- loop:review round=[0-9]+ verdict=")) ] as $r
-    | ([$r[] | select(.body | contains("verdict=pass")) | .createdAt] | max // "") as $pass
-    | ([$since, $pass] | max) as $after
-    | [$r[] | select(.body | contains("verdict=changes")) | select(.createdAt > $after)] | length'
+  local d total base=0 r n=0
+  d=$(item_dir "$1")
+  [[ -n $(find_pr "$1") ]] || { echo 0; return; }
+  [[ -f $d/blocked.md ]] && base=$(sed -n 's/^at-round=//p' "$d/blocked.md" | tail -n1)
+  base=${base:-0}
+  total=$(find "$d" -maxdepth 1 -name 'review-*.md' 2>/dev/null | wc -l)
+  for ((r = 1; r <= total; r++)); do
+    [[ $(sed -n '1s/^verdict=//p' "$d/review-$r.md" 2>/dev/null) == pass ]] && (( r > base )) && base=$r
+  done
+  for ((r = base + 1; r <= total; r++)); do
+    [[ $(sed -n '1s/^verdict=//p' "$d/review-$r.md" 2>/dev/null) == changes ]] && n=$((n + 1))
+  done
+  echo "$n"
 }

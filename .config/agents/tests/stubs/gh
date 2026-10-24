@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fake gh for the loop tests. Supports only the calls the loop scripts make.
-# State lives in $FAKE_GH: issues/<n>/{labels,created,comments}, prs/<n>/{body,comments}.
+# State lives in $FAKE_GH: issues/<n>/{labels,created}. The loop only changes labels, so it has no comment or PR calls.
 set -euo pipefail
 echo "gh $*" >>"$FAKE_GH/calls.log"
 
@@ -18,11 +18,7 @@ case "$1 $2" in
     for d in "$FAKE_GH"/issues/*/; do
       if [[ -d $d ]]; then issue_json "$(basename "$d")"; fi
     done | jq -s . ;;
-  "issue view")
-    case $5 in
-      labels) issue_json "$3" ;;
-      comments) jq -s '{comments: .}' "$FAKE_GH/issues/$3/comments" ;;
-    esac ;;
+  "issue view") issue_json "$3" ;;
   "issue edit")
     f=$FAKE_GH/issues/$3/labels; shift 3
     while (( $# )); do
@@ -32,13 +28,6 @@ case "$1 $2" in
       esac
       shift 2
     done ;;
-  "issue comment") jq -cn --arg b "$5" --arg t "$(now)" '{body: $b, createdAt: $t}' >>"$FAKE_GH/issues/$3/comments" ;;
-  "pr comment") jq -cn --arg b "$5" --arg t "$(now)" '{body: $b, createdAt: $t}' >>"$FAKE_GH/prs/$3/comments" ;;
   "label create") ;;
-  "pr list")
-    for d in "$FAKE_GH"/prs/*/; do
-      if [[ -d $d ]]; then jq -n --argjson n "$(basename "$d")" --rawfile b "$d/body" '{number: $n, body: $b}'; fi
-    done | jq -s . ;;
-  "pr view") jq -s '{comments: .}' "$FAKE_GH/prs/$3/comments" ;;
   *) echo "fake gh: unsupported: $*" >&2; exit 1 ;;
 esac

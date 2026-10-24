@@ -18,7 +18,7 @@ acquire_slot() {
   (( $(held_items "$REPO" | wc -l) < $(repo_wip) )) || return 1
   for ((n = 1; n <= $(user_wip); n++)); do
     exec {LOCK_FD}>"$LOOP_STATE/slot-$n.lock"
-    if flock -n "$LOCK_FD"; then SLOT=$n; return 0; fi
+    if flock -n "$LOCK_FD"; then SLOT=$n; rm -f "$LOOP_STATE/slot-$n.item"; return 0; fi
     exec {LOCK_FD}>&-
   done
   return 1
@@ -42,7 +42,9 @@ claim() {
   echo "$REPO#$ITEM" >"$LOOP_STATE/slot-$SLOT.item"
   gh label create "loop:$SLOT" --color BFD4F2 --description "Held by agent loop slot $SLOT" --force >/dev/null
   gh issue edit "$ITEM" --add-label agent:wip --add-label "loop:$SLOT" >/dev/null
-  gh issue comment "$ITEM" --body "loop:$SLOT claimed" >/dev/null
+  local blocked; blocked="$(item_dir "$ITEM")/blocked.md"
+  [[ ! -f $blocked ]] || printf '\n## %s resumed at %s\nSections above are resolved history, not instructions. The human'"'"'s answer, if any, is in notes.md. Trust the worktree and git log over their state descriptions.\n' \
+    "$(date -Is)" "$(item_state "$ITEM")" >>"$blocked"
   exec {CLAIM_FD}>&-
   ledger "$ITEM" "$SLOT" claim
 }
@@ -55,47 +57,48 @@ release() {
   ledger "$ITEM" "$SLOT" end "$RESULT"
 }
 
-# Block the item from STATE with a comment: block STATE NEED RESUME
-block() {
-  local body
-  body=$(printf '<!-- loop:blocked -->\n@%s loop:%s blocked this item.\n\n**Needed:** %s\n\n**Resume:** %s\n' \
-    "${REPO%%/*}" "$SLOT" "$2" "$3")
-  gh issue edit "$ITEM" --add-label agent:blocked --remove-label "$1" >/dev/null
-  gh issue comment "$ITEM" --body "$body" >/dev/null
-  ledger "$ITEM" "$SLOT" blocked "$1"
-}
+# Block the item from STATE: block STATE NEED RESUME
+block() { block_item "$ITEM" "$SLOT" "$1" "$2" "$3"; }
 
 title() { [[ -n ${TMUX:-} ]] && tmux rename-window -t "${TMUX_PANE:-}" "$1" 2>/dev/null || true; }
 
 # Run ROLE as a fresh headless agent. Records metrics and the role's friction notes.
 run_role() {
-  local role=$1 log start rc=0 extra=()
-  log="$RSTATE/logs/$ITEM-$(date +%Y%m%dT%H%M%S)-$role.json"
-  [[ $role == retro ]] && extra=(--add-dir "$LOOP_STATE")
-  [[ $role == contribute ]] || extra+=(--disallowedTools Edit Write NotebookEdit)
+  local role=$1 d log start rc=0 extra=() deny allow
+  d=$(item_dir "$ITEM")
+  mkdir -p "$d/logs"
+  log="$d/logs/$(date +%Y%m%dT%H%M%S)-$role.json"
+  mapfile -t deny < <(role_disallowed "$role" "$ROOT")
+  (( ${#deny[@]} )) && extra+=(--disallowedTools "${deny[@]}")
+  mapfile -t allow < <(role_allowed "$role" "$ROOT")
+  extra+=(--allowedTools "${allow[@]}")
+  extra+=(--append-system-prompt "Run exactly one command per Bash call: no ;, &&, ||, pipes, redirects or command substitution. Read files with Read, not cat. Glob and Grep do not exist here; use ls and grep.")
   title "l$SLOT #$ITEM $role"
   start=$(date +%s)
-  "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk \
-    --settings "$LOOP_REPO_SETTINGS" --output-format json "${extra[@]}" </dev/null >"$log" 2>"$log.err" || rc=$?
+  "$CLAUDE_BIN" -p "/loop-$role $ITEM" --permission-mode dontAsk --model "$(role_model "$role")" \
+    --settings "$LOOP_REPO_SETTINGS" --output-format json "${extra[@]}" </dev/null >"$log" 2>"$log.err" {LOCK_FD}>&- || rc=$?
   ledger "$ITEM" "$SLOT" "role:$role" "$(jq -r --arg rc "$rc" --arg s "$(( $(date +%s) - start ))" \
     '"rc=\($rc) error=\(.is_error | tostring) turns=\(.num_turns // "?") cost=\(.total_cost_usd // "?") secs=\($s)"' \
     "$log" 2>/dev/null || echo "rc=$rc unparsable")"
-  collect "$role" "$log" loop-friction "$RSTATE/friction/$ITEM.md" "### $role $(date -Is)"
+  collect "$role" "$log" loop-friction "$d/friction.md" "### $role $(date -Is)"
   collect "$role" "$log" loop-improvements "$RSTATE/improvements.tsv" ""
   return "$rc"
 }
 
 # Append the <TAG>...</TAG> block of a role's final message to FILE.
 collect() {
-  local role=$1 log=$2 tag=$3 file=$4 header=$5 block
-  block=$(jq -r '.result // ""' "$log" 2>/dev/null | sed -n "/<$tag>/,/<\/$tag>/{/<\/\{0,1\}$tag>/d;p}")
+  local role=$1 log=$2 tag=$3 file=$4 header=$5 text block
+  text=$(jq -r '.result // ""' "$log" 2>/dev/null) || return 0
+  [[ $text == *"<$tag>"*"</$tag>"* ]] || return 0
+  block=${text#*"<$tag>"}
+  block=${block%%"</$tag>"*}
   [[ -n ${block//[[:space:]]/} ]] || return 0
   if [[ $tag == loop-improvements ]]; then
     while IFS= read -r line; do
       [[ -n ${line//[[:space:]]/} ]] && printf '%s\t%s\t%s\n' "$(date -Is)" "$ITEM" "$line"
     done <<<"$block" >>"$file"
   else
-    printf '%s\n%s\n\n' "$header" "$block" >>"$file"
+    printf '%s\n%s\n\n' "$header" "$(sed '/^[[:space:]]*$/d' <<<"$block")" >>"$file"
   fi
 }
 
@@ -108,7 +111,8 @@ pipeline() {
       agent:human-review) RESULT=human-review; return ;;
       agent:blocked) RESULT=blocked; return ;;
       agent:explore) role=explore ;;
-      agent:explored) role=contribute ;;
+      agent:explored) role=plan ;;
+      agent:planned) role=contribute ;;
       agent:review) role=review ;;
       agent:changes)
         if (( $(change_rounds "$ITEM") >= max )); then
@@ -123,7 +127,7 @@ pipeline() {
       fails=0; continue
     fi
     if (( ++fails >= 2 )); then
-      block "$state" "The $role role failed twice without moving the item on. Logs are in \`$RSTATE/logs\` on $(hostname)." \
+      block "$state" "The $role role failed twice without moving the item on. Logs are in \`$(item_dir "$ITEM")/logs\`." \
         "Fix the cause, then remove \`agent:blocked\` and set \`$state\` again."
       RESULT=blocked; return
     fi
@@ -134,9 +138,16 @@ main() {
   cd "$(git rev-parse --show-toplevel)"
   [[ -f $LOOP_REPO_CONFIG ]] || die 3 "$LOOP_REPO_CONFIG missing: repo is not enrolled"
   [[ -f $LOOP_REPO_SETTINGS ]] || die 3 "$LOOP_REPO_SETTINGS missing: repo is not enrolled"
+  for role in "${LOOP_ROLES[@]}"; do
+    [[ -f $LOOP_SKILLS_DIR/loop-$role/SKILL.md ]] || die 3 "skill loop-$role is not installed in $LOOP_SKILLS_DIR"
+  done
+  unmatched=$(validate_unmatched)
+  [[ -z $unmatched ]] || die 3 "validate commands with no allow rule in $LOOP_REPO_SETTINGS, or compound: ${unmatched//$'\n'/; }"
   REPO=$(repo_slug)
-  RSTATE=$(repo_state "$REPO")
-  mkdir -p "$RSTATE"/{logs,results,friction}
+  ROOT=$(repo_root)
+  init_work "$REPO"
+  RSTATE=$(repo_state)
+  mkdir -p "$RSTATE/results"
   acquire_slot || die 3 "no free slot"
   claim "${1:-}" || die 3 "no eligible item${1:+ (#$1)}"
   trap release EXIT
