@@ -30,11 +30,20 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 - `[repo]/main` is the cloned worktree. It is always named `main`, even if the repo's default branch has another name (e.g. `master`), and **MUST** stay pristine on the default branch. Never work in it.
 - Every other subfolder of `[repo]` is a worktree for work in progress.
 - Worktree names are concise and meaningful. A change spanning multiple repositories uses the same worktree name in each.
+- Create worktrees with absolute paths: `git -C [repo]/main worktree add [repo]/[name] -b [name]`. A relative path resolves inside `main`.
 - When asked to clone a repo, clone it into this layout.
+
+## Remote Commands
+- Bound anything that can hang: wrap `ssh` and `kubectl` against nodes in `timeout`, and pass `-o BatchMode=yes -o ConnectTimeout=10` to `ssh`. A stuck call keeps a shell active.
 
 ## Git
 - **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
 - **NEVER** run `git checkout`, `switch` or `reset` in a repo's `main` worktree. Branch in a new worktree.
+- Cleanup is scoped to what was asked: removing worktrees does not include deleting remote branches or `git branch -D`. Do those only on request.
+
+## Processes
+- `pgrep -f` and `pkill -f` match the agent's own shell, whose command line contains the pattern. Write it as `[p]attern`.
+- Start long-lived helpers (`kubectl port-forward`, watchers) with `run_in_background`. A `( ... &)` subshell dies when the call returns.
 
 ## Credentials
 - **NEVER** put a credential in a command line or build one into a command string. A failed command is echoed in full (zsh does), which leaks it into logs and chat. Read it inside a script from its store and pass it by stdin or a file.
