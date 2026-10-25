@@ -74,6 +74,14 @@ function is_git_repo() {
     done
 }
 
+# worktree_path NAME
+# Prints the path of a worktree for NAME next to the main worktree. Fails when the main worktree isn't named `main`.
+function worktree_path() {
+    local main=$(git worktree list --porcelain | awk '/^worktree /{print substr($0,10); exit}')
+    [ "${main:t}" = main ] || return 1
+    echo "${main:h}/${1//\//-}"
+}
+
 # co [BRANCH]
 # Checks out or moves to the worktree of the selected branch, creating it next to the main worktree when missing.
 # When the main worktree doesn't follow `[repo]/[worktree]` convention, switches branch in-place.
@@ -96,15 +104,33 @@ function co() {
     local dir=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" \
         '/^worktree /{p=substr($0,10)} $1=="branch" && $2==b {print p; exit}')
     if [ -z "$dir" ]; then
-        local main=$(git worktree list --porcelain | awk '/^worktree /{print substr($0,10); exit}')
-        if [ "${main:t}" != main ]; then
-            # Doesn't follow [repo]/main, checkout in-place.
-            git checkout "$branch"
-            return
-        fi
-        dir="${main:h}/${branch//\//-}"
-        git -C "$main" worktree add "$dir" "$branch" || return 1
+        # Doesn't follow [repo]/main, checkout in-place.
+        dir=$(worktree_path "$branch") || { git checkout "$branch"; return; }
+        git worktree add "$dir" "$branch" || return 1
     fi
+    cd "$dir"
+}
+
+# b [NAME]
+# Creates branch NAME from the current HEAD in a new worktree next to the main worktree, and moves to it.
+# When the main worktree doesn't follow `[repo]/[worktree]` convention, creates and switches to the branch in-place.
+function b() {
+    if [ -z "$1" ]; then
+        echo "usage: b NAME" >&2
+        return 1
+    fi
+    if ! is_git_repo; then
+        echo "Not a git repository."
+        return 1
+    fi
+    if git show-ref --verify --quiet "refs/heads/$1"; then
+        echo "Branch '$1' already exists."
+        return 1
+    fi
+
+    local dir
+    dir=$(worktree_path "$1") || { git checkout -b "$1"; return; }
+    git worktree add -b "$1" "$dir" HEAD || return 1
     cd "$dir"
 }
 
