@@ -108,6 +108,33 @@ function co() {
     cd "$dir"
 }
 
+# b [NAME]
+# Creates branch NAME from the current HEAD in a new worktree next to the main worktree, and moves to it.
+# When the main worktree doesn't follow `[repo]/[worktree]` convention, creates and switches to the branch in-place.
+function b() {
+    if [ -z "$1" ]; then
+        echo "usage: b NAME" >&2
+        return 1
+    fi
+    if ! is_git_repo; then
+        echo "Not a git repository."
+        return 1
+    fi
+    if git show-ref --verify --quiet "refs/heads/$1"; then
+        echo "Branch '$1' already exists."
+        return 1
+    fi
+
+    local main=$(git worktree list --porcelain | awk '/^worktree /{print substr($0,10); exit}')
+    if [ "${main:t}" != main ]; then
+        git checkout -b "$1"
+        return
+    fi
+    local dir="${main:h}/${1//\//-}"
+    git -C "$main" worktree add -b "$1" "$dir" "$(git rev-parse HEAD)" || return 1
+    cd "$dir"
+}
+
 function gwl() {
     case "$1" in
         ""|prune|go) ;;
