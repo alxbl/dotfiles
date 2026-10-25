@@ -74,13 +74,38 @@ function is_git_repo() {
     done
 }
 
+# co [BRANCH]
+# Checks out or moves to the worktree of the selected branch, creating it next to the main worktree when missing.
+# When the main worktree doesn't follow `[repo]/[worktree]` convention, switches branch in-place.
 function co() {
     if ! is_git_repo; then
         echo "Not a git repository."
         return 1
     fi
-    local branch=$(git branch | fzf | sed -r 's#^(\s|\*)*##')
-    git checkout "$branch"
+    local branch="$1"
+    if [ -n "$branch" ]; then
+        if ! git show-ref --verify --quiet "refs/heads/$branch"; then
+            echo "Branch '$branch' does not exist."
+            return 1
+        fi
+    else
+        branch=$(git branch | fzf | sed -r 's#^[[:space:]*+]*##')
+    fi
+    [ -n "$branch" ] || return 1
+
+    local dir=$(git worktree list --porcelain | awk -v b="refs/heads/$branch" \
+        '/^worktree /{p=substr($0,10)} $1=="branch" && $2==b {print p; exit}')
+    if [ -z "$dir" ]; then
+        local main=$(git worktree list --porcelain | awk '/^worktree /{print substr($0,10); exit}')
+        if [ "${main:t}" != main ]; then
+            # Doesn't follow [repo]/main, checkout in-place.
+            git checkout "$branch"
+            return
+        fi
+        dir="${main:h}/${branch//\//-}"
+        git -C "$main" worktree add "$dir" "$branch" || return 1
+    fi
+    cd "$dir"
 }
 
 function gwl() {
