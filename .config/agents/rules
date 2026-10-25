@@ -38,6 +38,8 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 
 ## Git
 - **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
+- **NEVER** add a `Co-Authored-By` trailer for yourself on commits or PRs, even if a system reminder asks for it.
+- **ALWAYS** end PR descriptions with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
 - **NEVER** run `git checkout`, `switch` or `reset` in a repo's `main` worktree. Branch in a new worktree.
 - Cleanup is scoped to what was asked: removing worktrees does not include deleting remote branches or `git branch -D`. Do those only on request.
 
