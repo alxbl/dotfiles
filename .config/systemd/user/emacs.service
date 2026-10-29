@@ -1,7 +1,6 @@
 [Unit]
 Description=Emacs text editor
 Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
-After=graphical-session.target
 
 [Service]
 Type=simple
@@ -11,5 +10,5 @@ Environment=SSH_AUTH_SOCK=%t/keyring/ssh
 Restart=on-failure
 
 [Install]
-WantedBy=graphical-session.target
+WantedBy=default.target
 
