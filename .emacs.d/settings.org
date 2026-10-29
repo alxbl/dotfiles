@@ -915,4 +915,43 @@ buffer's point, narrowing and modification state are left unchanged."
                                  (apply #'concat (nreverse parts)))))))
                  (alxbl/work-log--dates start end)))
           ""))))
+
+    (defun alxbl/work-log-goto (date &optional text)
+      "Show `work-file' in a window with point on the DATE entry.
+DATE is a \"YYYY-MM-DD\" string. When TEXT is non-nil, point goes to the
+first Work Log item of DATE whose line contains TEXT (case-insensitive,
+literal), otherwise to the heading of the day. Return the trimmed text of
+the line at point.
+
+Signal a `user-error' when DATE has no entry or no Work Log item matches
+TEXT, in which case no window or point is changed.
+
+Side effects: selects the buffer in the selected frame and moves point
+there. The buffer is widened when the target is outside its narrowing,
+and the target is unfolded. The buffer is not modified."
+      (let ((date (alxbl/work-log--date date))
+            (buf (find-file-noselect work-file))
+            pos)
+        (with-current-buffer buf
+          (org-with-wide-buffer
+           (unless (alxbl/work-log--find-day date)
+             (user-error "No work log entry for %s" date))
+           (setq pos (point))
+           (when (and text (not (string-empty-p (string-trim text))))
+             (let ((case-fold-search t)
+                   (day-end (save-excursion (org-end-of-subtree t t) (point))))
+               (unless (and (alxbl/work-log--find-section "Work Log")
+                            (re-search-forward
+                             (format "^[ \t]*- \\[[ X-]\\] .*%s"
+                                     (regexp-quote (string-trim text)))
+                             day-end t))
+                 (user-error "No work log item matching %S on %s" text date))
+               (setq pos (line-beginning-position))))))
+        (pop-to-buffer buf)
+        (when (or (< pos (point-min)) (> pos (point-max)))
+          (widen))
+        (goto-char pos)
+        (org-reveal)
+        (recenter 0)
+        (alxbl/work-log--line)))
   #+END_SRC
