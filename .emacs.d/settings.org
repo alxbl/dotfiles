@@ -76,10 +76,11 @@ additional explanations are provided.
        (require 'use-package))
    #+END_SRC
 
-    The last part additionally starts =emacs-server= so that emacs keeps
-    running in the background. I use =emacsclient -c= to spawn a new frame.
-    This also makes it possible to use emacs from the command line in
-    degraded mode for quick edits.
+    Emacs runs in the background as a daemon, started by the =emacs=
+    systemd user unit (=.config/systemd/user/emacs.service=). I use
+    =emacsclient -c= to spawn a new frame. This also makes it possible to
+    use emacs from the command line in degraded mode for quick edits, and
+    enables automation via elisp evaluation from the CLI.
 
 ** Editor
    #+BEGIN_SRC emacs-lisp
@@ -615,10 +616,15 @@ additional explanations are provided.
     (use-package ox-reveal)
    #+END_SRC
 
-* Work Log
-  Helpers that read and append to the work log in =work-file=. Each day
-  is a datetree entry headed =YYYY-MM-DD Weekday= with a =Work Log=
-  child heading.
+** Work Log API
+  Helpers that read and edit the work log in =work-file=. Each day is a
+  datetree entry headed =YYYY-MM-DD Weekday= with =Work Log= and =Notes=
+  child headings. Work items are referenced as =(#123456)= inside a
+  checkbox item.
+
+  The functions are meant to be called through =emacsclient --eval= (see
+  the =org-diary= Claude skill). They return plain strings, conses and
+  lists, and signal a =user-error= on failure.
 
   #+BEGIN_SRC emacs-lisp
     ;; The org macros must be known when this block is byte-compiled.
@@ -627,20 +633,67 @@ additional explanations are provided.
       (require 'subr-x))
 
     (defvar work-file)
+    (defvar org-capture-templates)
+
+    (defun alxbl/work-log--find-day (date)
+      "Move point to the heading of the DATE entry and return non-nil.
+DATE is a \"YYYY-MM-DD\" string. The current buffer must be `work-file',
+widened. Return nil when DATE has no entry (point is then unspecified)."
+      (goto-char (point-min))
+      (when (re-search-forward
+             (format "^\\*+ %s\\(?: \\|$\\)" (regexp-quote date)) nil t)
+        (org-back-to-heading t)
+        t))
+
+    (defun alxbl/work-log--find-section (name)
+      "Move point to the child heading NAME of the day entry at point.
+Return non-nil on success, nil when the entry has no such heading (point
+is then unspecified). Point must be on the day heading."
+      (let ((end (save-excursion (org-end-of-subtree t t) (point))))
+        (when (re-search-forward
+               (format "^\\*+ %s\\b" (regexp-quote name)) end t)
+          (org-back-to-heading t)
+          t)))
 
     (defun alxbl/work-log--find (date)
       "Move point to the Work Log heading of DATE and return non-nil.
 DATE is a \"YYYY-MM-DD\" string. The current buffer must be `work-file',
 widened. Return nil when DATE has no entry or its entry has no Work Log
 heading (point is then unspecified)."
-      (goto-char (point-min))
-      (when (re-search-forward
-             (format "^\\*+ %s\\(?: \\|$\\)" (regexp-quote date)) nil t)
-        (org-back-to-heading t)
+      (and (alxbl/work-log--find-day date)
+           (alxbl/work-log--find-section "Work Log")))
+
+    (defun alxbl/work-log--body ()
+      "Return the trimmed text below the heading at point, up to its subtree end."
+      (string-trim
+       (buffer-substring-no-properties
+        (save-excursion (forward-line 1) (point))
+        (save-excursion (org-end-of-subtree t t) (point)))))
+
+    (defun alxbl/work-log--id (id)
+      "Return ID (a number or a string such as \"#123\") as a digit string.
+Signal a `user-error' when it is not a work item number."
+      (let ((s (string-remove-prefix "#" (string-trim (format "%s" id)))))
+        (unless (string-match-p "\\`[0-9]+\\'" s)
+          (user-error "Invalid work item %S, expected a number" id))
+        s))
+
+    (defun alxbl/work-log--goto-item (id date)
+      "Move point to the start of the item referencing work item ID on DATE.
+ID is a digit string. The current buffer must be `work-file', widened.
+Return non-nil when found, nil otherwise (point is then unspecified)."
+      (when (alxbl/work-log--find date)
         (let ((end (save-excursion (org-end-of-subtree t t) (point))))
-          (when (re-search-forward "^\\*+ Work Log\\b" end t)
-            (org-back-to-heading t)
+          (forward-line 1)
+          (when (re-search-forward
+                 (format "^[ \t]*- \\[[ X-]\\] .*#%s\\b" id) end t)
+            (beginning-of-line)
             t))))
+
+    (defun alxbl/work-log--line ()
+      "Return the trimmed text of the line at point."
+      (string-trim (buffer-substring-no-properties
+                    (line-beginning-position) (line-end-position))))
 
     (defun alxbl/work-log--dates (start end)
       "Return the list of \"YYYY-MM-DD\" strings from START to END inclusive.
@@ -679,10 +732,7 @@ buffer's point, narrowing and modification state are left unchanged."
                   (mapcar
                    (lambda (date)
                      (when (alxbl/work-log--find date)
-                       (let ((body (string-trim
-                                    (buffer-substring-no-properties
-                                     (save-excursion (forward-line 1) (point))
-                                     (save-excursion (org-end-of-subtree t t) (point))))))
+                       (let ((body (alxbl/work-log--body)))
                          (unless (string-empty-p body)
                            (format "* %s\n%s\n" date body)))))
                    (alxbl/work-log--dates start end)))
@@ -714,4 +764,155 @@ edits are never written to disk by this function."
                (insert "\n" item)
                (unless was-modified (save-buffer))))))
         item))
+
+    (defun alxbl/work-log--date (date)
+      "Return DATE, or today when DATE is nil, as a \"YYYY-MM-DD\" string.
+Signal a `user-error' when DATE is malformed."
+      (let ((date (or date (format-time-string "%F"))))
+        (alxbl/work-log--dates date date)
+        date))
+
+    (defun alxbl/work-log-ensure-day ()
+      "Make sure `work-file' has a Work Log section for today.
+Return non-nil when the day was created, nil when it already existed.
+
+A missing day is created by running the \"w\" (Start work day) capture
+template without prompting. Signal a `user-error' when that template is
+not defined or does not produce a Work Log section.
+
+Side effect: edits the `work-file' buffer. It is saved afterwards only if
+it had no unsaved changes before, as in `alxbl/work-log-add'."
+      (let ((today (format-time-string "%F")))
+        (with-current-buffer (find-file-noselect work-file)
+          (unless (org-with-wide-buffer (alxbl/work-log--find today))
+            (unless (assoc "w" org-capture-templates)
+              (user-error "No \"w\" capture template to start the work day"))
+            (let ((was-modified (buffer-modified-p)))
+              ;; The template jumps to the new entry, so restore the windows.
+              (save-window-excursion
+                (save-current-buffer
+                  (org-capture nil "w")))
+              (unless (org-with-wide-buffer (alxbl/work-log--find today))
+                (user-error "Starting the work day created no Work Log for %s" today))
+              (unless was-modified (save-buffer))
+              t)))))
+
+    (defun alxbl/work-log-item (id &optional date)
+      "Return the Work Log item that references work item ID, or nil.
+ID is a work item number (a number or a string such as \"#123\"). DATE is
+a \"YYYY-MM-DD\" string, today by default. The item is returned as its
+trimmed line, for example \"- [ ] Fix the widget (#123)\".
+
+Reads `work-file'. The buffer's point, narrowing and modification state
+are left unchanged."
+      (let ((id (alxbl/work-log--id id))
+            (date (alxbl/work-log--date date)))
+        (with-current-buffer (find-file-noselect work-file)
+          (org-with-wide-buffer
+           (when (alxbl/work-log--goto-item id date)
+             (alxbl/work-log--line))))))
+
+    (defun alxbl/work-log-workon (id text)
+      "Ensure today's Work Log has an item for work item ID.
+ID is a work item number (a number or a string such as \"#123\"). TEXT is
+a single-line description, to which \" (#ID)\" is appended unless it
+already mentions the work item.
+
+Return (existing . ITEM) when an item for ID is already in today's Work
+Log, or (added . ITEM) after appending \"- [ ] TEXT (#ID)\". Signal a
+`user-error' when TEXT is blank.
+
+Side effects: may create today's entry (see `alxbl/work-log-ensure-day')
+and edits `work-file' (see `alxbl/work-log-add')."
+      (let ((id (alxbl/work-log--id id))
+            (text (string-trim text)))
+        (when (string-empty-p text)
+          (user-error "Empty work log description"))
+        (alxbl/work-log-ensure-day)
+        (let ((existing (alxbl/work-log-item id)))
+          (if existing
+              (cons 'existing existing)
+            (cons 'added
+                  (alxbl/work-log-add
+                   (if (string-match-p (format "#%s\\b" id) text)
+                       text
+                     (format "%s (#%s)" text id))))))))
+
+    (defun alxbl/work-log-check (id &optional date)
+      "Mark the Work Log item that references work item ID as done.
+ID is a work item number (a number or a string such as \"#123\"). DATE is
+a \"YYYY-MM-DD\" string, today by default. Return the item as its trimmed
+line. Both open \"[ ]\" and in-progress \"[-]\" items become \"[X]\", and
+checking an item that is already checked is a no-op.
+
+Signal a `user-error' when DATE has no item for ID.
+
+Side effect: edits the `work-file' buffer (checkbox and parent statistics
+cookies). It is saved afterwards only if it had no unsaved changes before,
+as in `alxbl/work-log-add'."
+      (let ((id (alxbl/work-log--id id))
+            (date (alxbl/work-log--date date)))
+        (with-current-buffer (find-file-noselect work-file)
+          (org-with-wide-buffer
+           (unless (alxbl/work-log--goto-item id date)
+             (user-error "No work log item for #%s on %s" id date))
+           (when (looking-at "\\([ \t]*- \\)\\[[ -]\\]")
+             (let ((was-modified (buffer-modified-p)))
+               (replace-match "\\1[X]")
+               (org-update-checkbox-count-maybe)
+               (unless was-modified (save-buffer))))
+           (alxbl/work-log--line)))))
+
+    (defun alxbl/work-log-open-items (&optional date)
+      "Return the Work Log items of DATE that reference a work item and are not done.
+Items are open \"[ ]\" or in progress \"[-]\". DATE is a \"YYYY-MM-DD\" string,
+today by default. The result is a list of trimmed item lines in file
+order, nil when there are none.
+
+Reads `work-file'. The buffer's point, narrowing and modification state
+are left unchanged."
+      (let ((date (alxbl/work-log--date date))
+            items)
+        (with-current-buffer (find-file-noselect work-file)
+          (org-with-wide-buffer
+           (when (alxbl/work-log--find date)
+             (let ((end (save-excursion (org-end-of-subtree t t) (point))))
+               (forward-line 1)
+               (while (re-search-forward "^[ \t]*- \\[[ -]\\] .*#[0-9]+\\b" end t)
+                 (push (alxbl/work-log--line) items))))))
+        (nreverse items)))
+
+    (defun alxbl/work-diary (start end)
+      "Return the Work Log and Notes for each day from START to END inclusive.
+START and END are \"YYYY-MM-DD\" strings. The result has one block per
+day, formatted as \"* DATE\\n** Work Log\\nCONTENT\\n** Notes\\nCONTENT\\n\",
+in date order. Empty or missing sections are left out, as are days with
+neither, so the result is the empty string when nothing matches.
+
+Unlike `alxbl/work-log' this includes the Notes, which hold the activity
+and overtime hints that a timesheet needs.
+
+Reads `work-file' (visiting it in a background buffer if needed). The
+buffer's point, narrowing and modification state are left unchanged."
+      (with-current-buffer (find-file-noselect work-file)
+        (org-with-wide-buffer
+         (mapconcat
+          #'identity
+          (delq nil
+                (mapcar
+                 (lambda (date)
+                   (when (alxbl/work-log--find-day date)
+                     (let ((day (point))
+                           parts)
+                       (dolist (name '("Work Log" "Notes"))
+                         (goto-char day)
+                         (when (alxbl/work-log--find-section name)
+                           (let ((body (alxbl/work-log--body)))
+                             (unless (string-empty-p body)
+                               (push (format "** %s\n%s\n" name body) parts)))))
+                       (when parts
+                         (format "* %s\n%s" date
+                                 (apply #'concat (nreverse parts)))))))
+                 (alxbl/work-log--dates start end)))
+          ""))))
   #+END_SRC
