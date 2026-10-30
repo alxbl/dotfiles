@@ -4,7 +4,7 @@
 LOOP_STATE="${LOOP_STATE:-$HOME/.local/state/agent-loop}"
 LOOP_USER_CONFIG="${LOOP_USER_CONFIG:-$HOME/.config/agents/loop.md}"
 LOOP_SKILLS_DIR="${LOOP_SKILLS_DIR:-$HOME/.claude/skills}"
-LOOP_ROLES=(explore plan contribute review retro)
+LOOP_ROLES=(eval explore plan contribute review retro)
 LOOP_REPO_CONFIG=".agents/loop.md"
 LOOP_REPO_SETTINGS=".agents/settings.json"
 LOOP_STATES=(agent:explore agent:explored agent:planned agent:review agent:changes agent:human-review agent:blocked)
@@ -66,11 +66,30 @@ cfg() {
   echo "${v:-$2}"
 }
 
-# Print the model for ROLE: repo config, then user config, then the role default.
+# Print the item's eval KEY (complexity: trivial|standard|complex, security: yes|no), or nothing
+# when the eval is missing or the value is not one of those.
+eval_get() {
+  local v
+  v=$(sed -n "s/^$2=//p" "$(item_dir "$1")/eval.md" 2>/dev/null | head -n1)
+  case $2=$v in
+    complexity=trivial | complexity=standard | complexity=complex | security=yes | security=no) echo "$v" ;;
+  esac
+}
+
+# Print the model for ROLE on item ITEM. An explicit model_<role> setting wins; otherwise the
+# item's eval decides, never below sonnet except for eval itself and a trivial contribute.
+# Contribute is never opus. Retro uses opus unless the eval ruled out security impact.
 role_model() {
-  local d=sonnet
-  case $1 in explore | plan | retro) d=opus ;; esac
-  cfg "model_$1" "$d"
+  local v c s
+  v=$(cfg "model_$1" "")
+  [[ -z $v ]] || { echo "$v"; return; }
+  c=$(eval_get "$2" complexity); s=$(eval_get "$2" security)
+  case $1 in
+    eval) echo haiku ;;
+    contribute) [[ $c == trivial ]] && echo haiku || echo sonnet ;;
+    retro) [[ $s == no ]] && echo sonnet || echo opus ;;
+    *) [[ $c == complex ]] && echo opus || echo sonnet ;;
+  esac
 }
 
 # Print the tool patterns ROLE may not use, one per line, for the repo at ROOT. Only
@@ -146,7 +165,25 @@ free_slots() {
   echo "$free"
 }
 
-list_issues() { gh issue list --state open --limit 500 --json number,labels,createdAt; }
+# Print the GitHub user ids whose issues and comments the loop may act on, comma-separated.
+# Only the user config is read: a repo must not be able to widen its own trust.
+trusted_ids() { fm_get "$LOOP_USER_CONFIG" trusted_user_ids | tr -d '[:space:]'; }
+
+# Succeed if the user config names at least one trusted user id; otherwise explain and fail.
+require_trusted() { [[ -n $(trusted_ids) ]] || { echo "trusted_user_ids is not set in $LOOP_USER_CONFIG" >&2; return 1; }; }
+
+# Read a GitHub REST object or array on stdin; keep the entries whose .user is a trusted
+# human account. Matches the immutable numeric id and the account type, never the login.
+trusted_only() {
+  jq --argjson ids "[$(trusted_ids)]" 'map(select(.user.type == "User" and (.user.id as $i | $ids | index($i))))'
+}
+
+# Print open issues (not PRs) opened by a trusted user, as JSON: number, labels, createdAt.
+list_issues() {
+  gh api --paginate 'repos/{owner}/{repo}/issues?state=open&per_page=100' | jq -s 'add // []' |
+    jq 'map(select(.pull_request | not))' | trusted_only |
+    jq 'map({number, labels, createdAt: .created_at})'
+}
 
 # Read `list_issues` JSON on stdin; print eligible issue numbers in pickup order.
 eligible_filter() {

@@ -14,12 +14,13 @@ Record each run's result, ledger excerpt and cost in the results log at the end 
 
 ## Level 1: script logic (done)
 
-`tests/run.sh`, 31 tests, all passing.
+`tests/run.sh`, 53 tests, all passing.
 
 | Area | Covered |
 |---|---|
 | `lib.sh` | front-matter parsing, config precedence, repo WIP only lowers, per-role models and overrides, work dir exclusion and repo registration, pickup order and exclusions (including `agent:planned`), review rounds reset after a block or a pass |
 | `loop-run.sh` | happy path and role order (explore, plan, contribute, review, retro), model per role and override, no GitHub comments, `dontAsk` + settings, code-read-only roles, metrics/friction/improvements captured, block at max rounds, block after two stuck runs, role blocking itself, no free slot, second slot used, ineligible item, unenrolled repo |
+| eval and trust | eval role runs first and once, model per role from `D/eval.md` (complex and security, trivial implement, fix rounds, existing eval kept, failed eval falls back), explicit `model_<role>` pins; only trusted ids are eligible (login impersonation, bots, PRs, repo-config widening, no ids configured), `trusted.sh` filtering (impersonating login, bot with a trusted id, forged entries inside a body, PR reviews, bad arguments), settings template limits issue and PR reads |
 | `poll.sh` | dispatch within WIP and no double dispatch, repo WIP cap, `done`, `stale` once, `idle` once per blocked set, `drain`, `--status` |
 | `recurrence.sh` | grouping across registered repos, filter |
 | `labels.sh` | every state label is created, including `agent:planned` |
@@ -32,12 +33,15 @@ All gaps from the first draft are covered: `labels.sh`, the `blocked.md` entry, 
 
 | ID | Command | Expected |
 |---|---|---|
-| P1 | `gh issue view 1` | runs |
+| P1 | `gh issue view 1 --json labels` | runs |
 | P2 | `git push --force origin x` | refused |
 | P3 | `gh pr merge 1` | refused |
 | P4 | `gh api repos/o/r/pulls/1/merge -X PUT` | refused |
 | P5 | `gh api -X DELETE repos/o/r/git/refs/heads/x` | refused |
 | P6 | `gh pr comment 1 --body x` | refused (roles post nothing on GitHub) |
+| P28 | `gh issue view 1 --json comments` | refused (roles read issue text through `trusted.sh`) |
+| P29 | `gh pr view 1 --comments` | refused |
+| P30 | `gh api repos/o/r/issues/1/comments` | refused |
 | P7 | `rm -rf .worktrees` | refused (not allowed) |
 | P8 | `git checkout main` | refused |
 | P9 | an unlisted tool, e.g. `kubectl get pods` | refused |

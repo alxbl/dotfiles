@@ -14,13 +14,15 @@ Agent configuration shared by every coding agent on this machine.
 An autonomous pipeline that takes GitHub issues from a goal statement to a reviewed PR. A human decides what goes in (a label) and what ships (the merge); agents do the rest.
 
 ```
- human                 loop (one agent at a time)                                                         human
-───────            ────────────────────────────────────────────────────────────────────────────────    ─────────
-agent:explore ─► explore ─► agent:explored ─► plan ─► agent:planned ─► contribute ─► agent:review ─► review ─► agent:human-review ─► merge
-                    │                                                      ▲                         │
-                    │                                                      └──── agent:changes ◄─────┘  (max 3 rounds)
-                    └─────────────────────────► agent:blocked ◄── any step                              then: retro
+ human                 loop (one agent at a time)                                                                human
+───────            ─────────────────────────────────────────────────────────────────────────────────────────    ─────────
+agent:explore ─► eval ─► explore ─► agent:explored ─► plan ─► agent:planned ─► contribute ─► agent:review ─► review ─► agent:human-review ─► merge
+                            │                                                      ▲                         │
+                            │                                                      └──── agent:changes ◄─────┘  (max 3 rounds)
+                            └─────────────────────────► agent:blocked ◄── any step                              then: retro
 ```
+
+`eval` runs once, when the loop claims an item in any state, and its result picks the model of every later role. The first line of the chart is the usual path, not a fixed start: a loop resumes from whichever state label the item carries.
 
 GitHub carries only the labels and the PR. Specs, plans, reviews, blocks and logs stay on this machine in `.agents/work/` in the repo (git-ignored).
 
@@ -32,14 +34,15 @@ The full contract (labels, formats, config keys, state files) is [`skills/loop-s
 |---|---|---|
 | `/loop-setup` | interactive | Enroll a repo: labels, `.agents/loop.md`, `.agents/settings.json`, opened as a PR. |
 | `/loop-orchestrate` | long-running agent, sonnet | Polls for eligible issues, starts loops within the WIP limit, notifies you of results. |
-| `/loop-run [issue]` | script | One pipeline: slot, claim, roles in order, retro, release. |
-| `loop-explore` | role, opus | Turns the goal into a high-level spec with a feasibility analysis. |
-| `loop-plan` | role, opus | Turns the spec into an implementation plan. |
-| `loop-contribute` | role, sonnet | Implements the plan, tests, opens the PR; fixes review findings. |
-| `loop-review` | role, sonnet | Light rule-compliance check; passes to you or asks for changes. |
-| `loop-retro` | role, opus | Proposes workflow improvements. Changes nothing. |
+| `/loop-run [issue]` | script | One pipeline: slot, claim, eval, roles in order, retro, release. |
+| `loop-eval` | role, haiku | Rates complexity and security impact once per item; the loop picks each later role's model from it. |
+| `loop-explore` | role, sonnet/opus | Turns the goal into a high-level spec with a feasibility analysis. |
+| `loop-plan` | role, sonnet/opus | Turns the spec into an implementation plan. |
+| `loop-contribute` | role, haiku/sonnet | Implements the plan, tests, opens the PR; fixes review findings. |
+| `loop-review` | role, sonnet/opus | Light rule-compliance check; passes to you or asks for changes. |
+| `loop-retro` | role, sonnet/opus | Proposes workflow improvements. Changes nothing. |
 
-Roles run as fresh headless `claude -p` sessions, so each starts with a clean context and the reviewer never shares the contributor's reasoning. The model per role is `model_<role>` in `loop.md`.
+Roles run as fresh headless `claude -p` sessions, so each starts with a clean context and the reviewer never shares the contributor's reasoning. Models come from the eval (see PROTOCOL, "Models"); `model_<role>` in `loop.md` pins a role. Only issues opened by `trusted_user_ids` are picked up, and roles read issue text through `trusted.sh`.
 
 ### Setup
 

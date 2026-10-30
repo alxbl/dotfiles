@@ -103,6 +103,7 @@ main() {
   RSTATE=$(repo_state)
   mkdir -p "$RSTATE"/{results,pending}
   touch "$RSTATE/ledger.tsv"
+  require_trusted || exit 3
   [[ ${1:-} == --status ]] && { status; exit 0; }
   local interval
   interval=$(fm_get "$LOOP_USER_CONFIG" poll_interval); interval=${interval:-60}

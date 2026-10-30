@@ -12,7 +12,28 @@ issue_json() {
     '{number: $n, createdAt: $c, labels: ($l | split("\n") | map(select(. != "")) | map({name: .}))}'
 }
 
+# REST objects: issues/<n>/{author,author-type,is-pr,title,body,comments.json,reviews.json,review-comments.json}
+api_issue() {
+  local d=$FAKE_GH/issues/$1
+  issue_json "$1" | jq --argjson id "$(cat "$d/author" 2>/dev/null || echo 1)" --arg t "$(cat "$d/author-type" 2>/dev/null || echo User)" \
+    --arg title "$(cat "$d/title" 2>/dev/null || echo t)" --arg body "$(cat "$d/body" 2>/dev/null || echo b)" \
+    '{number, title: $title, body: $body, created_at: .createdAt, labels, user: {id: $id, type: $t, login: "u\($id)"}}' |
+    jq --argjson pr "$([[ -e $d/is-pr ]] && echo true || echo false)" 'if $pr then . + {pull_request: {}} else . end'
+}
+api() {
+  local url=${*: -1} n
+  case $url in
+    repos/*/issues\?*) for d in "$FAKE_GH"/issues/*/; do if [[ -d $d ]]; then api_issue "$(basename "$d")"; fi; done | jq -s . ;;
+    repos/*/issues/*/comments) n=${url#*/issues/}; cat "$FAKE_GH/issues/${n%/comments}/comments.json" 2>/dev/null || echo '[]' ;;
+    repos/*/issues/*) api_issue "${url##*/}" ;;
+    repos/*/pulls/*/reviews) n=${url#*/pulls/}; cat "$FAKE_GH/issues/${n%/reviews}/reviews.json" 2>/dev/null || echo '[]' ;;
+    repos/*/pulls/*/comments) n=${url#*/pulls/}; cat "$FAKE_GH/issues/${n%/comments}/review-comments.json" 2>/dev/null || echo '[]' ;;
+    *) echo "fake gh: unsupported api: $url" >&2; exit 1 ;;
+  esac
+}
+
 case "$1 $2" in
+  "api "*) shift; api "$@" ;;
   "repo view") jq -n --arg r "$FAKE_REPO" '{nameWithOwner: $r}' ;;
   "issue list")
     for d in "$FAKE_GH"/issues/*/; do
