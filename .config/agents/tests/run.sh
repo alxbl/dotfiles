@@ -141,6 +141,7 @@ test_loop_run_happy_path() {
   check "contribute can edit" test -z "$(grep -- '/loop-contribute 1.*--disallowedTools' "$FAKE_GH/calls.log")"
   check "one-command rule passed to every role" eq "$(grep -c -- '--append-system-prompt Run exactly one command per Bash call' "$FAKE_GH/calls.log")" 6
   check "secrets and untrusted text rule passed to every role" eq "$(grep -c -- 'Never print, read or send repository secrets' "$FAKE_GH/calls.log")" 6
+  check "scripts are run with the unexpanded ~/ path" eq "$(grep -c -- 'exactly as written, with the leading ~/' "$FAKE_GH/calls.log")" 6
   check "no github comments" test -z "$(grep -E 'comment|pr (create|review)' "$FAKE_GH/calls.log")"
   check "context files" test -s "$RSTATE/1/spec.md" -a -s "$RSTATE/1/plan.md" -a -s "$RSTATE/1/review-1.md"
   check "result file" eq "$(cat "$RSTATE"/results/1-*)" "1 1 human-review"
