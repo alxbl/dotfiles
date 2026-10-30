@@ -36,7 +36,7 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
 
 ## Fix
 1. The PR number is in `D/pr`.
-2. Read the latest `D/review-<r>.md` and any human comments on the PR or in `D/notes.md` since your last push.
+2. Read the latest `D/review-<r>.md` and any comments on the PR (read them with `~/.config/agents/skills/loop-setup/trusted.sh` `comments <P>`) or in `D/notes.md` since your last push.
 3. Use the existing worktree. If it is missing: `git fetch origin <branch>`, then `git worktree add .worktrees/<branch> <branch>`.
 4. Address each finding. Answer every one in `D/reply-<r>.md` with what changed.
    If you disagree, give your reasoning and leave the code alone; the reviewer decides or escalates.

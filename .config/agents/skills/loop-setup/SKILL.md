@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Interactive: the user approves every file before it is committed. Read `PROTOCOL.md` in this directory first.
 
-1. **User config.** If `~/.config/agents/loop.md` is missing, copy the defaults from the protocol's configuration table and tell the user.
+1. **User config.** If `~/.config/agents/loop.md` is missing, copy the defaults from the protocol's configuration table and tell the user. Ask for their numeric GitHub user id (`gh api user --jq .id`) and set `trusted_user_ids`; loops refuse to start without it.
 2. **Labels.** Run `~/.config/agents/skills/loop-setup/labels.sh` from the repo root. It is idempotent.
    Loop context stays local: `loop-run.sh` adds `.agents/work/` and `.worktrees/` to `.git/info/exclude` itself on its first run, so there is nothing to do here.
 3. **Research the repo:** `CLAUDE.md` and the docs it links, `README`, CI workflows, test and lint commands, recent `git log` (commit and branch conventions), and the default branch.

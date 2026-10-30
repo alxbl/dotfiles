@@ -19,6 +19,7 @@ if [[ -x $FAKE_GH/role-$role ]]; then
   msg=$("$FAKE_GH/role-$role" "$n")
 else
   case $role in
+    eval) if [[ -e $FAKE_GH/eval ]]; then cp "$FAKE_GH/eval" "$dir/eval.md"; else printf 'complexity=standard\nsecurity=no\n' >"$dir/eval.md"; fi ;;
     explore) has agent:explore && { echo spec >"$dir/spec.md"; move agent:explore agent:explored; } ;;
     plan) has agent:explored && { echo plan >"$dir/plan.md"; move agent:explored agent:planned; } ;;
     contribute)
@@ -34,6 +35,7 @@ else
       if [[ $verdict == pass ]]; then move agent:review agent:human-review; else move agent:review agent:changes; fi ;;
   esac
   msg=$(printf 'did %s\n<loop-friction>\n- missing-doc: %s note\n</loop-friction>\n' "$role" "$role")
+  [[ $role == eval ]] && msg=eval
   [[ $role == retro ]] && msg=$(printf 'retro\n<loop-improvements>\nPROTOCOL.md\tprotocol\tclarify X\n</loop-improvements>\n')
 fi
 jq -n --arg r "$msg" '{result: $r, is_error: false, num_turns: 3, total_cost_usd: 0.01}'

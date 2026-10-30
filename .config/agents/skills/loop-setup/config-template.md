@@ -4,7 +4,7 @@ base: main
 branch: "<type>/<slug>"
 commits: conventional
 # max_review_rounds: 3
-# model_<role>: opus|sonnet   # override the user-wide model for explore, plan, contribute, review or retro
+# model_<role>: opus|sonnet|haiku   # pin a role to a model instead of the eval-chosen one (eval, explore, plan, contribute, review or retro)
 # wip: 1            # may only lower the user-wide limit
 validate:
   - <command that must pass before pushing>
