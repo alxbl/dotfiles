@@ -142,6 +142,7 @@ test_loop_run_happy_path() {
   check "one-command rule passed to every role" eq "$(grep -c -- '--append-system-prompt Run exactly one command per Bash call' "$FAKE_GH/calls.log")" 6
   check "secrets and untrusted text rule passed to every role" eq "$(grep -c -- 'Never print, read or send repository secrets' "$FAKE_GH/calls.log")" 6
   check "scripts are run with the unexpanded ~/ path" eq "$(grep -c -- 'exactly as written, with the leading ~/' "$FAKE_GH/calls.log")" 6
+  check "no commit trailers rule reaches every role" eq "$(grep -c -- 'Never add a Co-Authored-By' "$FAKE_GH/calls.log")" 6
   check "no github comments" test -z "$(grep -E 'comment|pr (create|review)' "$FAKE_GH/calls.log")"
   check "context files" test -s "$RSTATE/1/spec.md" -a -s "$RSTATE/1/plan.md" -a -s "$RSTATE/1/review-1.md"
   check "result file" eq "$(cat "$RSTATE"/results/1-*)" "1 1 human-review"
@@ -468,6 +469,7 @@ test_settings_template_limits_issue_and_pr_reads() {
   local allow; allow=$(jq -r '.permissions.allow[]' "$SKILLS/loop-setup/settings-template.json")
   check "labels only" grep -qxF 'Bash(gh issue view * --json labels)' <<<"$allow"
   check "branch only" grep -qxF 'Bash(gh pr view * --json headRefName)' <<<"$allow"
+  check "commit attribution off" eq "$(jq -r '.attribution.commit' "$SKILLS/loop-setup/settings-template.json")" ""
   check "trusted.sh allowed" grep -qF 'loop-setup/trusted.sh' <<<"$allow"
   check "no broad view or list" test -z "$(grep -E 'gh (issue|pr) (view|list):\*|gh api' <<<"$allow")"
 }

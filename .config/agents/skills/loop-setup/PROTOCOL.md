@@ -228,7 +228,7 @@ Its final message lists each proposal for `improvements.tsv`, so later retros ca
 ## Git
 - Work only in a worktree at `.worktrees/<branch>` (add `.worktrees/` to `.git/info/exclude`). Never edit the main checkout.
 - Branch from an up-to-date `base`. Never force-push; add commits.
-- Follow the repo's commit convention. Never put a session ID or session URL in commits or PR bodies.
+- Follow the repo's commit convention. Never put a session ID or session URL in commits or PR bodies, and never add a `Co-Authored-By` or other trailer naming Claude: the user rules forbid it and pushed commits cannot be rewritten (no force-push).
 - Roles post nothing on issues or PRs besides the PR body and label changes.
 - Never merge, close, or delete a PR, issue, or branch.
 
