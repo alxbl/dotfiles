@@ -1,0 +1,12 @@
+# Dotfiles Rules
+
+Supplements the user-wide rules.
+
+## Working here
+- Exception to the user-wide rules: work directly in `dotfiles/main`, on `main`, including `git checkout`, `switch` and `reset`. `~/.config/agents` and `~/.claude` symlink into this tree, so changes here are live at once.
+- Commit and push to `main` only when asked; otherwise leave changes uncommitted.
+
+## Agent loop
+- The loop skills, scripts, `loop.md` and rules under `.config/agents` run live from this checkout. Run `.config/agents/tests/run.sh` (about two minutes) before committing a change to them.
+- Do not edit or pull into the loop scripts while a loop is running: bash reads a script incrementally, so a changed file breaks the run in flight. Check `tmux list-windows` for `loop-*` windows first.
+- The contract is `.config/agents/skills/loop-setup/PROTOCOL.md`. Change it with the scripts and skills it describes.
