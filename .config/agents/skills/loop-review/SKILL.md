@@ -20,7 +20,7 @@ This is a compliance check, not a deep code review. The human does the final rev
 
 ## Steps
 1. Check the issue has `agent:review`. The PR number is in `D/pr`; missing → block.
-2. Gather: `D/spec.md`, `D/plan.md`, `~/.config/agents/skills/loop-setup/trusted.sh` `comments <P>`, `gh pr diff <P>`, `gh pr checks <P>`, earlier `D/review-*.md` and the contributor's `D/reply-*.md`,
+2. Gather: `D/spec.md`, `D/plan.md`, the PR body as posted (`~/.config/agents/skills/loop-setup/trusted.sh` `issue <P>`) and its comments (`comments <P>`), `gh pr diff <P>`, `gh pr checks <P>`, earlier `D/review-*.md` and the contributor's `D/reply-*.md`,
    `.agents/loop.md` (including `review.extra`), `CLAUDE.md` and the docs it links, and the user rules.
 3. Check:
    - [ ] Every acceptance criterion is met, and the PR shows how it was verified.

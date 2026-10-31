@@ -25,7 +25,7 @@ The issue's label picks the mode: `agent:planned` → **Implement**, `agent:chan
 1. Read `D/spec.md`, `D/plan.md` and `D/notes.md` if present.
 2. Create the worktree: `git fetch origin <base>`, then `git worktree add .worktrees/<branch> -b <branch> origin/<base>`.
    If the worktree already exists from an earlier run and its branch was never pushed, commit any leftover edits, `git fetch origin <base>`, then `git -C .worktrees/<branch> rebase origin/<base>`.
-   Name the branch from `.agents/loop.md` `branch`. Make sure `.worktrees/` is in `.git/info/exclude`.
+   Name the branch from `.agents/loop.md` `branch`. The worktree path is the full branch name, `<type>/` prefix included (`.worktrees/feat/<slug>`), so the reviewer and the `validate` paths find it. Make sure `.worktrees/` is in `.git/info/exclude`.
 3. Follow the plan. Deviate only for a reason you can state, and list each deviation in the PR.
 4. Implement and test inside the worktree.
 5. Run every `validate` command and the relevant tests against the worktree by path, from the repo root (`validate` entries name `.worktrees/<branch>/...`; you cannot `cd`). All must pass. A failure caused outside the item's scope → block, after confirming the worktree is on the current `origin/<base>`.
