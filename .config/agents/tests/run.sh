@@ -460,6 +460,13 @@ test_trusted_comments_include_pr_reviews_in_order() {
     '["review:first","comment:second","review-comment:third"]'
 }
 
+test_trusted_issue_returns_a_prs_posted_body() {
+  issue 5 2026-01-01 agent:review; touch "$FAKE_GH/issues/5/is-pr"; echo 'Closes #1' >"$FAKE_GH/issues/5/body"
+  check "PR body" eq "$("$TRUSTED" issue 5 | jq -r .body)" 'Closes #1'
+  echo 999 >"$FAKE_GH/issues/5/author"
+  check "untrusted PR withheld" eq "$("$TRUSTED" issue 5 | jq -r .withheld)" 'author is not a trusted user'
+}
+
 test_trusted_script_rejects_bad_arguments() {
   check "non-numeric" eq "$("$TRUSTED" issue '1/../2' >/dev/null 2>&1; echo $?)" 2
   check "unknown mode" eq "$("$TRUSTED" body 1 >/dev/null 2>&1; echo $?)" 2
