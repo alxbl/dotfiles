@@ -48,6 +48,7 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 
 ## Shell
 - The interactive shell is zsh: unquoted variables do not word-split and `mapfile` does not exist. Run repo scripts and bash snippets with `bash -c`, and never report a check as passing from a zsh run.
+- The Bash tool runs zsh too. A glob that matches nothing is an error (`zsh: no matches found`) that aborts the command, not a literal. `*`, `?` and `[` all glob, so single-quote every argument containing them: URLs with `?`, `--include='*.md'`, `find -name '*.rs'`, `grep -E 'a|b[0-9]'`, `git log -- 'src/*.rs'`, remote paths for `scp`/`rsync`. Quote patterns and regexes by default.
 
 ## Processes
 - `pgrep -f` and `pkill -f` match the agent's own shell, whose command line contains the pattern. Write it as `[p]attern`.
