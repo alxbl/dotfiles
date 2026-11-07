@@ -110,6 +110,13 @@ test_end_hook_commits_only_memory() {
   check "nothing to do" eq "$(git -C "$LEDGER_ROOT" rev-parse HEAD)" "$before"
 }
 
+test_end_hook_ignores_empty_memory_dirs() {
+  mkdir -p "$LEDGER_ROOT/github.com/lab/memory" "$LEDGER_ROOT/github.com/aur/memory"
+  echo m >"$LEDGER_ROOT/github.com/lab/memory/a.md"
+  "$L/session-end.sh"
+  check "committed" eq "$(git -C "$LEDGER_ROOT" log -1 --format=%s)" "chore(memory): sync session memory"
+}
+
 test_end_hook_survives_push_failure() {
   mkdir -p "$LEDGER_ROOT/github.com/lab/memory"; echo m >"$LEDGER_ROOT/github.com/lab/memory/a.md"
   rm -rf "$T/origin.git"
