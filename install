@@ -52,7 +52,7 @@ done
 
 echo ">> Linking agent skills"
 mkdir -p "$HOME/.claude/skills"
-for SKILL in "$HOME"/.config/agents/skills/loop-*(/N); do
+for SKILL in "$HOME"/.config/agents/skills/*(/N); do
     ln -sfn "$SKILL" "$HOME/.claude/skills/${SKILL:t}"
 done
 

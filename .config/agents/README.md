@@ -7,6 +7,7 @@ Agent configuration shared by every coding agent on this machine.
 | `rules` | User-wide agent rules. `~/.claude/CLAUDE.md` links here. |
 | `loop.md` | User-wide settings for the agent loop. |
 | `skills/loop-*` | The agent loop skillset. `~/.claude/skills/loop-*` link here. |
+| `skills/ledger` | Central bookkeeping (plans, open items, memory) in `~/Code/code.segfault.me/alxbl/ledger`. Skill plus SessionStart/SessionEnd hooks. |
 | `tests/` | Tests for the loop scripts, and the test plan. |
 
 ## Agent loop
@@ -48,7 +49,7 @@ Roles run as fresh headless `claude -p` sessions, so each starts with a clean co
 
 Once per machine:
 ```sh
-cd ~/.claude/skills && for s in ~/.config/agents/skills/loop-*; do ln -sfn "$s" "${s:t}"; done
+cd ~/.claude/skills && for s in ~/.config/agents/skills/*(/); do ln -sfn "$s" "${s:t}"; done
 ```
 Needs `gh` (authenticated), `jq`, `flock`, `git`, and `claude`. tmux is optional; loops get their own windows when it is present.
 

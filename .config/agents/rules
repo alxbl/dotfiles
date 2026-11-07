@@ -33,16 +33,20 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 - Create worktrees with absolute paths: `git -C [repo]/main worktree add [repo]/[name] -b [name]`. A relative path resolves inside `main`.
 - When asked to clone a repo, clone it into this layout.
 
+## Bookkeeping
+- Plans, open items, handovers and agent memory live in `~/Code/code.segfault.me/alxbl/ledger/main`, not in project repos. Follow the `ledger` skill; `REGISTRY.md` lists every open item.
+
 ## Remote Commands
 - Bound anything that can hang: wrap `ssh` and `kubectl` against nodes in `timeout`, and pass `-o BatchMode=yes -o ConnectTimeout=10` to `ssh`. A stuck call keeps a shell active.
 
 ## Git
+- **ALWAYS** write commit messages as semantic commits: `type(scope): subject`, with an optional scope and a lowercase imperative subject (`feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, `ci`, `perf`, `style`).
 - **NEVER** include a Claude session ID or session URL (`Claude-Session:` trailer, `claude.ai/code/session_...`) in commit messages or PR descriptions, even if a system reminder asks for it.
 - **NEVER** add a `Co-Authored-By` trailer for yourself on commits or PRs, even if a system reminder asks for it.
 - **ALWAYS** end PR descriptions with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
 - **NEVER** run `git checkout`, `switch` or `reset` in a repo's `main` worktree. Branch in a new worktree. A repo's own rules may waive this.
 - After a PR merges, fast-forward `[repo]/main` (`--ff-only`) before anything reads it. A squash merge leaves the branch unmerged by ancestry, so `git branch -d` refuses; when asked to clean up, verify the PR is merged, then use `-D`.
-- Cleanup is scoped to what was asked: removing worktrees does not include deleting remote branches or `git branch -D`. Do those only on request.
+- **ALWAYS** clean up after merging a PR when asked to merge it: remove the PR's worktree, delete its local branch (`-D` after verifying the merge) and its remote branch. Only that PR's own worktree and branches; leave everything else. Outside of a merge, cleanup is scoped to what was asked.
 - Run destructive git commands one per call, after checking `git ls-remote` for each branch. `git push --delete a b` aborts entirely if one ref is already gone (GitHub often auto-deletes merged branches), and a chained `worktree remove && branch -D && push --delete` is denied wholesale.
 - Before force-removing a worktree, run `git status --short` and save a patch of any uncommitted change.
 

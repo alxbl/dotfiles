@@ -608,4 +608,7 @@ for t in "${names[@]}"; do
   teardown
 done
 echo "$PASS passed, $FAIL failed"
+if (( $# == 0 )); then
+  "$TESTS/ledger.sh" || FAIL=$((FAIL + 1))
+fi
 (( FAIL == 0 ))
