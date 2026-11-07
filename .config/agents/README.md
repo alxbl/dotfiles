@@ -113,4 +113,4 @@ Slot locks (`slot-<n>.lock`) are released by the OS when a loop dies. An issue l
 ~/.config/agents/tests/run.sh            # all tests
 ~/.config/agents/tests/run.sh test_poll_drain
 ```
-The tests use fake `gh` and `claude` from `tests/stubs/`; they touch no network. [`tests/TESTPLAN.md`](tests/TESTPLAN.md) covers everything beyond them.
+The tests use fake `gh` and `claude` from `tests/stubs/`; they touch no network.
