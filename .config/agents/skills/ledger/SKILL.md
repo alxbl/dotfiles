@@ -9,6 +9,8 @@ Repo: `~/Code/code.segfault.me/alxbl/ledger/main` (private, `code.segfault.me/al
 
 Project path: `<host>/<repo>` drops the user/org (`~/Code/github.com/alxbl/lab` is `github.com/lab`, `~/Code/code.segfault.me/alxbl/fgj` is `code.segfault.me/fgj`). Third-party clones have no entry.
 
+Always fully qualify a repository in the registry, plans and commit messages as `<host>/<owner>/<repo>` (e.g. `github.com/alxbl/aur`), never bare `alxbl/aur`: the same path exists on several hosts and one may be a stale mirror.
+
 ## Do this
 1. **Start:** `git -C <ledger> pull --rebase --autostash`, then read the project's `## <host>/<repo>` section of `REGISTRY.md`. The SessionStart hook already does both and prints the section.
 2. **Plan approved:** copy it from `~/.claude/plans/` to `<host>/<repo>/plans/<topic>.md` (topic name, not the random slug), then add or update its items in the registry with a link to it.

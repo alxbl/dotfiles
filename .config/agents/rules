@@ -32,6 +32,8 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 - Worktree names are concise and meaningful. A change spanning multiple repositories uses the same worktree name in each.
 - Create worktrees with absolute paths: `git -C [repo]/main worktree add [repo]/[name] -b [name]`. A relative path resolves inside `main`.
 - When asked to clone a repo, clone it into this layout.
+- **Mirrors:** `code.segfault.me/alxbl/aur` and `code.segfault.me/alxbl/lab` are read-only mirrors of `github.com/alxbl/aur` and `github.com/alxbl/lab`, synced every 24h. Never clone, branch, or judge state from them. Use `~/Code/github.com/alxbl/[repo]`, and clone it from GitHub if it is missing. Before saying something is absent from a repo, check the host of its `origin`.
+- Always name a repository with its host and owner (`github.com/alxbl/aur`), never bare (`alxbl/aur`): the same path can exist on several hosts, and one may be a stale mirror.
 
 ## Bookkeeping
 - Plans, open items, handovers and agent memory live in `~/Code/code.segfault.me/alxbl/ledger/main`, not in project repos. Follow the `ledger` skill; `REGISTRY.md` lists every open item.
