@@ -8,6 +8,7 @@ Agent configuration shared by every coding agent on this machine.
 | `loop.md` | User-wide settings for the agent loop. |
 | `skills/loop-*` | The agent loop skillset. `~/.claude/skills/loop-*` link here. |
 | `skills/ledger` | Central bookkeeping (plans, open items, memory) in `~/Code/code.segfault.me/alxbl/ledger`. Skill plus SessionStart/SessionEnd hooks. |
+| `skills/fgj` | Using `fgj`, the gh-compatible Forgejo CLI: traps and differences from gh. Source: `code.segfault.me/alxbl/fgj`. |
 | `tests/` | Tests for the loop scripts, and the test plan. |
 
 ## Agent loop
