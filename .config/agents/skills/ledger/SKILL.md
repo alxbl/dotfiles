@@ -22,4 +22,5 @@ Project path: `<host>/<repo>` drops the user/org (`~/Code/github.com/alxbl/lab` 
 - Plans, todos, handovers, prompts and research go to the ledger, not into the project repo. Durable docs (ADRs, HLDs, READMEs, runbooks) stay in the repo.
 - Never renumber or reuse IDs. A new project gets a section with its own counter.
 - Verify an item's state (issue, PR, cluster) before carrying it over or closing it.
+- Check any claim about outside state (a package, tag, release, server, sandbox or issue) against its source in the same sitting before writing it into the ledger, a commit or a PR text. Do not write an unchecked claim as fact, and do not copy one from an older note.
 - Keep secrets, tokens and key material out of the ledger.

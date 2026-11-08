@@ -49,6 +49,7 @@ Applies to all agents and projects. Project-level CLAUDE.md files supplement thi
 - **ALWAYS** clean up after merging a PR when asked to merge it: remove the PR's worktree, delete its local branch (`-D` after verifying the merge) and its remote branch. Only that PR's own worktree and branches; leave everything else. Outside of a merge, cleanup is scoped to what was asked.
 - Run destructive git commands one per call, after checking `git ls-remote` for each branch. `git push --delete a b` aborts entirely if one ref is already gone (GitHub often auto-deletes merged branches), and a chained `worktree remove && branch -D && push --delete` is denied wholesale.
 - Before force-removing a worktree, run `git status --short` and save a patch of any uncommitted change.
+- **ALWAYS** ask before creating a repository on a git server, even a throwaway probe or test fixture: say why, what it will hold and when it will be deleted. If a permission check denies it, ask the user instead of working around it. Delete what you created when done and confirm it is gone.
 
 ## Shell
 - The interactive shell is zsh: unquoted variables do not word-split and `mapfile` does not exist. Run repo scripts and bash snippets with `bash -c`, and never report a check as passing from a zsh run.
